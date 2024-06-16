@@ -10,3 +10,10 @@ git add .
 git commit -m "comment"
 git push
 ```
+
+
+## TODO
+- [ ] Move scripts, links are now broken.
+- [ ] streamio: /assets/images/acl-attack-graph.png (404: Not Found).
+- [ ] Fix writeups from Search and after.
+- [ ] Some errors in the text on Health, StreamIO, Trick and Late.
