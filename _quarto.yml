@@ -1,0 +1,27 @@
+project:
+  type: website
+  
+website:
+  title: ""
+  site-url: https://exploit.se
+  favicon: "favicon.ico"
+  navbar:
+    logo: "static/exploit_white-orange.png"
+    right:
+      - text: Home
+        href: index.qmd
+      - text: Notes
+        href: "https://0xpthree.gitbook.io/notes"
+      - text: About
+        href: about.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: 
+      - scss/styles.css
+      - scss/bootstrap-dark.min.css
+      - scss/quarto-syntax-highlighting-dark.css
+      - scss/bootstrap-icons.css
+      
+editor: visual

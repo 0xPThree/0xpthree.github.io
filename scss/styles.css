@@ -1,0 +1,45 @@
+button {
+	cursor: pointer;
+	color: var(--bs-body-color)
+}
+
+textarea {
+	color: var(--bs-body-color)
+}
+
+input {
+	color: var(--bs-body-color)
+}
+
+.lead {
+	font-size: 1.0rem;
+}
+
+.quarto-title-banner {
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.navbar-brand > img {
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: auto;
+    max-height: 3rem;
+    max-width: 100%;
+    width: auto;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.navbar-brand-container {
+    max-width: none;
+}
+
+.nav-link, .dropdown-item {
+    font-family: 'Lato', 'Inconsolata',sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}

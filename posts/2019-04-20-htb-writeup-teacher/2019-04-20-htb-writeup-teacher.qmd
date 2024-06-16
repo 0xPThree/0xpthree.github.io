@@ -1,0 +1,18 @@
+---
+title: Teacher - Hack The Box
+author: "0xPThree"
+description: "NO WRITEUP AVAILABLE!"
+date: 2019-04-20
+image: images/teacher_logo.png
+categories: [hackthebox, ]
+format: html
+editor: visual
+jupyter: python3
+toc: true
+---
+
+![](images/teacher_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
+
+No writeup available..<br><br><br><br><br><br><br>
+
+----------------

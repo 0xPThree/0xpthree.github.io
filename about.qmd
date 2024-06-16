@@ -1,0 +1,21 @@
+---
+title: "0xPThree"
+image: "static/avatar.png"
+about:
+  image-shape: rectangle
+  template: jolla
+  links:
+    - icon: discord
+      text: Discord
+      href: https://discord.gg/Sa4mFEXGEz
+    - icon: github
+      text: Github
+      href: https://github.com/0xpthree
+    - icon: signal
+      text: Signal
+      href: https://signal.me/#eu/PjVScis0spvu9_S_xNysergThKuqsWQFOwQ7xisr7HJgaJT69xC0Ku2fo3Ng0B1
+---
+
+Pentester with a background as Network Architect. Specialized in hacking UNIX-like devices, with a passion for routers, NAS devices and everything IOT really. Hit me up on Signal or join my (_empty_) Discord channel if you need anything.
+
+✅ 2022-09-16: Rank 1, Sweden, @HackTheBox
