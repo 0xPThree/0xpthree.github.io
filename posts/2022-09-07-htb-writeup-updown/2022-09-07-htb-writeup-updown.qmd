@@ -285,7 +285,11 @@ pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped
 
 Our normal one-line webshell are hurting since `system`, `passthru`, `shell_exec`, `exec`, `popen` and `pcntl_exec` are all disabled, however `proc_open` is not. Here's a list of [dangerous php functions](https://gist.github.com/mccabe615/b0907514d34b2de088c4996933ea1720).
 
-To stream line this process I wrote a script to write a malicious `.phar` file, upload the it to the target and gather the data. The script have two flags.. .. `-c` / `--command` for command injection .. `-r` / `reverse` automatically trigger a reverse shell
+To stream line this process I wrote a script to write a malicious `.phar` file, upload the it to the target and gather the data. The script have two flags.. 
+
+.. `-c` / `--command` for command injection 
+
+.. `-r` / `reverse` automatically trigger a reverse shell
 
 ``` bash
 ➜  updown python3 updown_rce.py -c "hostname && id"

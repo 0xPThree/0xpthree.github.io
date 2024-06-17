@@ -12,7 +12,7 @@ toc: true
 ---
 # USER
 
-### Step 1
+### Step 1 - Basic enumeration
 
 **nmap:**
 
@@ -140,6 +140,7 @@ We can request a user account for new employees at `/newuser.html`, this might b
 `/salesorders.html` shows us how to enable debugging for the sales order app. Possible that we can extract sensitive information from the app.
 
 `/passwords.html` gives us a huge piece of information, passwords might be set to be the same as username: 
+
 > *"Our self service password reset system will be up and running soon but in the meantime please call the IT support line and we will reset your password. If no one is available please leave a message stating your username and we will reset your **password to be the same as the username.**"*
 
 **port 4411:** 
@@ -320,7 +321,7 @@ Host scrm.local not found: 5(REFUSED)
 ; Transfer failed.
 ```
 
-### Step 2
+### Step 2 - Kerberoast
 With all the "normal" enumeration coming up short, I decide to dig deeper into the hints from the webpage especially username and password being the same. We have the user `ksimpson`, lets try if his password is set to be the same.
 
 ``` bash
@@ -408,7 +409,7 @@ Status...........: Cracked
 
 Notice the username `sqlsvc`, we've just cracked credentials for SQL - `sqlsvc:Pegasus60`
 
-### Step 3
+### Step 3 - More secrets
 We've got a username, TGT and password, meaning now we should be able to enumerate more services.
 Trying to enumerate SMB with `smbclient` fails:
 
@@ -459,7 +460,7 @@ drw-rw-rw-          0  Thu Nov  4 23:23:19 2021 ..
 
 The first vulnerability we already knew about since it was made public on the intranet (port 80), however the SQL information is new. This sounds perfect for us, as we just extracted and cracked the TGT for user `sqlsvc` - how do we exploit this?
 
-### Step 4
+### Step 4 - Silvet Ticket
 
 Reading about Silver ticket attacks the requirements are knowledge of: 
 
@@ -544,7 +545,7 @@ Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
 
 Testing to connect to the MsSQL service we fail, even though we exported the ticket..
 
-```         
+```bash
 ➜  scrambled export KRB5CCNAME=Administrator.ccache
 ➜  scrambled impacket-mssqlclient dc1.scrm.local -k
 Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
@@ -555,7 +556,7 @@ Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
 
 I got stuck here for a while before I noticed that I forgot the **SPN** when creating my impersonated Administrator ticket. Reading the [Microsoft docs](https://docs.microsoft.com/en-us/sql/relational-databases/native-client/features/service-principal-name-spn-support-in-client-connections?view=sql-server-ver16#specifying-the-spn) the SPN format is `MSSQLSvc/fqdn`, so lets re-create the ticket.
 
-``` bash
+```bash
 ➜  scrambled impacket-ticketer -nthash B999A16500B87D17EC7F2E2A68778F05 -domain-sid S-1-5-21-2743207045-1827831105-2542523200 -domain scrm.local -spn MSSQLSvc/dc1.scrm.local -user-id 500 Administrator
 Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
 
@@ -589,7 +590,7 @@ SQL>
 
 It works! We're connected to the SQL Service.
 
-### Step 5
+### Step 5 - MSSQL
 
 Enumerate the SQL Service:
 
@@ -690,7 +691,7 @@ PS C:\Users\miscsvc\Desktop> type user.txt
 ------------------------------------------------------------------------
 
 # ROOT
-### Step 1
+### Step 1 - More enumeration
 
 Looking on `miscsvc`'s privileges nothing stands out, however there are two custom groups added.
 
@@ -801,7 +802,7 @@ CertUtil: -encode command completed successfully.
 ➜  scrambled cat ScrambleLib.dll.b64| base64 -d > ScrambleLib.dll
 ```
 
-### Step 2
+### Step 2 - Dig deep with ilspy / DNSpy
 
 Analyze `.exe` and `.dll` with `ilspy` or `DNSpy` in a Windows VM. Briefly looking over the `.dll` we find static methods for serializing and deserializing data:
 

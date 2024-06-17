@@ -15,7 +15,7 @@ toc: true
 
 ### Step 1
 
-```         
+```bash
 ➜  /htb nmap -Pn -n -p- 10.10.11.172
 PORT    STATE SERVICE
 22/tcp  open  ssh
@@ -50,7 +50,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Port 80 is redirecting to `http://shared.htb` and from there to `https://shared.htb`
 
-```         
+```r
 ➜  /htb curl -kvs -L http://10.10.11.172
 *   Trying 10.10.11.172:80...
 * Connected to 10.10.11.172 (10.10.11.172) port 80 (#0)
@@ -69,7 +69,7 @@ Port 80 is redirecting to `http://shared.htb` and from there to `https://shared.
 * Issue another request to this URL: 'https://shared.htb/'
 ```
 
-```         
+```bash
 ➜  webanalyze ./webanalyze -host https://shared.htb
 https://shared.htb (0.7s):
     Nginx, 1.18.0 (Web servers, Reverse proxies)
@@ -336,7 +336,7 @@ dan_smith@shared:/var/www/shared.htb/ps/app/config$ cat parameters.php
 
 Testing all found passwords with all found users, including standard username ["default"](https://redis.io/commands/auth/), all fails.. But after a while of testing I noticed something interesting, when running the binary `redis_connector_dev` they start the service with an interesting line:
 
-```         
+```bash
 dan_smith@shared:/var/www/shared.htb/ps/app/config$ /usr/local/bin/redis_connector_dev
 [+] Logging to redis instance using password...
 

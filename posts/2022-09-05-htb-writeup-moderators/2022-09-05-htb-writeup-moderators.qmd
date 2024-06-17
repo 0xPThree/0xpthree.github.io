@@ -494,7 +494,7 @@ lexi@moderators:~$
 
 We are now able to read `wp-config.php`:
 
-```         
+```bash
 lexi@moderators:/opt/site.new$ cat wp-config.php
 [... snip ...]
 /** MySQL database username */
