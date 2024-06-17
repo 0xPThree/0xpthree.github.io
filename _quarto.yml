@@ -1,8 +1,10 @@
 project:
   type: website
-  
+  output-dir: docs
+
 website:
   title: ""
+  google-analytics: G-XVW5CQ7DG5
   site-url: https://exploit.se
   favicon: "favicon.ico"
   navbar:

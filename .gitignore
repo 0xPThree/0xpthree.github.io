@@ -1,5 +1,6 @@
-_site
+/_site/
 .Rproj.user
-.quarto
+/.quarto/
 .Rhistory
-_freeze
+/_freeze/
+exploit_quarto-book.Rproj

