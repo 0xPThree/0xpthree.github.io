@@ -1,7 +1,9 @@
 # Exploit.se based on Quarto
 Inspiration borrowed from: [Graynoise](https://www.labs.greynoise.io/grimoire/)
 
-Use `RStudio` to edit and render `.qmd` -> `html`. OSS Code's Quarto extension segfaults making it unusable (for now).
+Render all documents using `quarto render`, render only changes using `quarto preview`.
+
+OSS Code's Quarto extension segfaults making it unusable (for now).
 
 
 ```
@@ -13,6 +15,7 @@ git push
 
 
 ## TODO
+- [x] Add Google Analytics
 - [ ] Move scripts, links are now broken.
 - [ ] streamio: /assets/images/acl-attack-graph.png (404: Not Found).
 - [ ] Fix writeups from Search and after.
