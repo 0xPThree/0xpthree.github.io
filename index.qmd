@@ -5,6 +5,7 @@ listing:
   type: grid
   fields: [image, date, title, reading-time, description]
   categories: true
+  feed: true
   sort-ui: true
   filter-ui: false
 page-layout: full

@@ -3,13 +3,15 @@ project:
   output-dir: docs
 
 website:
-  title: ""
-  google-analytics: G-XVW5CQ7DG5
+  title: "Exploit.se"
+  description: "Writeups and articles about cyber security / hacking."
   site-url: https://exploit.se
   site-path: 'docs'
   favicon: "favicon.ico"
+  google-analytics: G-XVW5CQ7DG5
   navbar:
     logo: "static/exploit_white-orange.png"
+    title: false
     right:
       - text: Home
         href: index.qmd
@@ -17,6 +19,17 @@ website:
         href: "https://0xpthree.gitbook.io/notes"
       - text: About
         href: about.qmd
+  page-footer:
+    center:
+      - text: "© 2024 0xPThree - All Rights Reserved."
+    right:
+      - icon: signal
+        href: https://signal.me/#eu/PjVScis0spvu9_S_xNysergThKuqsWQFOwQ7xisr7HJgaJT69xC0Ku2fo3Ng0B1
+      - icon: github
+        href: https://github.com/0xpthree
+      - icon: rss
+        href: index.xml
+
 
 format:
   html:
