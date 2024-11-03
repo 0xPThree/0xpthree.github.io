@@ -520,4 +520,12 @@
     <loc>https://exploit.se/posts/2021-03-23-htb-writeup-delivery/2021-03-23-htb-writeup-delivery.html</loc>
     <lastmod>2024-06-16T09:38:04.486Z</lastmod>
   </url>
+  <url>
+    <loc>https://exploit.se/test.html</loc>
+    <lastmod>2024-11-03T11:09:30.546Z</lastmod>
+  </url>
+  <url>
+    <loc>https://exploit.se/writeups.html</loc>
+    <lastmod>2024-06-23T16:08:35.337Z</lastmod>
+  </url>
 </urlset>

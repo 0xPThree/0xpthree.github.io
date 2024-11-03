@@ -13,8 +13,8 @@ website:
     logo: "static/exploit_white-orange.png"
     title: false
     right:
-      - text: Home
-        href: index.qmd
+      - text: Writeups
+        href: writeups.qmd
       - text: Notes
         href: "https://0xpthree.gitbook.io/notes"
       - text: About
