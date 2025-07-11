@@ -1,7 +1,7 @@
 project:
   type: website
   resources:
-    - public/**
+    - assets/**
 
 website:
   title: "Exploit.se"
