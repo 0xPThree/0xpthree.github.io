@@ -23,14 +23,30 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Cache Python packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          python -m pip install jupyter nbformat
+          pip install -r requirements.txt
+
+      - name: Cache R packages
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-packages-${{ hashFiles('**/*.R', '**/*.r', '**/DESCRIPTION') }}
+          restore-keys: |
+            ${{ runner.os }}-r-packages-
 
       - name: Install R packages
         run: |
-          Rscript -e 'install.packages(c("quarto", "rmarkdown", "knitr"))'
+          Rscript -e 'install.packages(c("quarto", "rmarkdown", "knitr"), repos="https://cloud.r-project.org")'
 
       - name: Render the Quarto site
         run: quarto render

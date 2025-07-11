@@ -1,7 +1,7 @@
 ---
 title: Backdoor - Hack The Box
 author: "0xPThree"
-description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+description: "The WordPress site had a directory traversal vulnerability in an ebook plugin allowing access to sensitive files and discovery of a running gdbserver, which was exploited for a user shell. Privilege escalation was achieved by attaching to a root-owned SUID screen session, granting full root access."
 date: 2021-11-23
 image: images/backdoor_logo.png
 categories: [hackthebox, linux]
@@ -10,13 +10,6 @@ editor: visual
 jupyter: python3
 toc: true
 ---
-
-![](images/backdoor_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
-
-"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-<br>
-
-----------------
 
 # USER
 

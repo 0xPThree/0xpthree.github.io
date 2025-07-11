@@ -1,7 +1,7 @@
 ---
 title: Shibboleth - Hack The Box
 author: "0xPThree"
-description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+description: "The Shibboleth box was vulnerable to an IPMI Cipher Zero bypass, revealing the Administrator password. Using it, access to Zabbix was gained, allowing command execution and a shell as the zabbix user. Password reuse gave access to ipmi-svc, where MariaDB credentials were found. Exploiting a MariaDB vulnerability led to root access and the root flag."
 date: 2021-11-23
 image: images/shibboleth_logo.png
 categories: [hackthebox, linux]
