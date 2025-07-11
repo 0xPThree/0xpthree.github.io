@@ -1,6 +1,28 @@
-/_site/
-.Rproj.user
-/.quarto/
+# R specific
+.Rproj.user/
 .Rhistory
-/_freeze/
-exploit_quarto-book.Rproj
+.RData
+.Ruserdata
+
+# Quarto and Pandoc
+.quarto/
+_cache/
+_cache2/
+
+# Quarto output folders (don’t commit rendered site)
+_site/
+docs/
+
+# Other Quarto-related artifacts (if any)
+_freeze/
+
+# OS files (optional but recommended)
+.DS_Store
+Thumbs.db
+
+# Editor folders (optional)
+.vscode/
+.idea/
+
+# Misc
+.exploit_quarto-book.Rproj
