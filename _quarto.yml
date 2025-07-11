@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - public/**
 
 website:
   title: "Exploit.se"
@@ -8,7 +10,7 @@ website:
   favicon: "favicon.ico"
   google-analytics: G-XVW5CQ7DG5
   navbar:
-    logo: "static/exploit_white-orange.png"
+    logo: "assets/images/exploit_white-orange.png"
     title: false
     right:
       - text: Writeups

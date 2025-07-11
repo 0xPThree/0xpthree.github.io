@@ -1,6 +1,6 @@
 ---
 title: "0xPThree"
-image: "static/avatar.png"
+image: "assets/images/avatar.png"
 about:
   image-shape: rectangle
   template: jolla
