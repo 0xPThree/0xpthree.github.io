@@ -1,88 +1,148 @@
 <!DOCTYPE html>
-<html>
-  <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width initial-scale=1" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="robots" content="noindex">
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="noindex" />
   <title>exploit</title>
-  <meta name="description" content="Security, CTFs and other projects">
-  <meta name="author" content="0xPThree">
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Security, CTFs and other projects" />
+  <meta name="author" content="0xPThree" />
+  <meta name="theme-color" content="#000000" />
   <meta property="og:site_name" content="0xPThree" />
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="0xPThree">
-  <meta property="og:description" content="Security, CTFs and other projects">
-  <meta name="msapplication-TileColor" content="#ffc40d">
-  <meta name="msapplication-TileImage" content="/favicon.ico">
-  <meta name="theme-color" content="#ffffff">
-  <link href='https://fonts.googleapis.com/css?family=Roboto Mono' rel='stylesheet'>
-  
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="0xPThree" />
+  <meta property="og:description" content="Security, CTFs and other projects" />
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap" rel="stylesheet" />
+
   <style>
-    body, html {
+    html, body {
+      margin: 0;
       height: 100%;
-      margin:0;
+      background-color: #000;
+      font-family: 'Roboto Mono', monospace;
     }
 
     .bg {
       background-image: url("/assets/images/landing.jpg");
-      height: 100%; 
+      background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-size: cover;
+      height: 100%;
+      width: 100%;
+      position: relative;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.2);
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     .center {
-      margin: 0;
       position: absolute;
       top: 50%;
       left: 50%;
-      -ms-transform: translate(-50%, -50%);
       transform: translate(-50%, -50%);
+      z-index: 2;
     }
 
-    .button {
-      font-family: 'Roboto Mono';
-      font-size: 3vw;
-      background-color: #ff8c2f;
-      border: none;
-      color: white;
-      padding: 5px 20px;
-      text-align: center;
+    a {
       text-decoration: none;
-      display: inline-block;
-      transition-duration: 0.4s;
     }
 
-    .button:hover{
-      color:white
+    /* === Modern Flying Button from Uiverse.io === */
+    button {
+      font-family: inherit;
+      font-size: 20px;
+      background: #ff8c2f;
+      color: white;
+      padding: 0.7em 1em;
+      padding-left: 0.9em;
+      display: flex;
+      align-items: center;
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.2s;
+      cursor: pointer;
     }
 
-    .grow{
-      transition: .5s, color .10s;
-          -webkit-transition: .5s, color .10s;
-          -moz-transition: .5s, color .10s;
+    button span {
+      display: block;
+      margin-left: 0.3em;
+      transition: all 0.3s ease-in-out;
+      white-space: nowrap;
     }
-    .grow:hover{
-        transform: scale3d(1.2, 1.2, 0.3);
-            -webkit-transform: scale3d(1.2, 1.2, 0.3);
-            -moz-transform: scale3d(1.2, 1.2, 0.3);
+
+    .svg-wrapper-1 {
+      display: flex;
+    }
+
+    .svg-wrapper {
+      display: block;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    button svg {
+      display: block;
+      transform-origin: center center;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    button:hover .svg-wrapper {
+      animation: fly-1 0.6s ease-in-out infinite alternate;
+    }
+
+    button:hover svg {
+      transform: translateX(1.5em) rotate(45deg) scale(1.1);
+    }
+
+    button:hover span {
+      transform: translateX(5em);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes fly-1 {
+      from {
+        transform: translateY(0.1em);
+      }
+      to {
+        transform: translateY(-0.1em);
+      }
     }
   </style>
-  </head>
+</head>
 
-  <body>
-    <div class="bg" style="-webkit-background-size: cover;
-      -moz-background-size: cover;
-      -o-background-size: cover;background-size: cover;">
-      <div class="center">
-        <a href="writeups.html"><button class="button grow">Enter</button></a>
-      </div>
+<body>
+  <div class="bg">
+    <div class="overlay"></div>
+    <div class="center">
+      <a href="writeups.html">
+        <button>
+          <div class="svg-wrapper-1">
+            <div class="svg-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                <path fill="none" d="M0 0h24v24H0z"></path>
+                <path fill="currentColor"
+                      d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z">
+                </path>
+              </svg>
+            </div>
+          </div>
+          <span>Enter</span>
+        </button>
+      </a>
     </div>
-  </body>
+  </div>
+</body>
 </html>
 
