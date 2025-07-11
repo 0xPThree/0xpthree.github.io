@@ -105,8 +105,10 @@ Username or Password incorrect
 ### Step 2
 From our inital checks we found that GET requests on port 80 to `/maintenance/` got 302 Moved to `/nuxeo/Maintenance`, which is interesting. Playing some more we find that ..
 
-.. GET `/maintenance/..;/index.jsp` -> 302 Moved `/nuxeo/nxstartup.faces`<br>
-.. GET `/maintenance/..;/nuxeo/nxstartup.faces` -> 302 Moved `/nuxeo/login.jsp`<br>
+.. GET `/maintenance/..;/index.jsp` -> 302 Moved `/nuxeo/nxstartup.faces`
+
+.. GET `/maintenance/..;/nuxeo/nxstartup.faces` -> 302 Moved `/nuxeo/login.jsp`
+
 .. GET `/maintenance/..;/login.jsp` -> **200 Found**
 
 We have a login prompt, but no credentials. A quick google and the second result we find is a [authentication bypass rce](https://github.com/mpgn/CVE-2018-16341), which leverages SSTI. 
@@ -346,7 +348,8 @@ fbcd97c3cb51969565dfe241c1149a62
 
 -------------
 
-<br>
+
+
 
 # ROOT
 
@@ -526,10 +529,12 @@ In Ghidra we find a few interesting things..
 .. a login function containing username and a base64 encoded password in clear text
 ![](images/hancliffe03.png)
 
-.. encryption function `encrypt1`<br>
+.. encryption function `encrypt1`
+
 ![](images/hancliffe04.png)
 
-.. encryption function `encrypt2`<br>
+.. encryption function `encrypt2`
+
 ![](images/hancliffe05.png)
 
 Working our way backwards with the **login function** we can see that.. 
@@ -621,7 +626,8 @@ CORR: [97, 121, 88, 120, 59, 108, 108, 63, 124, 120, 59, 108, 90, 107, 57, 75, 3
 ```
 
 
-Looking for strings in the binary we find a few more interesting lines that might be usefull later.<br>
+Looking for strings in the binary we find a few more interesting lines that might be usefull later.
+
 ![](images/hancliffe07.png)
 
 
@@ -836,9 +842,12 @@ The EIP value is now **41326341**. Find the exact offset of the crash with eithe
 [*] Exact match at offset 66
 ```
 
-Modify the `bof.py` and ..<br>
-.. set **offset** variable to 66<br>
-.. set **retn** varible to "BBBB"<br>
+Modify the `bof.py` and ..
+
+.. set **offset** variable to 66
+
+.. set **retn** varible to "BBBB"
+
 .. clear the payload variable
 
 ```bash
@@ -851,7 +860,8 @@ padding = ""
 payload = ""
 ```
 
-Run `bof.py` again and the EIP should now be equal to **42424242**, the hex value of "BBBB", meaning we controll EIP.<br>
+Run `bof.py` again and the EIP should now be equal to **42424242**, the hex value of "BBBB", meaning we controll EIP.
+
 ![](images/hancliffe10.png)
 
 -----
@@ -885,7 +895,8 @@ In **x64dbg**, we can do this by inspecting the `Memory Map` tab and looking at 
 
 Unfortunate for us, all DLL's are protected and we have to bypass ASLR somehow. We have two options..
 
-.. find a JMP ESP within the EXE itself.<br>
+.. find a JMP ESP within the EXE itself.
+
 .. create your own malicious DLL and inject it into the program.
 
 The easiest of the two would be to find a jump point within the EXE, so lets go with that.
@@ -995,7 +1006,8 @@ except:
     print("Could not connect.")
 ```
 
-If we execute the exploit again, we will now find ourselves in the 66 byte NOP sled that precedes the initial EIP overwrite:<br>
+If we execute the exploit again, we will now find ourselves in the 66 byte NOP sled that precedes the initial EIP overwrite:
+
 ![](images/hancliffe20.png)
 
 ---------------
@@ -1271,24 +1283,36 @@ type C:\Users\Administrator\Desktop\root.txt
 ------
 
 # References
-**nginx parser logic:**<br>
+**nginx parser logic:**
+
 <https://i.blackhat.com/us-18/Wed-August-8/us-18-Orange-Tsai-Breaking-Parser-Logic-Take-Your-Path-Normalization-Off-And-Pop-0days-Out-2.pdf>
 
-**nuxeo authentication bypass rce:**<br>
+**nuxeo authentication bypass rce:**
+
 <https://github.com/mpgn/CVE-2018-16341>
 
-**firefox decrypt:**<br>
+**firefox decrypt:**
+
 <https://github.com/unode/firefox_decrypt>
 
-**ascii, hex, bin, dec, converter:**<br>
+**ascii, hex, bin, dec, converter:**
+
 <https://www.rapidtables.com/convert/number/ascii-hex-bin-dec-converter.html>
 
-**buffer overflow:**<br>
-<https://rastating.github.io/using-socket-reuse-to-exploit-vulnserver/><br>
-<https://liodeus.github.io/2020/08/11/bufferOverflow.html><br>
-<https://0xrick.github.io/binary-exploitation/bof5/><br>
-<https://security.stackexchange.com/questions/236956/buffer-overflow-mona-modules-all-show-rebase-safeseh-aslr-true><br>
-<https://blog.devgenius.io/buffer-overflow-tutorial-part4-1e80e90a2f03><br>
-<https://vulp3cula.gitbook.io/hackers-grimoire/exploitation/buffer-overflow><br>
-<https://snowscan.io/htb-writeup-bighead/#><br>
-<http://mislusnys.github.io/post/htb-bighead/><br>
+**buffer overflow:**
+
+<https://rastating.github.io/using-socket-reuse-to-exploit-vulnserver/>
+
+<https://liodeus.github.io/2020/08/11/bufferOverflow.html>
+
+<https://0xrick.github.io/binary-exploitation/bof5/>
+
+<https://security.stackexchange.com/questions/236956/buffer-overflow-mona-modules-all-show-rebase-safeseh-aslr-true>
+
+<https://blog.devgenius.io/buffer-overflow-tutorial-part4-1e80e90a2f03>
+
+<https://vulp3cula.gitbook.io/hackers-grimoire/exploitation/buffer-overflow>
+
+<https://snowscan.io/htb-writeup-bighead/#>
+
+<http://mislusnys.github.io/post/htb-bighead/>

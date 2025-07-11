@@ -169,9 +169,11 @@ if($_POST['check']){
         if(!preg_match("#file://#i",$site) && !preg_match("#data://#i",$site) && !preg_match("#ftp://#i",$site)){
             $check=isitup($site);
             if($check){
-                echo "<center>{$site}<br><font color='green'>is up ^_^</font></center>";
+                echo "<center>{$site}
+<font color='green'>is up ^_^</font></center>";
             }else{
-                echo "<center>{$site}<br><font color='red'>seems to be down :(</font></center>";
+                echo "<center>{$site}
+<font color='red'>seems to be down :(</font></center>";
             }   
         }else{
             echo "<center><font color='red'>Hacking attempt was detected !</font></center>";
@@ -188,7 +190,8 @@ Index.php:
 ``` bash
 ➜  dev git:(main) cat index.php
 <b>This is only for developers</b>
-<br>
+
+
 <a href="?page=admin">Admin Panel</a>
 <?php
     define("DIRECTACCESS",false);

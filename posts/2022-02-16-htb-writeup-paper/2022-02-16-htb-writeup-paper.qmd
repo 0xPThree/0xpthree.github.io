@@ -131,9 +131,13 @@ Looking for WP 5.2.3 vulnerabilities we find a unauthed view of private posts.
 WordPress Core < 5.2.3 - Viewing Unauthenticated/Password/Private Posts                    | multiple/webapps/47690.md
 ```
 
-Reading about the vulnerability it is as simple as adding `?static=1` to view posts. <br> `http://office.paper/?static=1` gives us:
+Reading about the vulnerability it is as simple as adding `?static=1` to view posts. 
+ `http://office.paper/?static=1` gives us:
 
-> "Micheal please remove the secret from drafts for gods sake!"<br> "Michael, you have to stop putting secrets in the drafts."<br> "\# Secret Registration URL of new Employee chat system http://chat.office.paper/register/8qozr226AhkCHZdyY"<br> "\# I am keeping this draft unpublished, as unpublished drafts cannot be accessed by outsiders."
+> "Micheal please remove the secret from drafts for gods sake!"
+ "Michael, you have to stop putting secrets in the drafts."
+ "\# Secret Registration URL of new Employee chat system http://chat.office.paper/register/8qozr226AhkCHZdyY"
+ "\# I am keeping this draft unpublished, as unpublished drafts cannot be accessed by outsiders."
 
 Use the provided link and create an account to the rocket.chat platform.
 

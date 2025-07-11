@@ -11,11 +11,6 @@ jupyter: python3
 toc: true
 ---
 
-![](images/querier_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
-
-N/A<br><br><br><br><br><br><br>
-
-----------------
 
 # USER
 
@@ -38,7 +33,9 @@ python mssqlclient.py querier/mssql-svc:corporate568@10.10.10.125 -windows-auth
 ```
 
 --------
-<br><br>
+
+
+
 # ROOT
 
 

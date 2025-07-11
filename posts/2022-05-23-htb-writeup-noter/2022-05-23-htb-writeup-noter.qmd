@@ -173,7 +173,8 @@ mget app_backup_1638395546.zip? y
 
 ### Step 4
 
-Review the backup files **`app_backup_1638395546`** and we find.. <br> .. **MySQL Config - `app.py`**
+Review the backup files **`app_backup_1638395546`** and we find.. 
+ .. **MySQL Config - `app.py`**
 
 ``` bash
 app.config['MYSQL_HOST'] = 'localhost'
@@ -182,7 +183,8 @@ app.config['MYSQL_PASSWORD'] = 'DB_password'
 app.config['MYSQL_DB'] = 'app'
 ```
 
-Review the older backup, **`app_backup_1635803546`**, and we find.. <br> .. **MySQL Config - `app.py`**
+Review the older backup, **`app_backup_1635803546`**, and we find.. 
+ .. **MySQL Config - `app.py`**
 
 ``` bash
 app.config['MYSQL_HOST'] = 'localhost'
@@ -369,4 +371,6 @@ blue:$6$pNud9u/1PdD8qPYi$cSe5FPCRGH5xjUiEMJ5tXSclSrWSz7gimtR2IcXiiVk0xNfSACcVgU3
 
 # References
 
-**Privesc, MySQL User Defined Functions**<br> https://medium.com/r3d-buck3t/privilege-escalation-with-mysql-user-defined-functions-996ef7d5ceaf<br> https://www.exploit-db.com/exploits/1518
+**Privesc, MySQL User Defined Functions**
+ https://medium.com/r3d-buck3t/privilege-escalation-with-mysql-user-defined-functions-996ef7d5ceaf
+ https://www.exploit-db.com/exploits/1518

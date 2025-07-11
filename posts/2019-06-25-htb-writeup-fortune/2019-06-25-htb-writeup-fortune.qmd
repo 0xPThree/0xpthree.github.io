@@ -11,11 +11,7 @@ jupyter: python3
 toc: true
 ---
 
-![](images/fortune_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
 
-N/A<br><br><br><br><br><br><br>
-
-----------------
 
 
 # USER
@@ -114,7 +110,8 @@ openssl pkcs12 -export -out bob.p12 -inkey bob.key -in bob.crt -certfile ../bob/
 openssl pkcs12 -export -out charlie.p12 -inkey charlie.key -in charlie.crt -certfile ../bob/ca/intermediate/certs/intermediate.cert.pem
 ```
 
-Importera charlie.p12 i Firefox och surfa in på https://10.10.10.127 för att få SSH key pair<br>
+Importera charlie.p12 i Firefox och surfa in på https://10.10.10.127 för att få SSH key pair
+
 `options -> preferences -> advanced -> certificates -> view certificates -> your certificates -> import -> select charlie.p12 -> ok`
 
 Tryck på "generate" och spara ner public key i `/root/.ssh/id_rsa.pub` (perm 644) samt private i `/root/.ssh/id_rsa` (perm 600)

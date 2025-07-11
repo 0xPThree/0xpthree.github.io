@@ -174,7 +174,8 @@ sharp
 ```
 
 ----------
-<br>
+
+
 ### Step 2
 Trying to dump hashes with GetNPUsers we find that **`hope.sharp`** is a valid user, however PREAUTH is not set.
 ```powershell

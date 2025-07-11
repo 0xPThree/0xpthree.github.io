@@ -11,11 +11,7 @@ jupyter: python3
 toc: true
 ---
 
-![](images/writeup_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
 
-N/A<br><br><br><br><br><br><br>
-
-----------------
 
 # ROOT
 
@@ -38,9 +34,13 @@ Noticed that both `/usr/local/bin` and `/usr/bin` is before `/bin` in order of s
 Start `nc` on local host, log out and in again from `jkr@writeup` to trigger scripts and boom - reverse root shell.
 
 
-> **INFO ABOUT PATH:**<br>
-> **Q:** If there are multiple executable files in PATH with the same name which one is preferred?<br>
-> **A:** It stops at the first one it finds, reading $PATH left to right.<br>
+> **INFO ABOUT PATH:**
+
+> **Q:** If there are multiple executable files in PATH with the same name which one is preferred?
+
+> **A:** It stops at the first one it finds, reading $PATH left to right.
+
 >
-> **Q:** Is current directory included in the search when file is executed?<br>
+> **Q:** Is current directory included in the search when file is executed?
+
 > **A:** If the current directory is in PATH then it is searched. Remember that an empty directory in PATH includes the current directory. e.g. PATH=:/usr/bin (leading empty) PATH=/usr/bin: (trailing empty) and PATH=/usr/bin::/bin (middle empty) will all effectively include current working directory.

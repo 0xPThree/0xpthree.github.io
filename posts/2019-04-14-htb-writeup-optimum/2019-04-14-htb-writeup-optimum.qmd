@@ -142,7 +142,8 @@ description: An EoP exist when the Windows kernel-mode driver fails to properly 
 Lets try the exploits.
 
 ### MS15-076:
-"local DCOM activation service to elevate privileges" sound promising as we want to escalate.<br>
+"local DCOM activation service to elevate privileges" sound promising as we want to escalate.
+
 Reading about the exploit it's only tested on x64/x86 Windows 7/8.1, this box is Win2012 - lets try it anyway.
 
 ```bash

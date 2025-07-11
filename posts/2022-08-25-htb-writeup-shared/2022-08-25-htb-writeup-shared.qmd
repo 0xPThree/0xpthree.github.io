@@ -78,7 +78,8 @@ https://shared.htb (0.7s):
 
 ![](images/shared01.png)
 
-New checkout process "be sure to take a look on it!" - is that a hint maybe? Pressing "checkout" takes you to https://checkout.shared.htb, add it to `/etc/hosts`.<br> In the footer of the page we find that the site is built using **PrestaShop**. Googling about PrestaShop we find some older and newer vulns, but in particular [one from 2022](https://build.prestashop.com/news/major-security-vulnerability-on-prestashop-websites/) where the module `blockwishlist` is vulnerable.
+New checkout process "be sure to take a look on it!" - is that a hint maybe? Pressing "checkout" takes you to https://checkout.shared.htb, add it to `/etc/hosts`.
+ In the footer of the page we find that the site is built using **PrestaShop**. Googling about PrestaShop we find some older and newer vulns, but in particular [one from 2022](https://build.prestashop.com/news/major-security-vulnerability-on-prestashop-websites/) where the module `blockwishlist` is vulnerable.
 
 The vulnerability is executed with help of SQL Injection, so lets look for a vector.
 

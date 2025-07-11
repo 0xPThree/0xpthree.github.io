@@ -75,7 +75,8 @@ msf6 auxiliary(scanner/ipmi/ipmi_cipher_zero) > run
 [+] 10.10.11.124:623 - IPMI - VULNERABLE: Accepted a session open request for cipher zero
 ```
 
-<br>
+
+
 
 We can abuse this issue with `ipmitool`, however it requires a valid user so loop through different user lists to get a hit.
 ```bash
@@ -155,7 +156,8 @@ Error: Unable to establish IPMI v2 / RMCP+ session
 
 ----------
 
-<br>
+
+
 
 ### Step 2
 
@@ -185,7 +187,8 @@ Status...........: Cracked
 
 The credentials work in [Zabbix](http://monitor.shibboleth.htb), giving us an Initial Foothold.
 
-<br>
+
+
 
 _**BONUS: Create ADMINISTRATOR User (not relevant for this box)**_
 ```bash
@@ -225,7 +228,8 @@ ID  Name	     Callin  Link Auth	IPMI Msg   Channel Priv Limit
 
 -------
 
-<br>
+
+
 
 ### Step 3
 After a LOT of time going through Zabbix I found [this post](https://stackoverflow.com/questions/24222086/how-to-run-command-on-zabbix-agents) explaining how to execute commands from the server through `items`.
@@ -234,7 +238,8 @@ First, go to **Configuration > Hosts > Items**
 
 ![[Pasted image 20211124085038.png]]
 
-<br>
+
+
 
 In the top right corner, press `Create Item`. Name it to whatever and in the Key-field execute code with the syntax: `system.run[command]`. Save your new item, press on it to and  in the bottom row press `Execute now`. A simple ping POC would look like this:
 
@@ -242,7 +247,8 @@ In the top right corner, press `Create Item`. Name it to whatever and in the Key
 
 ![[Pasted image 20211124085403.png]]
 
-<br>
+
+
 
 Trying to execute one liners directly through the GUI gives me a shell that closes down only after a few seconds. So instead I host a local HTTP Server that exposes a pearl one-liner, and trigger it using curl from the GUI. 
 
@@ -266,7 +272,8 @@ shibboleth
 
 -------------
 
-<br>
+
+
 
 ### Step 4
 The admin loves password re-use; change to user `ipmi-svc` password `ilovepumkinpie1`.
@@ -281,7 +288,8 @@ ipmi-svc@shibboleth:~$ cat user.txt
 
 -------------
 
-<br>
+
+
 
 # ROOT
 
@@ -322,7 +330,8 @@ Cracking the hashes is however useless and probably a rabbit hole. Guest comes b
 
 -------------
 
-<br>
+
+
 
 ### Step 2
 Digging around further into the running process we can see that mysql is running as root, something that's not best practice at all.

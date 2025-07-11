@@ -64,7 +64,13 @@ On port 80 we're met with a very basic and ugly php page for the company *Modera
 
 Looking around we find..
 
-.. three names and numbers in the footer - *Jane*, *Holy* and *Fred*<br> .. on `/about.php` we find 6 users - *Carl Benjamin*, *David Wall*, *Luna Harper*, *John Miller*, *Anthony Smith* and *Lexi Marie*. <br> .. `blog.php` contain vulnerability reports, mostly regarding sql injections. <br> .. `/reports.php?report=8121` contain a masked domain hinting that `moderators.htb` might have a subdomain.<br> .. `/reports.php?report=4221` nothing of use<br> .. `/reports.php?report=3478` nothing of use<br>
+.. three names and numbers in the footer - *Jane*, *Holy* and *Fred*
+ .. on `/about.php` we find 6 users - *Carl Benjamin*, *David Wall*, *Luna Harper*, *John Miller*, *Anthony Smith* and *Lexi Marie*. 
+ .. `blog.php` contain vulnerability reports, mostly regarding sql injections. 
+ .. `/reports.php?report=8121` contain a masked domain hinting that `moderators.htb` might have a subdomain.
+ .. `/reports.php?report=4221` nothing of use
+ .. `/reports.php?report=3478` nothing of use
+
 
 Use Burp Intruder to loop through 1-10000 on `/reports.php?report=` and we find three new *pending* reports: - `/reports.php?report=2589` nothing of use - `/reports.php?report=7612` nothing of use - `/reports.php?report=9798` a path to logs - `logs/e21cece511f43a5cb18d4932429915ed/`
 
@@ -403,7 +409,8 @@ $ cat /usr/local/sbin/startup.sh
 /usr/bin/php -S 127.0.0.1:8080 -t /opt/site.new/
 ```
 
-Upload `chisel` and setup a tunnel to start enumerate the local webservice. <br> **Note:** Port 8080 collides with my proxy settings, so I need to close this before setting up chisel.
+Upload `chisel` and setup a tunnel to start enumerate the local webservice. 
+ **Note:** Port 8080 collides with my proxy settings, so I need to close this before setting up chisel.
 
 ``` bash
 # Start server locally
@@ -689,7 +696,8 @@ We're still not able to start the box, because of this *Ubuntu.vdi*, so lets jus
     </AttachedDevice>
 ```
 
-I was stuck here for a while, even when mounting a new ubuntu ISO and booting I got nowhere.. then I remembered the disk is crypted, but already we have the password - `computer` <br> Add it to the configurations and try again. Note that you need [VirtualBox Extension Pack](https://www.virtualbox.org/wiki/Downloads) to be able to edit this..
+I was stuck here for a while, even when mounting a new ubuntu ISO and booting I got nowhere.. then I remembered the disk is crypted, but already we have the password - `computer` 
+ Add it to the configurations and try again. Note that you need [VirtualBox Extension Pack](https://www.virtualbox.org/wiki/Downloads) to be able to edit this..
 
 ![](images/moderators15.png)
 
@@ -717,7 +725,8 @@ Looking for ways to handle the LUKS encryption I find a few brute force tools, d
 
 ![](images/moderators19.png)
 
-The disk only contains a directory named `scripts`, and within a set of subfolders. In the directory `all-in-one` there is one script with a timestamp that's not like the others - `distro_update.sh`<br> Look in the script and we find a password, probably for user `john` - `$_THE_best_Sysadmin_Ever_`
+The disk only contains a directory named `scripts`, and within a set of subfolders. In the directory `all-in-one` there is one script with a timestamp that's not like the others - `distro_update.sh`
+ Look in the script and we find a password, probably for user `john` - `$_THE_best_Sysadmin_Ever_`
 
 ![](images/moderators20.png)
 

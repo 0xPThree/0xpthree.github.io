@@ -11,8 +11,7 @@ jupyter: python3
 toc: true
 ---
 
-![](images/help_logo.png){: style="float: right; width: 200px; margin-left: 2em"}
 
-No writeup available..<br><br><br><br><br><br><br>
+No writeup available..
 
-----------------
+

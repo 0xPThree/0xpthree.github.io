@@ -157,7 +157,8 @@ define( 'DB_HOST', 'localhost' );
 
 -----
 
-<br>
+
+
 
 ### Step 2
 Use the path traversal to find username;
@@ -177,7 +178,8 @@ PORT     STATE SERVICE
 
 -----
 
-<br>
+
+
 
 ### Step 3
 Exploit gdbserver with found [script](https://www.exploit-db.com/exploits/50539).
@@ -212,7 +214,8 @@ d41625febafce97713402b47d1044f48
 
 -------------
 
-<br>
+
+
 
 # ROOT
 
@@ -267,7 +270,8 @@ Saving the WordPress (MD5) hash to a file and trying to crack it with rockyou.tx
 
 ----
 
-<br>
+
+
 
 ### Step 2
 
