@@ -1,12 +1,10 @@
 project:
   type: website
-  output-dir: docs
 
 website:
   title: "Exploit.se"
   description: "Writeups and articles about cyber security / hacking."
   site-url: https://exploit.se
-  site-path: 'docs'
   favicon: "favicon.ico"
   google-analytics: G-XVW5CQ7DG5
   navbar:
